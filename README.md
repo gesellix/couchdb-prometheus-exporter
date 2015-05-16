@@ -86,3 +86,11 @@ couchdb_request_time 121.732
 # TYPE couchdb_up gauge
 couchdb_up 1
 ```
+
+## Thanks
+
+Thanks go to the Prometheus team, which is very active and responsive!
+
+I also have to admit that the couchdb-exporter code is heavily inspired by 
+the other [available exporters](http://prometheus.io/docs/instrumenting/exporters/), 
+and that some ideas have just been copied from them.

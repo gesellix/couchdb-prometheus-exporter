@@ -6,6 +6,7 @@
 # Folders
 _obj
 _test
+!*_test.go
 
 # Architecture specific extensions/prefixes
 *.[568vq]
@@ -22,3 +23,10 @@ _testmain.go
 *.exe
 *.test
 *.prof
+couchdb-exporter
+
+.idea
+*.iml
+
+*.sublime-project
+*.sublime-workspace

@@ -4,17 +4,16 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"sort"
 	"fmt"
 	"io/ioutil"
+	"sort"
+
+	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
 	dto "github.com/prometheus/client_model/go"
-	"github.com/golang/protobuf/proto"
 )
 
-const (
-)
+const ()
 
 func TestCouchdbStats(t *testing.T) {
 	exampleFile, err := ioutil.ReadFile("./couchdb-stats-example.json")
@@ -44,7 +43,7 @@ func TestCouchdbStats(t *testing.T) {
 	sort.Strings(metricStrings)
 	fmt.Println(metricStrings)
 
-	expectedMessageCount := 1
+	expectedMessageCount := 32
 	if len(metricStrings) > expectedMessageCount {
 		t.Errorf("got more messages (%i) as expected (%i)", len(metricStrings), expectedMessageCount)
 	}

@@ -11,8 +11,8 @@ type StatsDetail struct {
 }
 
 type CouchdbStats struct {
-	AuthCacheMisses StatsDetail `json:"auth_cache_misses"`
 	AuthCacheHits   StatsDetail `json:"auth_cache_hits"`
+	AuthCacheMisses StatsDetail `json:"auth_cache_misses"`
 	DatabaseReads   StatsDetail `json:"database_reads"`
 	DatabaseWrites  StatsDetail `json:"database_writes"`
 	OpenDatabases   StatsDetail `json:"open_databases"`
@@ -21,21 +21,21 @@ type CouchdbStats struct {
 }
 
 type HttpdRequestMethods struct {
-	COPY   float64
-	DELETE float64
-	GET    float64
-	HEAD   float64
-	POST   float64
-	PUT    float64
+	COPY   StatsDetail
+	DELETE StatsDetail
+	GET    StatsDetail
+	HEAD   StatsDetail
+	POST   StatsDetail
+	PUT    StatsDetail
 }
 
 type HttpdStatusCodes map[string]StatsDetail
 
 type Httpd struct {
-	ClientsRequestingChanges StatsDetail `json:"clients_requesting_changes"`
-	TemporaryViewReads       StatsDetail `json:"temporary_view_reads"`
-	Requests                 StatsDetail `json:"requests"`
 	BulkRequests             StatsDetail `json:"bulk_requests"`
+	ClientsRequestingChanges StatsDetail `json:"clients_requesting_changes"`
+	Requests                 StatsDetail `json:"requests"`
+	TemporaryViewReads       StatsDetail `json:"temporary_view_reads"`
 	ViewReads                StatsDetail `json:"view_reads"`
 }
 

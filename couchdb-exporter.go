@@ -106,7 +106,7 @@ func main() {
 	exporter := NewExporter(*couchdbURI)
 	prometheus.MustRegister(exporter)
 
-	log.Printf("Starting exporter at %s to fetch from CouchDB at %s", *listeningAddress, *couchdbURI)
+	log.Printf("Starting exporter at %s to read from CouchDB at %s", *listeningAddress, *couchdbURI)
 	http.Handle(*metricsEndpoint, prometheus.Handler())
 	log.Fatal(http.ListenAndServe(*listeningAddress, nil))
 }

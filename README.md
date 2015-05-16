@@ -1,4 +1,7 @@
 # CouchDB Exporter
+
+[![Build Status](https://travis-ci.org/gesellix/couchdb-exporter.svg?branch=master)](https://travis-ci.org/gesellix/couchdb-exporter)
+
 [CouchDB](http://couchdb.apache.org/) stats exporter for [Prometheus](http://prometheus.io/)
 
 The CouchDB Exporter requests the CouchDB stats from the `/_stats` endpoint and 

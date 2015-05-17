@@ -1,4 +1,4 @@
-package main
+package lib
 
 import (
 	"crypto/tls"
@@ -122,7 +122,6 @@ func NewExporter(uri string) *Exporter {
 				Help:      "number of HTTP requests by method",
 			},
 			[]string{"method"}),
-
 
 		bulkRequests: prometheus.NewGauge(
 			prometheus.GaugeOpts{

@@ -15,7 +15,7 @@ docker run -p 9984:9984 gesellix/couchdb-exporter -couchdb.uri=http://192.168.59
 
 The couchdb-exporter uses the [glog](https://godoc.org/github.com/golang/glog) library for logging.
 With the default parameters nothing will be logged.
-Use `-logtostderr` to enable logging to stderr and --help to see all options.
+Use `-logtostderr` to enable logging to stderr and `--help` to see all options.
 
 ## Metrics Overview
 The following list gives you an overview on the currently exposed metrics.

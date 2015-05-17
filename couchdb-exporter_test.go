@@ -1,13 +1,14 @@
 package main
 
 import (
-	"net/http"
-	"net/http/httptest"
-	"testing"
 	"fmt"
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"sort"
+	"testing"
 
+	"github.com/gesellix/couchdb-exporter/lib"
 	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
 	dto "github.com/prometheus/client_model/go"
@@ -26,7 +27,7 @@ func TestCouchdbStats(t *testing.T) {
 	})
 	server := httptest.NewServer(handler)
 
-	e := NewExporter(server.URL)
+	e := lib.NewExporter(server.URL)
 	ch := make(chan prometheus.Metric)
 
 	go func() {

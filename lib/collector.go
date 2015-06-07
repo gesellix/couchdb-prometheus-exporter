@@ -3,7 +3,6 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 
 	"github.com/golang/glog"
 	"github.com/prometheus/client_golang/prometheus"
@@ -43,24 +42,18 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	defer sendStatus()
 
 	e.up.Set(0)
-	resp, err := e.client.Get(e.URI)
+	data, err := e.client.getStats()
 	if err != nil {
 		return fmt.Errorf("Error reading couchdb stats: %v", err)
-	}
-
-	data, err := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
-	if resp.StatusCode < 200 || resp.StatusCode >= 400 {
-		if err != nil {
-			data = []byte(err.Error())
-		}
-		return fmt.Errorf("Status %s (%d): %s", resp.Status, resp.StatusCode, data)
 	}
 
 	e.up.Set(1)
 
 	var stats StatsResponse
 	err = json.Unmarshal(data, &stats)
+	if err != nil {
+		return fmt.Errorf("error unmarshalling stats: %v", err)
+	}
 	//	glog.Info(fmt.Sprintf("stats: %v\n", stats))
 
 	e.authCacheHits.Set(stats.Couchdb.AuthCacheHits.Current)

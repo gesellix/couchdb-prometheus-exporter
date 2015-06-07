@@ -1,12 +1,7 @@
 package lib
 
 import (
-	"crypto/tls"
-	"flag"
-	"fmt"
-	"net/http"
 	"sync"
-
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -14,16 +9,9 @@ const (
 	namespace = "couchdb"
 )
 
-var (
-	insecure = flag.Bool("insecure", true, "Ignore server certificate if using https")
-)
-
-// Exporter collects couchdb stats from the given URI and exports them using
-// the prometheus metrics package.
 type Exporter struct {
-	URI    string
-	client *http.Client
-	mutex  sync.RWMutex
+	client    *CouchdbClient
+	mutex     sync.RWMutex
 
 	up prometheus.Gauge
 
@@ -45,16 +33,10 @@ type Exporter struct {
 	viewReads                prometheus.Gauge
 }
 
-// NewExporter returns an initialized Exporter.
-func NewExporter(uri string) *Exporter {
-	couchDbClient := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: *insecure},
-		},
-	}
+func NewExporter(uri string, basicAuth BasicAuth) *Exporter {
+
 	return &Exporter{
-		URI:    fmt.Sprintf("%s/_stats", uri),
-		client: couchDbClient,
+		client: NewCouchdbClient(uri, basicAuth),
 
 		up: prometheus.NewGauge(
 			prometheus.GaugeOpts{

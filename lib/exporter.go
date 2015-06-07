@@ -1,8 +1,8 @@
 package lib
 
 import (
-	"sync"
 	"github.com/prometheus/client_golang/prometheus"
+	"sync"
 )
 
 const (
@@ -10,8 +10,8 @@ const (
 )
 
 type Exporter struct {
-	client    *CouchdbClient
-	mutex     sync.RWMutex
+	client *CouchdbClient
+	mutex  sync.RWMutex
 
 	up prometheus.Gauge
 

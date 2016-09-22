@@ -15,8 +15,6 @@ import (
 	dto "github.com/prometheus/client_model/go"
 )
 
-const ()
-
 type handler func(w http.ResponseWriter, r *http.Request)
 
 func BasicAuth(basicAuth lib.BasicAuth, pass handler) handler {
@@ -53,9 +51,13 @@ func BasicAuth(basicAuth lib.BasicAuth, pass handler) handler {
 	}
 }
 
-func CouchdbStatsResponse(exampleFile []byte) handler {
+func CouchdbStatsResponse(versionFile []byte, exampleFile []byte) handler {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(exampleFile))
+		if r.URL.Path == "/" {
+			w.Write([]byte(versionFile))
+		} else {
+			w.Write([]byte(exampleFile))
+		}
 	}
 }
 
@@ -63,11 +65,15 @@ func TestCouchdbStats(t *testing.T) {
 	expectedMetricsCount := 32
 	exampleFile, err := ioutil.ReadFile("./couchdb-stats-example.json")
 	if err != nil {
-		t.Error("File error: %v\n", err)
+		t.Errorf("Example file error: %v\n", err)
+	}
+	versionFile, err := ioutil.ReadFile("./couchdb-v1.json")
+	if err != nil {
+		t.Errorf("Version file error: %v\n", err)
 	}
 
 	basicAuth := lib.BasicAuth{Username: "username", Password: "password"}
-	handler := http.HandlerFunc(BasicAuth(basicAuth, CouchdbStatsResponse(exampleFile)))
+	handler := http.HandlerFunc(BasicAuth(basicAuth, CouchdbStatsResponse(versionFile, exampleFile)))
 	server := httptest.NewServer(handler)
 
 	e := lib.NewExporter(server.URL, basicAuth)
@@ -85,7 +91,7 @@ func TestCouchdbStats(t *testing.T) {
 		metricStrings = append(metricStrings, proto.CompactTextString(dtoMetric))
 	}
 	sort.Strings(metricStrings)
-	//	fmt.Println(metricStrings)
+	//fmt.Println(metricStrings)
 
 	if len(metricStrings) < expectedMetricsCount {
 		t.Errorf("got less metrics (%d) as expected (%d)", len(metricStrings), expectedMetricsCount)

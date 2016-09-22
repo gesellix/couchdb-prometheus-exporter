@@ -26,7 +26,7 @@ func main() {
 
 	http.Handle(*metricsEndpoint, prometheus.Handler())
 	http.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "OK")
+		fmt.Fprint(w, "OK")
 	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, *metricsEndpoint, http.StatusMovedPermanently)

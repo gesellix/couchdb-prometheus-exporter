@@ -1,47 +1,86 @@
 package lib
 
-type StatsDetail struct {
+type Counter struct {
+	// v1.x api
 	Description string
 	Current     float64
-	Sum         float64
-	Mean        float64
-	Stddev      float64
-	Min         float64
-	Max         float64
+	// v2.x api
+	Value float64
+	Type  string
+	Desc  string
+}
+
+// v2.x api
+type HistogramValue struct {
+	Min               float64 `json:"min"`
+	Max               float64 `json:"max"`
+	ArithmeticMean    float64 `json:"arithmetic_mean"`
+	GeometricMean     float64 `json:"geometric_mean"`
+	HarmonicMean      float64 `json:"harmonic_mean"`
+	Median            float64 `json:"median"`
+	Variance          float64 `json:"variance"`
+	StandardDeviation float64 `json:"standard_deviation"`
+	Skewness          float64 `json:"skewness"`
+	Kurtosis          float64 `json:"kurtosis"`
+	N                 float64 `json:"n"`
+}
+
+type Histogram struct {
+	// v1.x api
+	Description string
+	Current     float64 `json:"current"`
+	Min         float64 `json:"min"`
+	Max         float64 `json:"max"`
+	Mean        float64 `json:"mean"`
+	Sum         float64 `json:"sum"`
+	Stddev      float64 `json:"stddev"`
+
+	// v2.x api
+	Value HistogramValue
+	Type  string
+	Desc  string
 }
 
 type CouchdbStats struct {
-	AuthCacheHits   StatsDetail `json:"auth_cache_hits"`
-	AuthCacheMisses StatsDetail `json:"auth_cache_misses"`
-	DatabaseReads   StatsDetail `json:"database_reads"`
-	DatabaseWrites  StatsDetail `json:"database_writes"`
-	OpenDatabases   StatsDetail `json:"open_databases"`
-	OpenOsFiles     StatsDetail `json:"open_os_files"`
-	RequestTime     StatsDetail `json:"request_time"`
+	// v1.x, and v2.x api
+	AuthCacheHits   Counter   `json:"auth_cache_hits"`
+	AuthCacheMisses Counter   `json:"auth_cache_misses"`
+	DatabaseReads   Counter   `json:"database_reads"`
+	DatabaseWrites  Counter   `json:"database_writes"`
+	OpenDatabases   Counter   `json:"open_databases"`
+	OpenOsFiles     Counter   `json:"open_os_files"`
+	RequestTime     Histogram `json:"request_time"`
+	// v2.x api
+	Httpd               Httpd               `json:"httpd"`
+	HttpdRequestMethods HttpdRequestMethods `json:"httpd_request_methods"`
+	HttpdStatusCodes    HttpdStatusCodes    `json:"httpd_status_codes"`
 }
 
 type HttpdRequestMethods struct {
-	COPY   StatsDetail
-	DELETE StatsDetail
-	GET    StatsDetail
-	HEAD   StatsDetail
-	POST   StatsDetail
-	PUT    StatsDetail
+	COPY   Counter
+	DELETE Counter
+	GET    Counter
+	HEAD   Counter
+	POST   Counter
+	PUT    Counter
 }
 
-type HttpdStatusCodes map[string]StatsDetail
+type HttpdStatusCodes map[string]Counter
 
 type Httpd struct {
-	BulkRequests             StatsDetail `json:"bulk_requests"`
-	ClientsRequestingChanges StatsDetail `json:"clients_requesting_changes"`
-	Requests                 StatsDetail `json:"requests"`
-	TemporaryViewReads       StatsDetail `json:"temporary_view_reads"`
-	ViewReads                StatsDetail `json:"view_reads"`
+	BulkRequests             Counter `json:"bulk_requests"`
+	ClientsRequestingChanges Counter `json:"clients_requesting_changes"`
+	Requests                 Counter `json:"requests"`
+	TemporaryViewReads       Counter `json:"temporary_view_reads"`
+	ViewReads                Counter `json:"view_reads"`
 }
 
 type StatsResponse struct {
-	Couchdb             CouchdbStats        `json:"couchdb"`
+	Couchdb CouchdbStats `json:"couchdb"`
+	// v1.x api
+	Httpd               Httpd               `json:"httpd"`
 	HttpdRequestMethods HttpdRequestMethods `json:"httpd_request_methods"`
 	HttpdStatusCodes    HttpdStatusCodes    `json:"httpd_status_codes"`
-	Httpd               Httpd               `json:"httpd"`
 }
+
+type StatsByNodeName map[string]StatsResponse

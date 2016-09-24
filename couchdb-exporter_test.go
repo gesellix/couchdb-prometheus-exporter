@@ -2,17 +2,17 @@ package main
 
 import (
 	"encoding/base64"
+	"fmt"
+	"github.com/gesellix/couchdb-exporter/lib"
+	"github.com/golang/protobuf/proto"
+	"github.com/prometheus/client_golang/prometheus"
+	dto "github.com/prometheus/client_model/go"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"sort"
 	"strings"
 	"testing"
-
-	"github.com/gesellix/couchdb-exporter/lib"
-	"github.com/golang/protobuf/proto"
-	"github.com/prometheus/client_golang/prometheus"
-	dto "github.com/prometheus/client_model/go"
 )
 
 type handler func(w http.ResponseWriter, r *http.Request)
@@ -51,29 +51,33 @@ func BasicAuth(basicAuth lib.BasicAuth, pass handler) handler {
 	}
 }
 
-func CouchdbStatsResponse(versionFile []byte, exampleFile []byte) handler {
+func readFile(t *testing.T, filename string) []byte {
+	fileContent, err := ioutil.ReadFile(filename)
+	if err != nil {
+		t.Errorf("Error reading file %s: %v\n", filename, err)
+	}
+	return fileContent
+}
+
+func couchdbStatsResponse(t *testing.T, versionSuffix string) handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/" {
-			w.Write([]byte(versionFile))
+			file := readFile(t, fmt.Sprintf("./testdata/couchdb-%s.json", versionSuffix))
+			w.Write([]byte(file))
+		} else if r.URL.Path == "/_membership" {
+			file := readFile(t, fmt.Sprintf("./testdata/couchdb-membership-response-%s.json", versionSuffix))
+			w.Write([]byte(file))
 		} else {
-			w.Write([]byte(exampleFile))
+			file := readFile(t, fmt.Sprintf("./testdata/couchdb-stats-response-%s.json", versionSuffix))
+			w.Write([]byte(file))
 		}
 	}
 }
 
-func TestCouchdbStats(t *testing.T) {
-	expectedMetricsCount := 32
-	exampleFile, err := ioutil.ReadFile("./couchdb-stats-example.json")
-	if err != nil {
-		t.Errorf("Example file error: %v\n", err)
-	}
-	versionFile, err := ioutil.ReadFile("./couchdb-v1.json")
-	if err != nil {
-		t.Errorf("Version file error: %v\n", err)
-	}
-
+// expectedMetricsCount := count(nodes) * 31 + 1
+func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetricsCount int) {
 	basicAuth := lib.BasicAuth{Username: "username", Password: "password"}
-	handler := http.HandlerFunc(BasicAuth(basicAuth, CouchdbStatsResponse(versionFile, exampleFile)))
+	handler := http.HandlerFunc(BasicAuth(basicAuth, couchdbStatsResponse(t, couchdbVersion)))
 	server := httptest.NewServer(handler)
 
 	e := lib.NewExporter(server.URL, basicAuth)
@@ -99,4 +103,12 @@ func TestCouchdbStats(t *testing.T) {
 	if len(metricStrings) > expectedMetricsCount {
 		t.Errorf("got more metrics (%d) as expected (%d)", len(metricStrings), expectedMetricsCount)
 	}
+}
+
+func TestCouchdbStatsV1(t *testing.T) {
+	performCouchdbStatsTest(t, "v1", 32)
+}
+
+func TestCouchdbStatsV2(t *testing.T) {
+	performCouchdbStatsTest(t, "v2", 63)
 }

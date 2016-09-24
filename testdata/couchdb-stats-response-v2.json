@@ -175,7 +175,7 @@
         "desc": "number of bulk requests"
       },
       "requests": {
-        "value": 21,
+        "value": 620,
         "type": "counter",
         "desc": "number of HTTP requests"
       },
@@ -262,7 +262,7 @@
       "desc": "number of authentication cache hits"
     },
     "auth_cache_misses": {
-      "value": 4,
+      "value": 129,
       "type": "counter",
       "desc": "number of authentication cache misses"
     },
@@ -316,7 +316,7 @@
       "desc": "microsecond latency for calls to couch_db:collect_results/3"
     },
     "database_writes": {
-      "value": 26,
+      "value": 23,
       "type": "counter",
       "desc": "number of times a database was changed"
     },
@@ -380,7 +380,7 @@
       "desc": "number of documents inserted"
     },
     "document_writes": {
-      "value": 13,
+      "value": 14,
       "type": "counter",
       "desc": "number of document write operations"
     },
@@ -401,7 +401,7 @@
         "desc": "number of HTTP DELETE requests"
       },
       "GET": {
-        "value": 17,
+        "value": 4712,
         "type": "counter",
         "desc": "number of HTTP GET requests"
       },
@@ -428,7 +428,7 @@
     },
     "httpd_status_codes": {
       "200": {
-        "value": 17,
+        "value": 611,
         "type": "counter",
         "desc": "number of HTTP 200 OK responses"
       },
@@ -473,7 +473,7 @@
         "desc": "number of HTTP 400 Bad Request responses"
       },
       "401": {
-        "value": 0,
+        "value": 4,
         "type": "counter",
         "desc": "number of HTTP 401 Unauthorized responses"
       },
@@ -724,12 +724,12 @@
   },
   "ddoc_cache": {
     "hit": {
-      "value": 1,
+      "value": 2,
       "type": "counter",
       "desc": "number of design doc cache hits"
     },
     "miss": {
-      "value": 4,
+      "value": 3,
       "type": "counter",
       "desc": "number of design doc cache misses"
     },
@@ -741,7 +741,7 @@
   },
   "global_changes": {
     "db_writes": {
-      "value": 4,
+      "value": 3,
       "type": "counter",
       "desc": "number of db writes performed by global changes"
     },
@@ -774,12 +774,12 @@
         "desc": "number of shard cache evictions"
       },
       "hit": {
-        "value": 35,
+        "value": 799,
         "type": "counter",
         "desc": "number of shard cache hits"
       },
       "miss": {
-        "value": 8,
+        "value": 6,
         "type": "counter",
         "desc": "number of shard cache misses"
       }
@@ -807,7 +807,7 @@
     },
     "doc_update": {
       "errors": {
-        "value": 3,
+        "value": 1,
         "type": "counter",
         "desc": "number of document update errors"
       },

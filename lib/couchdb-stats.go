@@ -57,12 +57,12 @@ type CouchdbStats struct {
 }
 
 type HttpdRequestMethods struct {
-	COPY   Counter
-	DELETE Counter
-	GET    Counter
-	HEAD   Counter
-	POST   Counter
-	PUT    Counter
+	COPY   Counter `json:"COPY"`
+	DELETE Counter `json:"DELETE"`
+	GET    Counter `json:"GET"`
+	HEAD   Counter `json:"HEAD"`
+	POST   Counter `json:"POST"`
+	PUT    Counter `json:"PUT"`
 }
 
 type HttpdStatusCodes map[string]Counter
@@ -83,4 +83,7 @@ type StatsResponse struct {
 	HttpdStatusCodes    HttpdStatusCodes    `json:"httpd_status_codes"`
 }
 
-type StatsByNodeName map[string]StatsResponse
+type Stats struct {
+	StatsByNodeName map[string]StatsResponse
+	ApiVersion      string
+}

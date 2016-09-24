@@ -99,8 +99,8 @@ func (c *CouchdbClient) getStatsUrisByNodeName(baseUri string) (map[string]strin
 	return urisByNodeName, nil
 }
 
-func (c *CouchdbClient) getStatsByNodeName(urisByNodeName map[string]string) (StatsByNodeName, error) {
-	statsByNodeName := make(StatsByNodeName)
+func (c *CouchdbClient) getStatsByNodeName(urisByNodeName map[string]string) (map[string]StatsResponse, error) {
+	statsByNodeName := make(map[string]StatsResponse)
 	for name, uri := range urisByNodeName {
 		data, err := c.request("GET", uri)
 		if err != nil {
@@ -112,36 +112,39 @@ func (c *CouchdbClient) getStatsByNodeName(urisByNodeName map[string]string) (St
 		if err != nil {
 			return nil, fmt.Errorf("error unmarshalling stats: %v", err)
 		}
-		if stats.Httpd == (Httpd{}) {
-			stats.Httpd = stats.Couchdb.Httpd
-		}
-		if stats.HttpdRequestMethods == (HttpdRequestMethods{}) {
-			stats.HttpdRequestMethods = stats.Couchdb.HttpdRequestMethods
-		}
-		if stats.HttpdStatusCodes == nil {
-			stats.HttpdStatusCodes = stats.Couchdb.HttpdStatusCodes
-		}
 		statsByNodeName[name] = stats
 	}
 	return statsByNodeName, nil
 }
 
-func (c *CouchdbClient) getStats() (StatsByNodeName, error) {
+func (c *CouchdbClient) getStats() (Stats, error) {
 	isCouchDbV2, err := c.isCouchDbV2()
 	if err != nil {
-		return nil, err
+		return Stats{}, err
 	}
 	if isCouchDbV2 {
 		urisByNode, err := c.getStatsUrisByNodeName(c.baseUri)
 		if err != nil {
-			return nil, err
+			return Stats{}, err
 		}
-		return c.getStatsByNodeName(urisByNode)
+		nodeStats, err := c.getStatsByNodeName(urisByNode)
+		if err != nil {
+			return Stats{}, err
+		}
+		return Stats{
+			StatsByNodeName: nodeStats,
+			ApiVersion:      "2"}, nil
 	} else {
 		urisByNode := map[string]string{
 			"master": c.statsUri,
 		}
-		return c.getStatsByNodeName(urisByNode)
+		nodeStats, err := c.getStatsByNodeName(urisByNode)
+		if err != nil {
+			return Stats{}, err
+		}
+		return Stats{
+			StatsByNodeName: nodeStats,
+			ApiVersion:      "1"}, nil
 	}
 }
 

@@ -76,7 +76,7 @@
     },
     "GET": {
       "description": "number of HTTP GET requests",
-      "current": 68.0,
+      "current": 4711.0,
       "sum": 68.0,
       "mean": 0.016000000000000000333,
       "stddev": 0.51100000000000000977,

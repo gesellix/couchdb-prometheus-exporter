@@ -74,8 +74,29 @@ func couchdbStatsResponse(t *testing.T, versionSuffix string) handler {
 	}
 }
 
+func getGaugeValue(metrics []*dto.Metric, labelName string, labelValue string) float64 {
+	for _, metric := range metrics {
+		for _, label := range metric.Label {
+			if *label.Name == labelName && *label.Value == labelValue {
+				return *metric.Gauge.Value
+			}
+		}
+	}
+	return 0
+}
+
+func printMetrics(metrics []*dto.Metric) {
+	metricStrings := []string{}
+	for _, metric := range metrics {
+		metricStrings = append(metricStrings, proto.CompactTextString(metric))
+	}
+
+	sort.Strings(metricStrings)
+	fmt.Println(metricStrings)
+}
+
 // expectedMetricsCount := count(nodes) * 31 + 1
-func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetricsCount int) {
+func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetricsCount int, expectedGetRequestCount float64) {
 	basicAuth := lib.BasicAuth{Username: "username", Password: "password"}
 	handler := http.HandlerFunc(BasicAuth(basicAuth, couchdbStatsResponse(t, couchdbVersion)))
 	server := httptest.NewServer(handler)
@@ -88,27 +109,30 @@ func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetric
 		e.Collect(ch)
 	}()
 
-	metricStrings := []string{}
+	metrics := []*dto.Metric{}
 	for metric := range ch {
 		dtoMetric := &dto.Metric{}
 		metric.Write(dtoMetric)
-		metricStrings = append(metricStrings, proto.CompactTextString(dtoMetric))
+		metrics = append(metrics, dtoMetric)
 	}
-	sort.Strings(metricStrings)
-	//fmt.Println(metricStrings)
+	//printMetrics(metrics)
+	actualGetRequestCount := getGaugeValue(metrics, "method", "GET")
 
-	if len(metricStrings) < expectedMetricsCount {
-		t.Errorf("got less metrics (%d) as expected (%d)", len(metricStrings), expectedMetricsCount)
+	if len(metrics) < expectedMetricsCount {
+		t.Errorf("got less metrics (%d) as expected (%d)", len(metrics), expectedMetricsCount)
 	}
-	if len(metricStrings) > expectedMetricsCount {
-		t.Errorf("got more metrics (%d) as expected (%d)", len(metricStrings), expectedMetricsCount)
+	if len(metrics) > expectedMetricsCount {
+		t.Errorf("got more metrics (%d) as expected (%d)", len(metrics), expectedMetricsCount)
+	}
+	if expectedGetRequestCount != actualGetRequestCount {
+		t.Errorf("expected %d GET requests, but got %d instead", expectedGetRequestCount, actualGetRequestCount)
 	}
 }
 
 func TestCouchdbStatsV1(t *testing.T) {
-	performCouchdbStatsTest(t, "v1", 32)
+	performCouchdbStatsTest(t, "v1", 32, 4711)
 }
 
 func TestCouchdbStatsV2(t *testing.T) {
-	performCouchdbStatsTest(t, "v2", 63)
+	performCouchdbStatsTest(t, "v2", 63, 4712)
 }

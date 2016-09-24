@@ -41,43 +41,19 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	defer sendStatus()
 
 	e.up.Set(0)
-	statsByNodeName, err := e.client.getStats()
+	stats, err := e.client.getStats()
 	if err != nil {
 		return fmt.Errorf("Error reading couchdb stats: %v", err)
 	}
 
 	e.up.Set(1)
 
-	for name, stats := range statsByNodeName {
-		//fmt.Printf("%s -> %v\n", name, stats)
-		//glog.Info(fmt.Sprintf("name: %s -> stats: %v\n", name, stats))
-		e.authCacheHits.WithLabelValues(name).Set(stats.Couchdb.AuthCacheHits.Current)
-		e.authCacheMisses.WithLabelValues(name).Set(stats.Couchdb.AuthCacheMisses.Current)
-		e.databaseReads.WithLabelValues(name).Set(stats.Couchdb.DatabaseReads.Current)
-		e.databaseWrites.WithLabelValues(name).Set(stats.Couchdb.DatabaseWrites.Current)
-		e.openDatabases.WithLabelValues(name).Set(stats.Couchdb.OpenDatabases.Current)
-		e.openOsFiles.WithLabelValues(name).Set(stats.Couchdb.OpenOsFiles.Current)
-		e.requestTime.WithLabelValues(name).Set(stats.Couchdb.RequestTime.Current)
-
-		for _, code := range exposedHttpStatusCodes {
-			if _, ok := stats.HttpdStatusCodes[code]; ok {
-				e.httpdStatusCodes.WithLabelValues(code, name).Set(stats.HttpdStatusCodes[code].Current)
-			}
-		}
-
-		e.httpdRequestMethods.WithLabelValues("COPY", name).Set(stats.HttpdRequestMethods.COPY.Current)
-		e.httpdRequestMethods.WithLabelValues("DELETE", name).Set(stats.HttpdRequestMethods.DELETE.Current)
-		e.httpdRequestMethods.WithLabelValues("GET", name).Set(stats.HttpdRequestMethods.GET.Current)
-		e.httpdRequestMethods.WithLabelValues("HEAD", name).Set(stats.HttpdRequestMethods.HEAD.Current)
-		e.httpdRequestMethods.WithLabelValues("POST", name).Set(stats.HttpdRequestMethods.POST.Current)
-		e.httpdRequestMethods.WithLabelValues("PUT", name).Set(stats.HttpdRequestMethods.PUT.Current)
-
-		e.bulkRequests.WithLabelValues(name).Set(stats.Httpd.BulkRequests.Current)
-		e.clientsRequestingChanges.WithLabelValues(name).Set(stats.Httpd.ClientsRequestingChanges.Current)
-		e.requests.WithLabelValues(name).Set(stats.Httpd.Requests.Current)
-		e.temporaryViewReads.WithLabelValues(name).Set(stats.Httpd.TemporaryViewReads.Current)
-		e.viewReads.WithLabelValues(name).Set(stats.Httpd.ViewReads.Current)
+	if stats.ApiVersion == "2" {
+		e.collectV2(stats, exposedHttpStatusCodes)
+	} else {
+		e.collectV1(stats, exposedHttpStatusCodes)
 	}
+
 	e.authCacheHits.Collect(ch)
 	e.authCacheMisses.Collect(ch)
 	e.databaseReads.Collect(ch)

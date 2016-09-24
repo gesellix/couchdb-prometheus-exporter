@@ -10,7 +10,7 @@ exposes them for Prometheus consumption.
 ## Run it as container
 
 ```
-docker run -p 9984:9984 gesellix/couchdb-exporter -couchdb.uri=http://192.168.59.103:5984
+docker run -p 9984:9984 gesellix/couchdb-exporter -couchdb.uri=http://couchdb:5984
 ```
 
 The couchdb-exporter uses the [glog](https://godoc.org/github.com/golang/glog) library for logging.

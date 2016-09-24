@@ -53,7 +53,7 @@ func NewExporter(uri string, basicAuth BasicAuth) *Exporter {
 				Name:      "auth_cache_hits",
 				Help:      "number of authentication cache hits",
 			},
-			[]string{"name"}),
+			[]string{"node_name"}),
 		authCacheMisses: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,
@@ -61,7 +61,7 @@ func NewExporter(uri string, basicAuth BasicAuth) *Exporter {
 				Name:      "auth_cache_misses",
 				Help:      "number of authentication cache misses",
 			},
-			[]string{"name"}),
+			[]string{"node_name"}),
 		databaseReads: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,
@@ -69,7 +69,7 @@ func NewExporter(uri string, basicAuth BasicAuth) *Exporter {
 				Name:      "database_reads",
 				Help:      "number of times a document was read from a database",
 			},
-			[]string{"name"}),
+			[]string{"node_name"}),
 		databaseWrites: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,
@@ -77,7 +77,7 @@ func NewExporter(uri string, basicAuth BasicAuth) *Exporter {
 				Name:      "database_writes",
 				Help:      "number of times a database was changed",
 			},
-			[]string{"name"}),
+			[]string{"node_name"}),
 		openDatabases: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,
@@ -85,7 +85,7 @@ func NewExporter(uri string, basicAuth BasicAuth) *Exporter {
 				Name:      "open_databases",
 				Help:      "number of open databases",
 			},
-			[]string{"name"}),
+			[]string{"node_name"}),
 		openOsFiles: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,
@@ -93,7 +93,7 @@ func NewExporter(uri string, basicAuth BasicAuth) *Exporter {
 				Name:      "open_os_files",
 				Help:      "number of file descriptors CouchDB has open",
 			},
-			[]string{"name"}),
+			[]string{"node_name"}),
 		requestTime: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,
@@ -101,7 +101,7 @@ func NewExporter(uri string, basicAuth BasicAuth) *Exporter {
 				Name:      "request_time",
 				Help:      "length of a request inside CouchDB without MochiWeb",
 			},
-			[]string{"name"}),
+			[]string{"node_name"}),
 
 		httpdStatusCodes: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
@@ -110,7 +110,7 @@ func NewExporter(uri string, basicAuth BasicAuth) *Exporter {
 				Name:      "status_codes",
 				Help:      "number of HTTP responses by status code",
 			},
-			[]string{"code"}),
+			[]string{"code", "node_name"}),
 		httpdRequestMethods: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,
@@ -118,7 +118,7 @@ func NewExporter(uri string, basicAuth BasicAuth) *Exporter {
 				Name:      "request_methods",
 				Help:      "number of HTTP requests by method",
 			},
-			[]string{"method", "node"}),
+			[]string{"method", "node_name"}),
 
 		bulkRequests: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
@@ -127,7 +127,7 @@ func NewExporter(uri string, basicAuth BasicAuth) *Exporter {
 				Name:      "bulk_requests",
 				Help:      "number of bulk requests",
 			},
-			[]string{"name"}),
+			[]string{"node_name"}),
 		clientsRequestingChanges: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,
@@ -135,7 +135,7 @@ func NewExporter(uri string, basicAuth BasicAuth) *Exporter {
 				Name:      "clients_requesting_changes",
 				Help:      "number of clients for continuous _changes",
 			},
-			[]string{"name"}),
+			[]string{"node_name"}),
 		requests: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,
@@ -143,7 +143,7 @@ func NewExporter(uri string, basicAuth BasicAuth) *Exporter {
 				Name:      "requests",
 				Help:      "number of HTTP requests",
 			},
-			[]string{"name"}),
+			[]string{"node_name"}),
 		temporaryViewReads: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,
@@ -151,7 +151,7 @@ func NewExporter(uri string, basicAuth BasicAuth) *Exporter {
 				Name:      "temporary_view_reads",
 				Help:      "number of temporary view reads",
 			},
-			[]string{"name"}),
+			[]string{"node_name"}),
 		viewReads: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,
@@ -159,6 +159,6 @@ func NewExporter(uri string, basicAuth BasicAuth) *Exporter {
 				Name:      "view_reads",
 				Help:      "number of view reads",
 			},
-			[]string{"name"}),
+			[]string{"node_name"}),
 	}
 }

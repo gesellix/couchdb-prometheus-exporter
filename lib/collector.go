@@ -61,7 +61,7 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 
 		for _, code := range exposedHttpStatusCodes {
 			if _, ok := stats.HttpdStatusCodes[code]; ok {
-				e.httpdStatusCodes.WithLabelValues(code).Set(stats.HttpdStatusCodes[code].Current)
+				e.httpdStatusCodes.WithLabelValues(code, name).Set(stats.HttpdStatusCodes[code].Current)
 			}
 		}
 

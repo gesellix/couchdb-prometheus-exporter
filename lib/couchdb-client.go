@@ -71,14 +71,6 @@ func (c *CouchdbClient) isCouchDbV2() (bool, error) {
 	return clusteredCouch.Check(couchDbVersion), nil
 }
 
-func (c *CouchdbClient) getFirstNodeName() (string, error) {
-	names, err := c.getNodeNames()
-	if err != nil {
-		return "", err
-	}
-	return names[0], nil
-}
-
 func (c *CouchdbClient) getNodeNames() ([]string, error) {
 	data, err := c.request("GET", fmt.Sprintf("%s/_membership", c.baseUri))
 	if err != nil {
@@ -90,7 +82,7 @@ func (c *CouchdbClient) getNodeNames() ([]string, error) {
 		return nil, err
 	}
 	for i, name := range membership.ClusterNodes {
-		fmt.Printf("node[%d]: %s\n", i, name)
+		glog.Infof("node[%d]: %s\n", i, name)
 	}
 	return membership.ClusterNodes, nil
 }

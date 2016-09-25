@@ -17,10 +17,21 @@ The couchdb-exporter uses the [glog](https://godoc.org/github.com/golang/glog) l
 With the default parameters nothing will be logged.
 Use `-logtostderr` to enable logging to stderr and `--help` to see all options.
 
+For CouchDB 2.x, you should configure the exporter to fetch the stats on port 15984, where you'll
+get a complete cluster overview. In contrast to CouchDB 1.x you'll need to configure the admin
+credentials, e.g. like this:
+
+```
+docker run -p 9984:9984 gesellix/couchdb-exporter -couchdb.uri=http://couchdb:5984 -couchdb.username=root -couchdb.password=a-secret
+```
+
 ## Metrics Overview
 The following list gives you an overview on the currently exposed metrics.
 Please note that beyond the complete CouchDB stats a metric `couchdb_up` has been
 added as minimal connection health check.
+
+The `node_name` label defaults to `master`, but makes more sense in a clustered CouchDB 2.x environment.
+Then, you'll get separated stats for each node. 
 
 ```
 # HELP couchdb_auth_cache_hits number of authentication cache hits

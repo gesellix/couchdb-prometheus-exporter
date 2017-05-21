@@ -43,7 +43,7 @@ func main() {
 	// Convinces goflags that we have called Parse() to avoid noisy logs.
 	// Necessary due to https://github.com/golang/glog/commit/65d674618f712aa808a7d0104131b9206fc3d5ad
 	// and us using another flags package.
-	goflag.Parse()
+	goflag.CommandLine.Parse([]string{})
 	goflag.Lookup("logtostderr").Value.Set(strconv.FormatBool(*&logging.toStderr))
 	goflag.Lookup("alsologtostderr").Value.Set(strconv.FormatBool(*&logging.alsoToStderr))
 	goflag.Lookup("v").Value.Set(logging.verbosity.String())

@@ -30,3 +30,6 @@ couchdb-exporter
 
 *.sublime-project
 *.sublime-workspace
+
+couchdb-cookies.txt
+.couchdb-env

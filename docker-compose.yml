@@ -1,0 +1,34 @@
+version: "2"
+
+services:
+  couchdb:
+    image: klaemo/couchdb:2.0-single
+    env_file: .couchdb-env
+    restart: always
+    volumes:
+      - couchdb-test:/opt/couchdb/data
+    networks:
+      - couchdb-test
+    expose:
+      - 5984
+    ports:
+      - "5984:5984"
+
+  couchdbstats:
+    image: gesellix/couchdb-exporter
+    command: -couchdb.uri=http://couchdb:5984/
+    env_file: .couchdb-env
+    networks:
+      - couchdb-test
+    expose:
+      - 9984
+    ports:
+      - "9984:9984"
+
+networks:
+  couchdb-test:
+    external: true
+
+volumes:
+  couchdb-test:
+    external: true

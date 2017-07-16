@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<!-- saved from url=(0074)http://gws.github.io/munin-plugin-couchdb/guide-to-couchdb-monitoring.html -->
+<html class="passboltplugin no-passboltplugin-config"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style>html { font-size: 100%; overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+
+body{
+  color:#444;
+  font-family:Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman',
+              "Hiragino Sans GB", "STXihei", "微软雅黑", serif;
+  font-size:12px;
+  line-height:1.5em;
+  background:#fefefe;
+  width: 45em;
+  margin: 10px auto;
+  padding: 1em;
+  outline: 1300px solid #FAFAFA;
+}
+
+a{ color: #0645ad; text-decoration:none;}
+a:visited{ color: #0b0080; }
+a:hover{ color: #06e; }
+a:active{ color:#faa700; }
+a:focus{ outline: thin dotted; }
+a:hover, a:active{ outline: 0; }
+
+span.backtick {
+  border:1px solid #EAEAEA;
+  border-radius:3px;
+  background:#F8F8F8;
+  padding:0 3px 0 3px;
+}
+
+::-moz-selection{background:rgba(255,255,0,0.3);color:#000}
+::selection{background:rgba(255,255,0,0.3);color:#000}
+
+a::-moz-selection{background:rgba(255,255,0,0.3);color:#0645ad}
+a::selection{background:rgba(255,255,0,0.3);color:#0645ad}
+
+p{
+margin:1em 0;
+}
+
+img{
+max-width:100%;
+}
+
+h1,h2,h3,h4,h5,h6{
+font-weight:normal;
+color:#111;
+line-height:1em;
+}
+h4,h5,h6{ font-weight: bold; }
+h1{ font-size:2.5em; }
+h2{ font-size:2em; border-bottom:1px solid silver; padding-bottom: 5px; }
+h3{ font-size:1.5em; }
+h4{ font-size:1.2em; }
+h5{ font-size:1em; }
+h6{ font-size:0.9em; }
+
+blockquote{
+color:#666666;
+margin:0;
+padding-left: 3em;
+border-left: 0.5em #EEE solid;
+}
+hr { display: block; height: 2px; border: 0; border-top: 1px solid #aaa;border-bottom: 1px solid #eee; margin: 1em 0; padding: 0; }
+
+
+pre , code, kbd, samp { 
+  color: #000; 
+  font-family: monospace; 
+  font-size: 0.88em; 
+  border-radius:3px;
+  background-color: #F8F8F8;
+  border: 1px solid #CCC; 
+}
+pre { white-space: pre; white-space: pre-wrap; word-wrap: break-word; padding: 5px 12px;}
+pre code { border: 0px !important; padding: 0;}
+code { padding: 0 3px 0 3px; }
+
+b, strong { font-weight: bold; }
+
+dfn { font-style: italic; }
+
+ins { background: #ff9; color: #000; text-decoration: none; }
+
+mark { background: #ff0; color: #000; font-style: italic; font-weight: bold; }
+
+sub, sup { font-size: 75%; line-height: 0; position: relative; vertical-align: baseline; }
+sup { top: -0.5em; }
+sub { bottom: -0.25em; }
+
+ul, ol { margin: 1em 0; padding: 0 0 0 2em; }
+li p:last-child { margin:0 }
+dd { margin: 0 0 0 2em; }
+
+img { border: 0; -ms-interpolation-mode: bicubic; vertical-align: middle; }
+
+table { border-collapse: collapse; border-spacing: 0; }
+td { vertical-align: top; }
+
+@media only screen and (min-width: 480px) {
+body{font-size:14px;}
+}
+
+@media only screen and (min-width: 768px) {
+body{font-size:16px;}
+}
+
+@media print {
+  * { background: transparent !important; color: black !important; filter:none !important; -ms-filter: none !important; }
+  body{font-size:12pt; max-width:100%; outline:none;}
+  a, a:visited { text-decoration: underline; }
+  hr { height: 1px; border:0; border-bottom:1px solid black; }
+  a[href]:after { content: " (" attr(href) ")"; }
+  abbr[title]:after { content: " (" attr(title) ")"; }
+  .ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after { content: ""; }
+  pre, blockquote { border: 1px solid #999; padding-right: 1em; page-break-inside: avoid; }
+  tr, img { page-break-inside: avoid; }
+  img { max-width: 100% !important; }
+  @page :left { margin: 15mm 20mm 15mm 10mm; }
+  @page :right { margin: 15mm 10mm 15mm 20mm; }
+  p, h2, h3 { orphans: 3; widows: 3; }
+  h2, h3 { page-break-after: avoid; }
+}
+</style><title>mail</title></head><body><h1 id="couchdb-monitoring-youre-doing-it-wroyou-can-do-it-better">CouchDB monitoring: you're doing it wro...you can do it better!</h1>
+<h2 id="why-do-i-need-to-care-about-things-monitoring">Why do I need to care about things monitoring?</h2>
+<p>The main propose of application metrics to answer on simple question:
+"what's going on there?" Why our app works slowly? Or may be it works
+fast enough? Will we face some issues in near future? Or may be we're
+expecting them right now? All these questions are important if you're
+going to provide high quality service and yes, wise metrics analysis
+gives you ability even to predict (a little) the future!</p>
+<h2 id="get-_stats-http11">GET /_stats HTTP/1.1</h2>
+<p>First of all, we'll take a look on CouchDB <a href="http://docs.couchdb.org/en/latest/api/server/common.html#stats">/_stats</a> resource
+which contains a lot of various CouchDB metrics: httpd request
+and responses, opened databases and auth cache, continuous changes
+feeds listeners and view reads, and more. These metrics are have good
+self-descriptions, but let's stop on the most important ones.</p>
+<h3 id="request-methods">Request Methods</h3>
+<p>Every request to CouchDB starts with HTTP method which defines
+operation semantic and results behavior. CouchDB operates with
+the next methods:</p>
+<ul>
+<li><code>HEAD</code></li>
+<li><code>GET</code></li>
+<li><code>POST</code></li>
+<li><code>PUT</code></li>
+<li><code>DELETE</code></li>
+<li><code>COPY</code></li>
+</ul>
+<p>and tracks stats by them as well. How this information could help us?</p>
+<p>As was said, request method defines operation semantic. <code>HEAD</code>
+requests are used to check existence of the databases, documents
+or attachments, <code>GET</code> are for fetching the data; a lot of <code>PUT</code>
+requests signs about large set of update operations. On other hand
+if you see a lot of <code>DELETE</code> requests this is the open room for
+optimizations: mass deletes are better and effective to made via
+<a href="http://docs.couchdb.org/en/latest/api/database/bulk-api.html#db-bulk-docs">bulk update</a> requests.</p>
+<p>Putting all these metrics together into single graph easily provides
+the answer about how your CouchDB instance is used by your clients.</p>
+<p><img alt="Request methods" src="./guide-to-couchdb-monitoring_files/request-methods.png"></p>
+<h3 id="requests-time">Requests Time</h3>
+<p>Every request is served for some amount of time. As faster it has
+processed, as faster client receives the response and as more your
+users are happy (as you too). Larger request times leading to "slow"
+service and request timeouts, which are bad.</p>
+<p>CouchDB provides <code>request_time</code> metric which represents
+<em>length of a request inside CouchDB without MochiWeb</em> - not a full,
+but still a picture which helps to estimate quality of service
+of your CouchDB instance.</p>
+<p>Suddenly, CouchDB doesn't provides per each request statistic about
+spent time on it, but it provides others useful values: <code>stddev</code>
+and <code>mean</code> against spent time. So we could know about average time
+of our requests and a low standard deviation for them too.
+The difference between them is in details: <code>stddev</code> value represents
+times within +/- 1σ range (34,1% from both sides on <code>mean</code>), so it's
+immune to rare, but very fast or very slow requests.</p>
+<p>Looking on the next stats:</p>
+<pre><code>"request_time": {
+    "description": "length of a request inside CouchDB without MochiWeb",
+    "current": 409002.771,
+    "sum": 409002.771,
+    "mean": 51.687,
+    "stddev": 287.39,
+    "min": 0.6666666666666667,
+    "max": 5014.25
+}
+</code></pre>
+
+<p>we could say, that to serve the most slow request 5 seconds was spent,
+but for average request it took ~300ms to be processed by CouchDB.</p>
+<p><img alt="Request times" src="./guide-to-couchdb-monitoring_files/request-times.png"></p>
+<p>Since <code>stddev</code> and <code>mean</code> values are formed from all request that
+were served, this makes them not much accurate in long term service.
+To make them better, let's take a look on <a href="http://docs.couchdb.org/en/latest/config/misc.html#stats/samples">samples</a> configuration
+option. You're probably wondered why it exists and on what it affects.
+Well, it's allows to get the statistics for specified time frame
+(in seconds). The default value is <code>[0, 60, 300, 900]</code> that means
+that we could receive metrics values for all the time (<code>0</code>), for
+the last minute, 5 minutes, 15 minutes. In other words, we could use
+that to measure <code>stddev</code> and <code>mean</code> within certain time frame without
+side effect of all previous requests to get the most accurate values
+which reflects the reality.</p>
+<h3 id="requests-by-type">Requests by Type</h3>
+<p>There are some specific requests that requires some additional
+attention. CouchDB provides special <code>httpd</code> metrics group for them:</p>
+<ul>
+<li><code>HTTP requests</code>: overall amount of HTTP requests</li>
+<li><code>bulk requests</code>: how often were used <a href="http://docs.couchdb.org/en/latest/api/database/bulk-api.html#db-bulk-docs">bulk updates</a></li>
+<li><code>view reads</code>: amount of requests to the <a href="http://docs.couchdb.org/en/latest/api/ddoc/views.html">view indexes</a></li>
+<li><code>temporary view reads</code>: amount of requests to the <a href="http://docs.couchdb.org/en/latest/api/database/temp-views.html">temporary view indexes</a></li>
+</ul>
+<p><img alt="Requests by type" src="./guide-to-couchdb-monitoring_files/http-requests.png"></p>
+<p>How this information could be useful?</p>
+<p>The <code>bulk update</code> operation costs single <code>POST</code> request, but it may
+cause a lot of changes and significantly boost databases writes rate
+(see <code>Databases I/O</code> section below).</p>
+<p>The <code>temporary view reads</code> is almost always signs about executing
+temporary view. That's really not good operation, especially for
+huge databases for millions of documents. You'll be happy to keep
+this metric around <code>0</code>.</p>
+<p>The <code>view reads</code> is good metric to determine how often your views
+are been used. Also, if a lot of <code>view read</code> requests comes when
+view index isn't build, the resulting request time for them could be
+huge.</p>
+<h3 id="continuous-changes-feed-listeners">Continuous Changes Feed Listeners</h3>
+<p>Another special kind of requests is subscribing to the continuous
+changes feeds. Why it's so special that we're discussing it
+separately? Because unlike others requests, it goes not in form
+request-response, but request-response-response-response-...-response.
+During this communication session the client receives all database
+changes instantly.</p>
+<p><img alt="Continuous changes feeds listeners" src="./guide-to-couchdb-monitoring_files/continuous-changes-feeds-listeners.png"></p>
+<p>This metric also could be used to approximately determine amount of
+pull replications which served on others instances and uses yours
+as data source. But the key word is "approximately" since you
+(and CouchDB too) couldn't be sure in that - these listeners could be
+just a clients which monitors database changes, nothing more.</p>
+<h3 id="response-status-codes">Response Status Codes</h3>
+<p>Finally, when request had been served, the response returns back to
+the client. With what every HTTP response starts? Right, with HTTP
+status code, which defines the response nature: is it completed
+successfully, or some error happened, or may be request wasn't even
+correct.</p>
+<p><img alt="Response status codes" src="./guide-to-couchdb-monitoring_files/http-status-codes.png"></p>
+<p>Keeping eye on amount of HTTP <code>4xx</code> and <code>5xx</code> responses helps
+you provide quality service for you users. Normally, you want to see
+no <code>500</code> errors at all. Having high amount of <code>401</code> errors could say
+about authentication problems while <code>403</code> tell you that something
+or someone actively doing things that he's shouldn't do. Notable
+amount of <code>409</code> tells about high update concurrency for some
+resources.</p>
+<p>Do you need to track the others codes? Yes, you do, since you'll never
+know what part of successful responses errors takes.
+"2 HTTP 500 errors" is about nothing, but this is bad is there are
+only 10 successful responses and in the same time they could be
+ignored (unless you're perfectionist) if 100000 <code>HTTP 200 OK</code>
+were returned back.</p>
+<h3 id="authentication-cache">Authentication Cache</h3>
+<p>CouchDB keeps some amount of user credentials in memory to speedup
+authentication process by elimination of additional database lookups.
+This cache size is limited by the configuration option
+<a href="http://docs.couchdb.org/en/latest/config/auth.html#couch_httpd_auth/auth_cache_size">auth_cache_size</a>. On what this affects? In short, when user
+login CouchDB first looks for user credentials what associated with
+provided login name in auth cache and if they miss there then it reads
+credentials from auth database (in other words, from disk).</p>
+<p>The <code>auth_cache_miss</code> metric is highly related to <code>HTTP 401</code> responses
+one, so there are three cases that are worth to be looked for:</p>
+<ul>
+<li>
+<p>High <code>cache misses</code> and high <code>401</code> responses: something brute forces
+  your server by iterating over large set of user names that doesn't
+  exists for your instance</p>
+</li>
+<li>
+<p>High <code>cache misses</code> and low <code>401</code> responses: your <code>auth_cache_size</code>
+  is too small to handle all your active users. try to increase his
+  capacity to reduce disk I/O</p>
+</li>
+<li>
+<p>Low <code>cache misses</code> and high <code>401</code> responses: much likely something
+  tries to brute force passwords for existed accounts on your server</p>
+</li>
+</ul>
+<p>Note that "high" and "low" in metrics world should be read as
+"anomaly high" and "anomaly low" for your instance.</p>
+<p><img alt="Authentication cache ratio" src="./guide-to-couchdb-monitoring_files/auth-cache.png"></p>
+<p>Whoa! Someone really trying to do bad things on the graph above! And that's not
+looks like <code>auth_cache_size</code> issue.</p>
+<p>Ok, but why do we need auth cache hit there? We need it as an ideal
+value to compare misses counter with. Just for instance, is 10 cache
+misses a high value? What about 100 or 1000? Having cache hits rate
+at some point helps to answer on this question.</p>
+<h3 id="databases-io">Databases I/O</h3>
+<p>The <code>database_reads</code> and <code>database_writes</code> shows overall I/O for your
+databases when documents are been read and changed. Combining both
+these metrics helps to define nature of your instance: is it readonly,
+mostly for reads, have balanced reads and writes, or writes-heavy.
+The answer on this question helps to determine your server
+optimization: for write-heavy case you need in good and fast disks,
+while for read-heavy case SSD disks would be the best solution.
+However, SSD always makes things better, but they lives longer when
+writes are less.</p>
+<p><img alt="Databases I/O" src="./guide-to-couchdb-monitoring_files/database-io.png"></p>
+<p>You can try to get the same answer by using HTTP request methods
+metrics, but the result you get wouldn't be clear: single <code>POST</code>
+request for bulk update can cause a lot of writes, while same <code>POST</code>
+requests against views causes only reads.</p>
+<h3 id="open-databases">Open Databases</h3>
+<p>CouchDB only keeps opened databases which are receives some activity:
+been requested or running the compaction. The maximum amount of opened
+databases in the same moment of time is limited by <a href="http://docs.couchdb.org/en/latest/config/couchdb.html#couchdb/max_dbs_open">max_dbs_open</a>
+configuration option.  By default it set to <code>100</code> so you're unlikely
+hit this error at startup, but it may strike later when your services
+grows. When CouchDB hits this limit, any request to "closed" databases
+will generate the error response: <code>{error, all_dbs_active}</code>.</p>
+<p>However, once opened database doesn't remains open forever: in case of
+inactivity CouchDB eventually closes them providing more space in
+the room for others, but sometimes such cleanup may not help due to
+large activity on your CouchDB instance, especially if it runs a lot
+of replication processes.</p>
+<p><img alt="Open databases" src="./guide-to-couchdb-monitoring_files/open-databases.png"></p>
+<p>The <code>open_databases</code> metric combined with <code>max_dbs_open</code> configuration
+option helps to predict and eliminate possibility of such error and
+also configure your CouchDB right by your needs.</p>
+<h3 id="open-files">Open Files</h3>
+<p>The <code>open_files</code> metric shows amount of file descriptors that CouchDB
+holds opened. Normally, CouchDB opens two file descriptors per each
+database + one per view index + for compaction files + few for other
+files like log file etc.</p>
+<p><img alt="Open files" src="./guide-to-couchdb-monitoring_files/open-files.png"></p>
+<p>By the way, on this graph you may see the face of the real issue: file
+descriptors leak.</p>
+<p>Suddenly, this metric doesn't shows real file descriptor usage, so these values
+isn't accurate for <code>emfile</code> error prediction (but for approximately it's ok).
+See below for the fix.</p>
+<h2 id="cool-but-can-i-do-more">Cool! But can I do more?</h2>
+<p>Yes! But since this moment we need to elevate our privileged up to
+CouchDB server administrator. This opens us more doors and stats
+sources.</p>
+<h3 id="active-tasks">Active Tasks</h3>
+<p>One day you're looking though graphics of your monitoring system
+and see that your CouchDB server suffers from heavy disk I/O.
+Really heavy disk I/O. What could cause that? You take a look on
+<code>Databases I/O</code> graph, but nothing seems wrong there. Another look
+on the requests graphs - again, there are not much as usual write
+requests made, bulk updates are also on the normal level.
+But diskstats is full of not peaks, but really high "mountains".
+So what's going wrong there?</p>
+<p>Before completely exclude CouchDB from list of causers, we need to
+check the <a href="http://docs.couchdb.org/en/latest/api/server/common.html#active-tasks">/_active_tasks</a> resource. The database compaction is
+an operation with heavy I/O (since it's about copying a lot of data
+from database <code>A</code> to database <code>B</code>) and if there runs multiple of them
+for the large databases this could explain the situation.
+Views indexing also matters, but not so much as compactions are.</p>
+<p><img alt="Active tasks" src="./guide-to-couchdb-monitoring_files/active-tasks.png"></p>
+<p>Allowing your monitoring tools to track active tasks on your CouchDB
+instance helps to detect these operations: when they starts and when
+they ends and with help of others metrics make a diagnostic of current
+disk I/O issues.</p>
+<p>As bonus, active tasks also shows amount of active replication served
+by this instance. This could be useful for you.</p>
+<h3 id="know-your-server-admins">Know Your Server Admins</h3>
+<p>CouchDB server administrators are the gods and can do a lot of things,
+especially dangerous and which requires care and attention. Normally,
+you have set up some certain amount of server admins users: for
+yourself and for people you trusted to administrate your instance, but
+are you sure that their amount wouldn't be changed in time?</p>
+<p>With simple monitoring of server admins amount (keys length of object
+from <a href="http://docs.couchdb.org/en/latest/config/auth.html#admins">/_config/admins</a> response) you'll be notified in case when
+new server administrators were added and if you still don't know
+"who? and why?" it's good time to find the answers on these questions.
+For the security reasons.</p>
+<h3 id="know-your-users">Know Your Users</h3>
+<p>Ok, you provides some public service based on CouchDB, let's say
+it's blogging platform. Users comes, registers, generates content,
+service lives active life. But how many users you have? How faster
+your user database grows? Or may be it's stalled? These questions
+are also important. Bigger users database requires to have bigger
+resources to provide for your service and reserve for future.</p>
+<p>The answer on these questions is pretty simple: you need to monitor
+<a href="http://docs.couchdb.org/en/latest/intro/security.html#authentication-database">authentication database</a> documents count. By requesting
+<a href="http://docs.couchdb.org/en/latest/api/database/common.html#get--db">database information</a> you'll know two things about your users:
+how much registered you have and how many of them were deleted.</p>
+<p><img alt="CouchDB users" src="./guide-to-couchdb-monitoring_files/users.png"></p>
+<p>This graph shows us that nothing had changed in observed time frame, it's a pity.</p>
+<p>This would say nothing about how many users are really active, nothing
+about how much of them working with your service in the same time -
+CouchDB doesn't knows that, but tracing the change of documents count
+answers helps to understand growing potential of your users database.
+That's really important for planning and marketing things.</p>
+<p>As about users activity, just place near graphic with request methods
+and apply some base mathematics magic to estimate average activity.</p>
+<h2 id="and-now-that-all">And now that all?</h2>
+<p>Not yet. On monitoring the authentication database we used information
+about documents count and how faster their number grows. Why not to
+apply same questions for others databases?</p>
+<h3 id="graveyard-databases">Graveyard Databases</h3>
+<p>You should know, that when you deletes a document from database it's
+actually doesn't physically removed from database. If you'd used
+<code>DELETE</code> method, then CouchDB removes all document fields (except
+system <code>_id</code> and <code>_rev</code>) and adds another new special one:
+<code>_deleted: true</code>. You can also mark document as deleted by just simple
+update via <code>PUT</code> request by adding same <code>_deleted: true</code> field to it
+without removing any others fields - document will be "deleted", but
+all his content remains preserved.</p>
+<p>This behavior leads to the situations when long lived databases
+contains a lot of deleted documents which are consumes significant
+amount of disk space. The <em>Graveyard Database</em> is the database which
+have deleted documents more than existed ("alive") ones.</p>
+<p><img alt="Database documents" src="./guide-to-couchdb-monitoring_files/database-docs.png"></p>
+<p>The reason to track such databases is the disk space. At some moment
+you'll want to completely remove deleted documents from these
+databases. That's easily to do via filtered replication.
+However, make sure that there is no any active replication that uses
+these databases as target otherwise all deleted documents would be
+replicated back again.</p>
+<h3 id="database-fragmentation">Database Fragmentation</h3>
+<p>Another bit of your knowledge about CouchDB reminds you that databases
+have to be compacted from time to time to free disk space which is
+consumed by old documents revisions.</p>
+<p>But when to run database compaction? And, since this is heavy disk I/O
+operation, when it's reasonable to compact database?</p>
+<p>Great questions. And again monitoring of database size helps to answer
+on them.</p>
+<p><img alt="Database disk usage" src="./guide-to-couchdb-monitoring_files/database-frag.png"></p>
+<p>This database looks as a good candidate to be compacted RIGHT NOW!</p>
+<p>The <a href="http://docs.couchdb.org/en/latest/json-structure.html#couchdb-database-information-object">database information object</a> contains two fields that are
+relevant to this problem: <code>disk_size</code> and <code>data_size</code>. <code>data_size</code>
+is the actual size of stored data, <code>disk_size</code> is the actual on disk
+size of database. Difference between these values shows the stored
+overhead which could be eliminated via database compaction.</p>
+<p>At what point it's reasonable to start a database compaction? Well,
+the answer on that question depends on total amount of available disk
+space on partition where databases are stored. Personally, I prefer
+mark 50% for overhead of <code>disk_size</code> over <code>data_size</code>, but it's all
+depends from your environment and resources that you have.</p>
+<h3 id="views-fragmentation">Views Fragmentation</h3>
+<p>As well as databases, view indexes are also needs to be compacted.
+The strategy for them is the same, except that single database can
+contains dozens design documents.</p>
+<h2 id="beyond-of-couchdb-api">Beyond of CouchDB API</h2>
+<p>Our monitoring powers could be extended if we have access to
+environment of the host which serves CouchDB instance. This gives us
+more important information about CouchDB.</p>
+<p>Note, I wouldn't tell there about disk space issues: that's quite
+trivial case and it handles by every monitoring tools by default.</p>
+<h3 id="file-descriptors">File Descriptors</h3>
+<p>Does the error: <code>{error, emfile}</code> looks familiar for you? Right, it's
+about exhausting of available file descriptors for CouchDB user.
+This error always happens SUDDENLY and leads to deny of service.
+That's completely bad, but this situation you can predict and fix long
+before it'll happens by using monitoring tools.</p>
+<h3 id="os-daemons">OS Daemons</h3>
+<p>CouchDB has awesome feature called <a href="http://docs.couchdb.org/en/latest/externals.html#how-does-it-work-os-daemons">os_daemons</a> - it turns CouchDB
+into supervisor for thirdparty scripts or applications which are
+served by CouchDB, respawned on failure and able to communicate with
+CouchDB thought simple JSON-over-stdio protocol.</p>
+<p>While that's feature is awesome, CouchDB doesn't shows <code>os_daemons</code>
+status in the list of active tasks, so you don't know are they alive
+or actually dead (CouchDB stops his attempts to respawn process after
+5 continuous failures). But we can fix that with monitoring tools.</p>
+<p>The strategy is quite trivial: get the list of <code>os_daemons</code> from
+configuration and iterate over CouchDB child processes. If process
+exists - it's alive. Those who wasn't found marks as dead.</p>
+<h2 id="resume">Resume</h2>
+<p>Metrics are import part of any system since they can tell you what's
+going on, what's going wrong and even what's will be wrong in nearest
+future.</p>
+<p>Please note, that all these graphs are good to visualise processes
+that goes on server, they are miss concrete details about situation.
+If you have powerful system to manage application logs with flexible
+searching both solutions might be awesome additional to each over.</p>
+<h2 id="awesome-can-i-haz-all-these-now">Awesome! Can I haz all these NOW?</h2>
+<p>The most of monitoring systems plugins for CouchDB are unable
+to handle all the described cases since they are trying to work with
+just <code>/_stats</code> resource - it's good, but, as you may noted,
+not enough to see full picture of your CouchDB.</p>
+<p>However, at least for Munin there is one that's going to handle all
+this post recommendations. This plugin had been initially written by
+<a href="https://github.com/gws/">Gordon Stratton</a> 5 years ago, but the time has only made it better:</p>
+<p><a href="https://github.com/gws/munin-plugin-couchdb">https://github.com/gws/munin-plugin-couchdb</a></p>
+<p>Today as for 0.6 release it's able to handle all the described cases
+with few exceptions, but work isn't done yet.</p></body></html>

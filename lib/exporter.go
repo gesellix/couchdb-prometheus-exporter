@@ -10,8 +10,9 @@ const (
 )
 
 type Exporter struct {
-	client *CouchdbClient
-	mutex  sync.RWMutex
+	client    *CouchdbClient
+	databases []string
+	mutex     sync.RWMutex
 
 	up prometheus.Gauge
 
@@ -31,12 +32,17 @@ type Exporter struct {
 	requests                 *prometheus.GaugeVec
 	bulkRequests             *prometheus.GaugeVec
 	viewReads                *prometheus.GaugeVec
+
+	diskSize         *prometheus.GaugeVec
+	dataSize         *prometheus.GaugeVec
+	diskSizeOverhead *prometheus.GaugeVec
 }
 
-func NewExporter(uri string, basicAuth BasicAuth) *Exporter {
+func NewExporter(uri string, basicAuth BasicAuth, databases []string) *Exporter {
 
 	return &Exporter{
-		client: NewCouchdbClient(uri, basicAuth),
+		client:    NewCouchdbClient(uri, basicAuth, databases),
+		databases: databases,
 
 		up: prometheus.NewGauge(
 			prometheus.GaugeOpts{
@@ -160,5 +166,32 @@ func NewExporter(uri string, basicAuth BasicAuth) *Exporter {
 				Help:      "number of view reads",
 			},
 			[]string{"node_name"}),
+
+		diskSize: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "database",
+				Name:      "disk_size",
+				Help:      "disk size",
+			},
+			[]string{"node_name", "db_name"}),
+
+		dataSize: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "database",
+				Name:      "data_size",
+				Help:      "data size",
+			},
+			[]string{"node_name", "db_name"}),
+
+		diskSizeOverhead: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "database",
+				Name:      "overhead",
+				Help:      "disk size overhead",
+			},
+			[]string{"node_name", "db_name"}),
 	}
 }

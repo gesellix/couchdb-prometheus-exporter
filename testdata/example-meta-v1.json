@@ -1,0 +1,13 @@
+{
+  "db_name": "example",
+  "doc_count": 1,
+  "doc_del_count": 0,
+  "update_seq": 1,
+  "purge_seq": 0,
+  "compact_running": false,
+  "disk_size": 12396,
+  "data_size": 2132,
+  "instance_start_time": "1500232741635241",
+  "disk_format_version": 6,
+  "committed_update_seq": 1
+}

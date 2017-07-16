@@ -10,6 +10,7 @@ import (
 	"github.com/namsral/flag"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"strings"
 )
 
 type exporterConfigType struct {
@@ -18,6 +19,7 @@ type exporterConfigType struct {
 	couchdbURI      string
 	couchdbUsername string
 	couchdbPassword string
+	databases       string
 }
 
 var exporterConfig exporterConfigType
@@ -28,6 +30,7 @@ func init() {
 	flag.StringVar(&exporterConfig.couchdbURI, "couchdb.uri", "http://localhost:5984", "URI to the CouchDB instance")
 	flag.StringVar(&exporterConfig.couchdbUsername, "couchdb.username", "", "Basic auth username for the CouchDB instance")
 	flag.StringVar(&exporterConfig.couchdbPassword, "couchdb.password", "", "Basic auth password for the CouchDB instance")
+	flag.StringVar(&exporterConfig.databases, "databases", "", "Comma separated list of database names")
 
 	flag.BoolVar(&logging.toStderr, "logtostderr", false, "log to standard error instead of files")
 	flag.BoolVar(&logging.alsoToStderr, "alsologtostderr", false, "log to standard error as well as files")
@@ -49,7 +52,12 @@ func main() {
 	goflag.Lookup("v").Value.Set(logging.verbosity.String())
 	goflag.Lookup("stderrthreshold").Value.Set(logging.stderrThreshold.String())
 
-	exporter := lib.NewExporter(*&exporterConfig.couchdbURI, lib.BasicAuth{Username: *&exporterConfig.couchdbUsername, Password: *&exporterConfig.couchdbPassword})
+	databases := strings.Split(*&exporterConfig.databases, ",")
+
+	exporter := lib.NewExporter(
+		*&exporterConfig.couchdbURI,
+		lib.BasicAuth{Username: *&exporterConfig.couchdbUsername, Password: *&exporterConfig.couchdbPassword},
+		databases)
 	prometheus.MustRegister(exporter)
 
 	http.Handle(*&exporterConfig.metricsEndpoint, promhttp.Handler())

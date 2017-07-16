@@ -32,6 +32,10 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	e.requests.Describe(ch)
 	e.temporaryViewReads.Describe(ch)
 	e.viewReads.Describe(ch)
+
+	e.diskSize.Describe(ch)
+	e.dataSize.Describe(ch)
+	e.diskSizeOverhead.Describe(ch)
 }
 
 func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
@@ -49,9 +53,9 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	e.up.Set(1)
 
 	if stats.ApiVersion == "2" {
-		e.collectV2(stats, exposedHttpStatusCodes)
+		e.collectV2(stats, exposedHttpStatusCodes, e.databases)
 	} else {
-		e.collectV1(stats, exposedHttpStatusCodes)
+		e.collectV1(stats, exposedHttpStatusCodes, e.databases)
 	}
 
 	e.authCacheHits.Collect(ch)
@@ -68,6 +72,9 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	e.requests.Collect(ch)
 	e.temporaryViewReads.Collect(ch)
 	e.viewReads.Collect(ch)
+	e.diskSize.Collect(ch)
+	e.dataSize.Collect(ch)
+	e.diskSizeOverhead.Collect(ch)
 
 	return nil
 }

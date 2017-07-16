@@ -83,7 +83,16 @@ type StatsResponse struct {
 	HttpdStatusCodes    HttpdStatusCodes    `json:"httpd_status_codes"`
 }
 
+type DatabaseStats struct {
+	DiskSize         float64 `json:"disk_size"`
+	DataSize         float64 `json:"data_size"`
+	DiskSizeOverhead float64
+}
+
+type DatabaseStatsByDbName map[string]DatabaseStats
+
 type Stats struct {
-	StatsByNodeName map[string]StatsResponse
-	ApiVersion      string
+	StatsByNodeName         map[string]StatsResponse
+	DatabaseStatsByNodeName map[string]DatabaseStatsByDbName
+	ApiVersion              string
 }

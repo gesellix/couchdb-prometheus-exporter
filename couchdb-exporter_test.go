@@ -59,13 +59,19 @@ func readFile(t *testing.T, filename string) []byte {
 	return fileContent
 }
 
-func couchdbStatsResponse(t *testing.T, versionSuffix string) handler {
+func couchdbResponse(t *testing.T, versionSuffix string) handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/" {
 			file := readFile(t, fmt.Sprintf("./testdata/couchdb-%s.json", versionSuffix))
 			w.Write([]byte(file))
 		} else if r.URL.Path == "/_membership" {
 			file := readFile(t, fmt.Sprintf("./testdata/couchdb-membership-response-%s.json", versionSuffix))
+			w.Write([]byte(file))
+		} else if r.URL.Path == "/example" {
+			file := readFile(t, fmt.Sprintf("./testdata/example-meta-%s.json", versionSuffix))
+			w.Write([]byte(file))
+		} else if r.URL.Path == "/another-example" {
+			file := readFile(t, fmt.Sprintf("./testdata/example-meta-%s.json", versionSuffix))
 			w.Write([]byte(file))
 		} else {
 			file := readFile(t, fmt.Sprintf("./testdata/couchdb-stats-response-%s.json", versionSuffix))
@@ -95,13 +101,12 @@ func printMetrics(metrics []*dto.Metric) {
 	fmt.Println(metricStrings)
 }
 
-// expectedMetricsCount := count(nodes) * 31 + 1
-func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetricsCount int, expectedGetRequestCount float64) {
+func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetricsCount int, expectedGetRequestCount float64, expectedDiskSize float64) {
 	basicAuth := lib.BasicAuth{Username: "username", Password: "password"}
-	handler := http.HandlerFunc(BasicAuth(basicAuth, couchdbStatsResponse(t, couchdbVersion)))
+	handler := http.HandlerFunc(BasicAuth(basicAuth, couchdbResponse(t, couchdbVersion)))
 	server := httptest.NewServer(handler)
 
-	e := lib.NewExporter(server.URL, basicAuth)
+	e := lib.NewExporter(server.URL, basicAuth, []string{"example"})
 	ch := make(chan prometheus.Metric)
 
 	go func() {
@@ -117,6 +122,7 @@ func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetric
 	}
 	//printMetrics(metrics)
 	actualGetRequestCount := getGaugeValue(metrics, "method", "GET")
+	actualDiskSize := getGaugeValue(metrics, "db_name", "example")
 
 	if len(metrics) < expectedMetricsCount {
 		t.Errorf("got less metrics (%d) as expected (%d)", len(metrics), expectedMetricsCount)
@@ -127,12 +133,16 @@ func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetric
 	if expectedGetRequestCount != actualGetRequestCount {
 		t.Errorf("expected %d GET requests, but got %d instead", expectedGetRequestCount, actualGetRequestCount)
 	}
+	if expectedDiskSize != actualDiskSize {
+		t.Errorf("expected %f disk size, but got %f instead", expectedDiskSize, actualDiskSize)
+	}
 }
 
 func TestCouchdbStatsV1(t *testing.T) {
-	performCouchdbStatsTest(t, "v1", 32, 4711)
+	// expectedMetricsCount := count(nodes) * 34 + 1
+	performCouchdbStatsTest(t, "v1", 35, 4711, 12396)
 }
 
 func TestCouchdbStatsV2(t *testing.T) {
-	performCouchdbStatsTest(t, "v2", 63, 4712)
+	performCouchdbStatsTest(t, "v2", 69, 4712, 58570)
 }

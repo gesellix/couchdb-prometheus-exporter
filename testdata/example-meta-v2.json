@@ -1,0 +1,20 @@
+{
+  "db_name": "example",
+  "update_seq": "1-g1AAAAFDeJzLYWBg4MhgTmHgz8tPSTVyMDQy1zMAQsMcoARTIkOS_P___7MSGXAqSVIAkkn2hFQ5gFTFE1KVAFJVT0BVHguQZGgAUkCF8wmrXABRuT8rkZGAygMQlfcJm_kAohLkziwAJCRWfw",
+  "sizes": {
+    "file": 58570,
+    "external": 984,
+    "active": 3866
+  },
+  "purge_seq": 0,
+  "other": {
+    "data_size": 984
+  },
+  "doc_del_count": 0,
+  "doc_count": 1,
+  "disk_size": 58570,
+  "disk_format_version": 6,
+  "data_size": 3866,
+  "compact_running": false,
+  "instance_start_time": "0"
+}

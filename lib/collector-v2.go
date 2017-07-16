@@ -1,6 +1,6 @@
 package lib
 
-func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string) error {
+func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, databases []string) error {
 	for name, nodeStats := range stats.StatsByNodeName {
 		//fmt.Printf("%s -> %v\n", name, stats)
 		//glog.Info(fmt.Sprintf("name: %s -> stats: %v\n", name, stats))
@@ -30,6 +30,14 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string) error
 		e.requests.WithLabelValues(name).Set(nodeStats.Couchdb.Httpd.Requests.Value)
 		e.temporaryViewReads.WithLabelValues(name).Set(nodeStats.Couchdb.Httpd.TemporaryViewReads.Value)
 		e.viewReads.WithLabelValues(name).Set(nodeStats.Couchdb.Httpd.ViewReads.Value)
+	}
+
+	for name, dbStats := range stats.DatabaseStatsByNodeName {
+		for _, dbName := range databases {
+			e.diskSize.WithLabelValues(name, dbName).Set(dbStats[dbName].DiskSize)
+			e.dataSize.WithLabelValues(name, dbName).Set(dbStats[dbName].DataSize)
+			e.diskSizeOverhead.WithLabelValues(name, dbName).Set(dbStats[dbName].DiskSizeOverhead)
+		}
 	}
 
 	return nil

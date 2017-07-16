@@ -24,6 +24,7 @@ type CouchdbClient struct {
 	baseUri   string
 	statsUri  string
 	basicAuth BasicAuth
+	databases []string
 	client    *http.Client
 }
 
@@ -131,9 +132,14 @@ func (c *CouchdbClient) getStats() (Stats, error) {
 		if err != nil {
 			return Stats{}, err
 		}
+		databaseStats, err := c.getDatabasesStatsByNodeName(urisByNode)
+		if err != nil {
+			return Stats{}, err
+		}
 		return Stats{
-			StatsByNodeName: nodeStats,
-			ApiVersion:      "2"}, nil
+			StatsByNodeName:         nodeStats,
+			DatabaseStatsByNodeName: databaseStats,
+			ApiVersion:              "2"}, nil
 	} else {
 		urisByNode := map[string]string{
 			"master": c.statsUri,
@@ -142,10 +148,37 @@ func (c *CouchdbClient) getStats() (Stats, error) {
 		if err != nil {
 			return Stats{}, err
 		}
+		databaseStats, err := c.getDatabasesStatsByNodeName(urisByNode)
+		if err != nil {
+			return Stats{}, err
+		}
 		return Stats{
-			StatsByNodeName: nodeStats,
-			ApiVersion:      "1"}, nil
+			StatsByNodeName:         nodeStats,
+			DatabaseStatsByNodeName: databaseStats,
+			ApiVersion:              "1"}, nil
 	}
+}
+
+func (c *CouchdbClient) getDatabasesStatsByNodeName(urisByNodeName map[string]string) (map[string]DatabaseStatsByDbName, error) {
+	dbStatsByDbName := make(map[string]DatabaseStatsByDbName)
+	for name, _ := range urisByNodeName {
+		dbStatsByDbName[name] = make(map[string]DatabaseStats)
+		for _, dbName := range c.databases {
+			data, err := c.request("GET", fmt.Sprintf("%s/%s", c.baseUri, dbName))
+			if err != nil {
+				return nil, fmt.Errorf("Error reading couchdb stats: %v", err)
+			}
+
+			var dbStats DatabaseStats
+			err = json.Unmarshal(data, &dbStats)
+			if err != nil {
+				return nil, fmt.Errorf("error unmarshalling stats: %v", err)
+			}
+			dbStats.DiskSizeOverhead = dbStats.DiskSize - dbStats.DataSize
+			dbStatsByDbName[name][dbName] = dbStats
+		}
+	}
+	return dbStatsByDbName, nil
 }
 
 func (c *CouchdbClient) request(method string, uri string) (respData []byte, err error) {
@@ -174,7 +207,7 @@ func (c *CouchdbClient) request(method string, uri string) (respData []byte, err
 	return respData, nil
 }
 
-func NewCouchdbClient(uri string, basicAuth BasicAuth) *CouchdbClient {
+func NewCouchdbClient(uri string, basicAuth BasicAuth, databases []string) *CouchdbClient {
 	httpClient := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: *insecure},
@@ -185,6 +218,7 @@ func NewCouchdbClient(uri string, basicAuth BasicAuth) *CouchdbClient {
 		baseUri:   uri,
 		statsUri:  fmt.Sprintf("%s/_stats", uri),
 		basicAuth: basicAuth,
+		databases: databases,
 		client:    httpClient,
 	}
 }

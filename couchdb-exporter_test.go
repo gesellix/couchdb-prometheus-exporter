@@ -94,7 +94,7 @@ func getGaugeValue(metrics []*dto.Metric, labelName string, labelValue string) f
 func printMetrics(metrics []*dto.Metric) {
 	metricStrings := []string{}
 	for _, metric := range metrics {
-		metricStrings = append(metricStrings, proto.CompactTextString(metric))
+		metricStrings = append(metricStrings, proto.MarshalTextString(metric))
 	}
 
 	sort.Strings(metricStrings)
@@ -106,7 +106,7 @@ func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetric
 	handler := http.HandlerFunc(BasicAuth(basicAuth, couchdbResponse(t, couchdbVersion)))
 	server := httptest.NewServer(handler)
 
-	e := lib.NewExporter(server.URL, basicAuth, []string{"example"})
+	e := lib.NewExporter(server.URL, basicAuth, []string{"example", "another-example"})
 	ch := make(chan prometheus.Metric)
 
 	go func() {
@@ -140,9 +140,9 @@ func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetric
 
 func TestCouchdbStatsV1(t *testing.T) {
 	// expectedMetricsCount := count(nodes) * 34 + 1
-	performCouchdbStatsTest(t, "v1", 35, 4711, 12396)
+	performCouchdbStatsTest(t, "v1", 38, 4711, 12396)
 }
 
 func TestCouchdbStatsV2(t *testing.T) {
-	performCouchdbStatsTest(t, "v2", 69, 4712, 58570)
+	performCouchdbStatsTest(t, "v2", 75, 4712, 58570)
 }

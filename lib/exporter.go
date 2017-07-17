@@ -175,7 +175,6 @@ func NewExporter(uri string, basicAuth BasicAuth, databases []string) *Exporter 
 				Help:      "disk size",
 			},
 			[]string{"node_name", "db_name"}),
-
 		dataSize: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,
@@ -184,7 +183,6 @@ func NewExporter(uri string, basicAuth BasicAuth, databases []string) *Exporter 
 				Help:      "data size",
 			},
 			[]string{"node_name", "db_name"}),
-
 		diskSizeOverhead: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,

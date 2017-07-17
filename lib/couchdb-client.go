@@ -166,13 +166,13 @@ func (c *CouchdbClient) getDatabasesStatsByNodeName(urisByNodeName map[string]st
 		for _, dbName := range c.databases {
 			data, err := c.request("GET", fmt.Sprintf("%s/%s", c.baseUri, dbName))
 			if err != nil {
-				return nil, fmt.Errorf("Error reading couchdb stats: %v", err)
+				return nil, fmt.Errorf("Error reading database '%s' stats: %v", dbName, err)
 			}
 
 			var dbStats DatabaseStats
 			err = json.Unmarshal(data, &dbStats)
 			if err != nil {
-				return nil, fmt.Errorf("error unmarshalling stats: %v", err)
+				return nil, fmt.Errorf("error unmarshalling database '%s' stats: %v", dbName, err)
 			}
 			dbStats.DiskSizeOverhead = dbStats.DiskSize - dbStats.DataSize
 			dbStatsByDbName[name][dbName] = dbStats

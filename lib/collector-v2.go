@@ -1,5 +1,10 @@
 package lib
 
+import (
+	"fmt"
+	"strconv"
+)
+
 func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, databases []string) error {
 	for name, nodeStats := range stats.StatsByNodeName {
 		//fmt.Printf("%s -> %v\n", name, stats)
@@ -38,6 +43,36 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, datab
 			e.dataSize.WithLabelValues(name, dbName).Set(dbStats[dbName].DataSize)
 			e.diskSizeOverhead.WithLabelValues(name, dbName).Set(dbStats[dbName].DiskSizeOverhead)
 		}
+	}
+
+	activeTasksByNode := make(map[string]ActiveTaskTypes)
+	for _, task := range stats.ActiveTasksResponse {
+		if _, ok := activeTasksByNode[task.Node]; !ok {
+			activeTasksByNode[task.Node] = ActiveTaskTypes{}
+		}
+		types := activeTasksByNode[task.Node]
+
+		switch taskType := task.Type; taskType {
+		case "database_compaction":
+			types.DatabaseCompaction++
+			types.Sum++
+		case "view_compaction":
+			types.ViewCompaction++
+			types.Sum++
+		case "indexer":
+			types.Indexer++
+			types.Sum++
+		case "replication":
+			types.Replication++
+			types.Sum++
+		default:
+			fmt.Printf("unknown task type %s.", taskType)
+			types.Sum++
+		}
+		activeTasksByNode[task.Node] = types
+	}
+	for nodeName, tasks := range activeTasksByNode {
+		e.activeTasks.WithLabelValues(nodeName, strconv.Itoa(tasks.DatabaseCompaction), strconv.Itoa(tasks.ViewCompaction), strconv.Itoa(tasks.Indexer), strconv.Itoa(tasks.Replication)).Set(tasks.Sum)
 	}
 
 	return nil

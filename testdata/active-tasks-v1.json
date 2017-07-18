@@ -1,0 +1,22 @@
+[
+  {
+    "pid": "<0.2661.0>",
+    "checkpoint_interval": 5000,
+    "checkpointed_source_seq": 0,
+    "continuous": false,
+    "doc_id": null,
+    "doc_write_failures": 0,
+    "docs_read": 3226,
+    "docs_written": 3226,
+    "missing_revisions_found": 3226,
+    "progress": 54,
+    "replication_id": "84fe4be74c554c401cce5526636624b4+create_target",
+    "revisions_checked": 3226,
+    "source": "source-db",
+    "source_seq": 5954,
+    "started_on": 1500235070,
+    "target": "target",
+    "type": "replication",
+    "updated_on": 1500235074
+  }
+]

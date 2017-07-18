@@ -91,8 +91,16 @@ type DatabaseStats struct {
 
 type DatabaseStatsByDbName map[string]DatabaseStats
 
+type ActiveTask struct {
+	Node string `json:"node,omitempty"`
+	Type string `json:"type"`
+}
+
+type ActiveTasksResponse []ActiveTask
+
 type Stats struct {
 	StatsByNodeName         map[string]StatsResponse
 	DatabaseStatsByNodeName map[string]DatabaseStatsByDbName
+	ActiveTasksResponse     ActiveTasksResponse
 	ApiVersion              string
 }

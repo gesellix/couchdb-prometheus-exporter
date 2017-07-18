@@ -36,6 +36,8 @@ type Exporter struct {
 	diskSize         *prometheus.GaugeVec
 	dataSize         *prometheus.GaugeVec
 	diskSizeOverhead *prometheus.GaugeVec
+
+	activeTasks *prometheus.GaugeVec
 }
 
 func NewExporter(uri string, basicAuth BasicAuth, databases []string) *Exporter {
@@ -191,5 +193,14 @@ func NewExporter(uri string, basicAuth BasicAuth, databases []string) *Exporter 
 				Help:      "disk size overhead",
 			},
 			[]string{"node_name", "db_name"}),
+
+		activeTasks: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "server",
+				Name:      "active_tasks",
+				Help:      "active tasks",
+			},
+			[]string{"node_name", "database_compaction", "view_compaction", "indexer", "replication"}),
 	}
 }

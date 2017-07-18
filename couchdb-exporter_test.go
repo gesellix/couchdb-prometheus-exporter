@@ -67,6 +67,9 @@ func couchdbResponse(t *testing.T, versionSuffix string) handler {
 		} else if r.URL.Path == "/_membership" {
 			file := readFile(t, fmt.Sprintf("./testdata/couchdb-membership-response-%s.json", versionSuffix))
 			w.Write([]byte(file))
+		} else if r.URL.Path == "/_active_tasks" {
+			file := readFile(t, fmt.Sprintf("./testdata/active-tasks-%s.json", versionSuffix))
+			w.Write([]byte(file))
 		} else if r.URL.Path == "/example" {
 			file := readFile(t, fmt.Sprintf("./testdata/example-meta-%s.json", versionSuffix))
 			w.Write([]byte(file))
@@ -131,7 +134,7 @@ func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetric
 		t.Errorf("got more metrics (%d) as expected (%d)", len(metrics), expectedMetricsCount)
 	}
 	if expectedGetRequestCount != actualGetRequestCount {
-		t.Errorf("expected %d GET requests, but got %d instead", expectedGetRequestCount, actualGetRequestCount)
+		t.Errorf("expected %f GET requests, but got %f instead", expectedGetRequestCount, actualGetRequestCount)
 	}
 	if expectedDiskSize != actualDiskSize {
 		t.Errorf("expected %f disk size, but got %f instead", expectedDiskSize, actualDiskSize)
@@ -139,10 +142,10 @@ func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetric
 }
 
 func TestCouchdbStatsV1(t *testing.T) {
-	// expectedMetricsCount := count(nodes) * 34 + 1
-	performCouchdbStatsTest(t, "v1", 38, 4711, 12396)
+	// expectedMetricsCount := count(nodes) * 38 + 1
+	performCouchdbStatsTest(t, "v1", 39, 4711, 12396)
 }
 
 func TestCouchdbStatsV2(t *testing.T) {
-	performCouchdbStatsTest(t, "v2", 75, 4712, 58570)
+	performCouchdbStatsTest(t, "v2", 76, 4712, 58570)
 }

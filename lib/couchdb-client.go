@@ -22,7 +22,6 @@ type BasicAuth struct {
 
 type CouchdbClient struct {
 	baseUri   string
-	statsUri  string
 	basicAuth BasicAuth
 	databases []string
 	client    *http.Client
@@ -88,14 +87,14 @@ func (c *CouchdbClient) getNodeNames() ([]string, error) {
 	return membership.ClusterNodes, nil
 }
 
-func (c *CouchdbClient) getStatsUrisByNodeName(baseUri string) (map[string]string, error) {
+func (c *CouchdbClient) getNodeBaseUrisByNodeName(baseUri string) (map[string]string, error) {
 	names, err := c.getNodeNames()
 	if err != nil {
 		return nil, err
 	}
 	urisByNodeName := make(map[string]string)
 	for _, name := range names {
-		urisByNodeName[name] = fmt.Sprintf("%s/_node/%s/_stats", baseUri, name)
+		urisByNodeName[name] = fmt.Sprintf("%s/_node/%s", baseUri, name)
 	}
 	return urisByNodeName, nil
 }
@@ -103,7 +102,7 @@ func (c *CouchdbClient) getStatsUrisByNodeName(baseUri string) (map[string]strin
 func (c *CouchdbClient) getStatsByNodeName(urisByNodeName map[string]string) (map[string]StatsResponse, error) {
 	statsByNodeName := make(map[string]StatsResponse)
 	for name, uri := range urisByNodeName {
-		data, err := c.request("GET", uri)
+		data, err := c.request("GET", fmt.Sprintf("%s/_stats", uri))
 		if err != nil {
 			return nil, fmt.Errorf("Error reading couchdb stats: %v", err)
 		}
@@ -124,7 +123,7 @@ func (c *CouchdbClient) getStats() (Stats, error) {
 		return Stats{}, err
 	}
 	if isCouchDbV2 {
-		urisByNode, err := c.getStatsUrisByNodeName(c.baseUri)
+		urisByNode, err := c.getNodeBaseUrisByNodeName(c.baseUri)
 		if err != nil {
 			return Stats{}, err
 		}
@@ -136,13 +135,18 @@ func (c *CouchdbClient) getStats() (Stats, error) {
 		if err != nil {
 			return Stats{}, err
 		}
+		activeTasks, err := c.getActiveTasks()
+		if err != nil {
+			return Stats{}, err
+		}
 		return Stats{
 			StatsByNodeName:         nodeStats,
 			DatabaseStatsByNodeName: databaseStats,
+			ActiveTasksResponse:     activeTasks,
 			ApiVersion:              "2"}, nil
 	} else {
 		urisByNode := map[string]string{
-			"master": c.statsUri,
+			"master": c.baseUri,
 		}
 		nodeStats, err := c.getStatsByNodeName(urisByNode)
 		if err != nil {
@@ -152,9 +156,14 @@ func (c *CouchdbClient) getStats() (Stats, error) {
 		if err != nil {
 			return Stats{}, err
 		}
+		activeTasks, err := c.getActiveTasks()
+		if err != nil {
+			return Stats{}, err
+		}
 		return Stats{
 			StatsByNodeName:         nodeStats,
 			DatabaseStatsByNodeName: databaseStats,
+			ActiveTasksResponse:     activeTasks,
 			ApiVersion:              "1"}, nil
 	}
 }
@@ -179,6 +188,26 @@ func (c *CouchdbClient) getDatabasesStatsByNodeName(urisByNodeName map[string]st
 		}
 	}
 	return dbStatsByDbName, nil
+}
+
+func (c *CouchdbClient) getActiveTasks() (ActiveTasksResponse, error) {
+	data, err := c.request("GET", fmt.Sprintf("%s/_active_tasks", c.baseUri))
+	if err != nil {
+		return ActiveTasksResponse{}, fmt.Errorf("Error reading active tasks: %v", err)
+	}
+
+	var activeTasks ActiveTasksResponse
+	err = json.Unmarshal(data, &activeTasks)
+	if err != nil {
+		return ActiveTasksResponse{}, fmt.Errorf("error unmarshalling active tasks: %v", err)
+	}
+	for _, activeTask := range activeTasks {
+		// CouchDB 1.x doesn't know anything about nodes.
+		if activeTask.Node != "" {
+			activeTask.Node = "master"
+		}
+	}
+	return activeTasks, nil
 }
 
 func (c *CouchdbClient) request(method string, uri string) (respData []byte, err error) {
@@ -216,7 +245,6 @@ func NewCouchdbClient(uri string, basicAuth BasicAuth, databases []string) *Couc
 
 	return &CouchdbClient{
 		baseUri:   uri,
-		statsUri:  fmt.Sprintf("%s/_stats", uri),
 		basicAuth: basicAuth,
 		databases: databases,
 		client:    httpClient,

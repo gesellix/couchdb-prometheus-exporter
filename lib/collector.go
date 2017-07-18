@@ -11,6 +11,16 @@ var (
 	exposedHttpStatusCodes = []string{"200", "201", "202", "301", "304", "400", "401", "403", "404", "405", "409", "412", "500"}
 )
 
+type ActiveTaskTypes struct {
+	DatabaseCompaction int
+	ViewCompaction     int
+	Indexer            int
+	Replication        int
+	Sum                float64
+}
+
+type ActiveTaskTypesByNodeName map[string]ActiveTaskTypes
+
 // Describe describes all the metrics ever exported by the couchdb exporter. It
 // implements prometheus.Collector.
 func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
@@ -36,6 +46,8 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	e.diskSize.Describe(ch)
 	e.dataSize.Describe(ch)
 	e.diskSizeOverhead.Describe(ch)
+
+	e.activeTasks.Describe(ch)
 }
 
 func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
@@ -65,16 +77,21 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	e.openDatabases.Collect(ch)
 	e.openOsFiles.Collect(ch)
 	e.requestTime.Collect(ch)
+
 	e.httpdStatusCodes.Collect(ch)
 	e.httpdRequestMethods.Collect(ch)
+
 	e.bulkRequests.Collect(ch)
 	e.clientsRequestingChanges.Collect(ch)
 	e.requests.Collect(ch)
 	e.temporaryViewReads.Collect(ch)
 	e.viewReads.Collect(ch)
+
 	e.diskSize.Collect(ch)
 	e.dataSize.Collect(ch)
 	e.diskSizeOverhead.Collect(ch)
+
+	e.activeTasks.Collect(ch)
 
 	return nil
 }

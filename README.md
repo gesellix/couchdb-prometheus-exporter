@@ -1,10 +1,10 @@
-# CouchDB Exporter
+# CouchDB Prometheus Exporter
 
 [![Build Status](https://travis-ci.org/gesellix/couchdb-prometheus-exporter.svg?branch=master)](https://travis-ci.org/gesellix/couchdb-prometheus-exporter)
 
-[CouchDB](http://couchdb.apache.org/) exporter for [Prometheus](http://prometheus.io/)
+[CouchDB](http://couchdb.apache.org/) metrics exporter for [Prometheus](http://prometheus.io/)
 
-The CouchDB Exporter requests the CouchDB stats from the `/_stats` and `/_active_tasks` endpoints and 
+The CouchDB metrics exporter requests the CouchDB stats from the `/_stats` and `/_active_tasks` endpoints and 
 exposes them for Prometheus consumption. You can optionally monitor detailed database stats like
 disk and data size to monitor the storage overhead.
 
@@ -118,6 +118,6 @@ The node name makes more sense in a clustered CouchDB 2.x environment with sever
 
 Thanks go to the Prometheus team, which is very active and responsive!
 
-I also have to admit that the couchdb-exporter code is heavily inspired by 
+I also have to admit that the couchdb-prometheus-exporter code is heavily inspired by 
 the other [available exporters](http://prometheus.io/docs/instrumenting/exporters/), 
 and that some ideas have just been copied from them.

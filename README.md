@@ -1,6 +1,6 @@
 # CouchDB Exporter
 
-[![Build Status](https://travis-ci.org/gesellix/couchdb-exporter.svg?branch=master)](https://travis-ci.org/gesellix/couchdb-exporter)
+[![Build Status](https://travis-ci.org/gesellix/couchdb-prometheus-exporter.svg?branch=master)](https://travis-ci.org/gesellix/couchdb-prometheus-exporter)
 
 [CouchDB](http://couchdb.apache.org/) exporter for [Prometheus](http://prometheus.io/)
 
@@ -10,7 +10,7 @@ disk and data size to monitor the storage overhead.
 
 ## Run it as container
 
-    docker run -p 9984:9984 gesellix/couchdb-exporter -couchdb.uri=http://couchdb:5984
+    docker run -p 9984:9984 gesellix/couchdb-prometheus-exporter -couchdb.uri=http://couchdb:5984
 
 The couchdb-exporter uses the [glog](https://godoc.org/github.com/golang/glog) library for logging.
 With the default parameters nothing will be logged.
@@ -20,11 +20,11 @@ For CouchDB 2.x, you should configure the exporter to fetch the stats from one n
 a complete cluster overview. In contrast to CouchDB 1.x you'll need to configure the admin
 credentials, e.g. like this:
 
-    docker run -p 9984:9984 gesellix/couchdb-exporter -couchdb.uri=http://couchdb:5984 -couchdb.username=root -couchdb.password=a-secret
+    docker run -p 9984:9984 gesellix/couchdb-prometheus-exporter -couchdb.uri=http://couchdb:5984 -couchdb.username=root -couchdb.password=a-secret
 
 If you need database disk usage stats, simply add a comma separated list of database names like this:
 
-    docker run -p 9984:9984 gesellix/couchdb-exporter -couchdb.uri=http://couchdb:5984 -databases=db-1,db-2 -couchdb.username=root -couchdb.password=a-secret
+    docker run -p 9984:9984 gesellix/couchdb-prometheus-exporter -couchdb.uri=http://couchdb:5984 -databases=db-1,db-2 -couchdb.username=root -couchdb.password=a-secret
  
 
 ## Metrics Overview

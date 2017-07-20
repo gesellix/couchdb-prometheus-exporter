@@ -143,9 +143,9 @@ func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetric
 
 func TestCouchdbStatsV1(t *testing.T) {
 	// expectedMetricsCount := count(nodes) * 38 + 1
-	performCouchdbStatsTest(t, "v1", 39, 4711, 12396)
+	performCouchdbStatsTest(t, "v1", 43, 4711, 12396)
 }
 
 func TestCouchdbStatsV2(t *testing.T) {
-	performCouchdbStatsTest(t, "v2", 76, 4712, 58570)
+	performCouchdbStatsTest(t, "v2", 80, 4712, 58570)
 }

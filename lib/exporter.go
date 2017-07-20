@@ -37,7 +37,11 @@ type Exporter struct {
 	dataSize         *prometheus.GaugeVec
 	diskSizeOverhead *prometheus.GaugeVec
 
-	activeTasks *prometheus.GaugeVec
+	activeTasks                   *prometheus.GaugeVec
+	activeTasksDatabaseCompaction *prometheus.GaugeVec
+	activeTasksViewCompaction     *prometheus.GaugeVec
+	activeTasksIndexer            *prometheus.GaugeVec
+	activeTasksReplication        *prometheus.GaugeVec
 }
 
 func NewExporter(uri string, basicAuth BasicAuth, databases []string) *Exporter {
@@ -201,6 +205,39 @@ func NewExporter(uri string, basicAuth BasicAuth, databases []string) *Exporter 
 				Name:      "active_tasks",
 				Help:      "active tasks",
 			},
-			[]string{"node_name", "database_compaction", "view_compaction", "indexer", "replication"}),
+			[]string{"node_name"}),
+
+		activeTasksDatabaseCompaction: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "server",
+				Name:      "active_tasks_database_compaction",
+				Help:      "active tasks",
+			},
+			[]string{"node_name"}),
+		activeTasksViewCompaction: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "server",
+				Name:      "active_tasks_view_compaction",
+				Help:      "active tasks",
+			},
+			[]string{"node_name"}),
+		activeTasksIndexer: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "server",
+				Name:      "active_tasks_indexer",
+				Help:      "active tasks",
+			},
+			[]string{"node_name"}),
+		activeTasksReplication: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "server",
+				Name:      "active_tasks_replication",
+				Help:      "active tasks",
+			},
+			[]string{"node_name"}),
 	}
 }

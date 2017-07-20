@@ -2,7 +2,6 @@ package lib
 
 import (
 	"fmt"
-	"strconv"
 )
 
 func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, databases []string) error {
@@ -72,7 +71,11 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, datab
 		activeTasksByNode[task.Node] = types
 	}
 	for nodeName, tasks := range activeTasksByNode {
-		e.activeTasks.WithLabelValues(nodeName, strconv.Itoa(tasks.DatabaseCompaction), strconv.Itoa(tasks.ViewCompaction), strconv.Itoa(tasks.Indexer), strconv.Itoa(tasks.Replication)).Set(tasks.Sum)
+		e.activeTasks.WithLabelValues(nodeName).Set(tasks.Sum)
+		e.activeTasksDatabaseCompaction.WithLabelValues(nodeName).Set(tasks.DatabaseCompaction)
+		e.activeTasksViewCompaction.WithLabelValues(nodeName).Set(tasks.ViewCompaction)
+		e.activeTasksIndexer.WithLabelValues(nodeName).Set(tasks.Indexer)
+		e.activeTasksReplication.WithLabelValues(nodeName).Set(tasks.Replication)
 	}
 
 	return nil

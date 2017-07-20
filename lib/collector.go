@@ -12,10 +12,10 @@ var (
 )
 
 type ActiveTaskTypes struct {
-	DatabaseCompaction int
-	ViewCompaction     int
-	Indexer            int
-	Replication        int
+	DatabaseCompaction float64
+	ViewCompaction     float64
+	Indexer            float64
+	Replication        float64
 	Sum                float64
 }
 
@@ -48,6 +48,10 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	e.diskSizeOverhead.Describe(ch)
 
 	e.activeTasks.Describe(ch)
+	e.activeTasksDatabaseCompaction.Describe(ch)
+	e.activeTasksViewCompaction.Describe(ch)
+	e.activeTasksIndexer.Describe(ch)
+	e.activeTasksReplication.Describe(ch)
 }
 
 func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
@@ -92,6 +96,10 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	e.diskSizeOverhead.Collect(ch)
 
 	e.activeTasks.Collect(ch)
+	e.activeTasksDatabaseCompaction.Collect(ch)
+	e.activeTasksViewCompaction.Collect(ch)
+	e.activeTasksIndexer.Collect(ch)
+	e.activeTasksReplication.Collect(ch)
 
 	return nil
 }

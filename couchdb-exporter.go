@@ -25,6 +25,7 @@ type exporterConfigType struct {
 var exporterConfig exporterConfigType
 
 func init() {
+	flag.String(flag.DefaultConfigFlagname, "", "path to config file")
 	flag.StringVar(&exporterConfig.listenAddress, "telemetry.address", "localhost:9984", "Address on which to expose metrics.")
 	flag.StringVar(&exporterConfig.metricsEndpoint, "telemetry.endpoint", "/metrics", "Path under which to expose metrics.")
 	flag.StringVar(&exporterConfig.couchdbURI, "couchdb.uri", "http://localhost:5984", "URI to the CouchDB instance")

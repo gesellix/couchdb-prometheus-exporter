@@ -6,7 +6,8 @@
 
 The CouchDB metrics exporter requests the CouchDB stats from the `/_stats` and `/_active_tasks` endpoints and 
 exposes them for Prometheus consumption. You can optionally monitor detailed database stats like
-disk and data size to monitor the storage overhead.
+disk and data size to monitor the storage overhead. The exporter can be configured via program parameters,
+environment variables, and config file.
 
 ## Run it as container
 

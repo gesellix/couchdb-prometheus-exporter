@@ -122,3 +122,7 @@ Thanks go to the Prometheus team, which is very active and responsive!
 I also have to admit that the couchdb-prometheus-exporter code is heavily inspired by 
 the other [available exporters](http://prometheus.io/docs/instrumenting/exporters/), 
 and that some ideas have just been copied from them.
+
+## Monitoring CouchDB with Prometheus, Grafana and Docker
+
+For a step-by-step guide, see [Monitoring CouchDB with Prometheus, Grafana and Docker](https://medium.com/@redgeoff/monitoring-couchdb-with-prometheus-grafana-and-docker-4693bc8408f0)

@@ -1,0 +1,47 @@
+---
+version: "3.3"
+
+services:
+  couchdb:
+    image: klaemo/couchdb:2.0-dev
+    command: --admin root:a-secret --with-haproxy
+    volumes:
+      - couchdb-data:/opt/couchdb/data
+    networks:
+      - couchdb
+    ports:
+      - "5984:5984"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+
+  couchdbstats:
+    image: gesellix/couchdb-prometheus-exporter
+    command: -couchdb.uri=http://couchdb:5984 -config=/run/secrets/config.properties -logtostderr
+    networks:
+      - couchdb
+    ports:
+      - "9984:9984"
+    secrets:
+      - source: exporter-config
+        target: config.properties
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+
+networks:
+  couchdb:
+
+volumes:
+  couchdb-data:
+#    external: true
+
+secrets:
+  exporter-config:
+    file: config.properties
+
+configs:
+  cluster-config-script:
+    file: cluster-config.sh

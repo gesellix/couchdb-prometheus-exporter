@@ -26,10 +26,17 @@ credentials, e.g. like this:
 If you need database disk usage stats, simply add a comma separated list of database names like this:
 
     docker run -p 9984:9984 gesellix/couchdb-prometheus-exporter -couchdb.uri=http://couchdb:5984 -databases=db-1,db-2 -couchdb.username=root -couchdb.password=a-secret
- 
+
 ## Monitoring CouchDB with Prometheus, Grafana and Docker
 
 For a step-by-step guide, see [Monitoring CouchDB with Prometheus, Grafana and Docker](https://medium.com/@redgeoff/monitoring-couchdb-with-prometheus-grafana-and-docker-4693bc8408f0)
+
+## Examples
+
+The `examples` directory in this repository contains ready-to-run examples for
+
+- [Docker Compose](examples/compose/README.md)
+- [Docker Swarm/Stack](examples/stack/README.md)
 
 ## Metrics Overview
 The following list gives you an overview on the currently exposed metrics.

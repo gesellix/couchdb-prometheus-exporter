@@ -1,4 +1,4 @@
-# Creating a local dev cluster with an admin party
+# Creating a local dev cluster using Docker Compose
 
 Prepare a volume to manage the CouchDB data. The network helps in case of debugging.
 These steps only need to be performed once.  

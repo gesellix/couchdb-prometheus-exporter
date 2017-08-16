@@ -140,10 +140,10 @@ func (c *CouchdbClient) getStats() (Stats, error) {
 			return Stats{}, err
 		}
 		return Stats{
-			StatsByNodeName:         nodeStats,
-			DatabaseStatsByNodeName: databaseStats,
-			ActiveTasksResponse:     activeTasks,
-			ApiVersion:              "2"}, nil
+			StatsByNodeName:       nodeStats,
+			DatabaseStatsByDbName: databaseStats,
+			ActiveTasksResponse:   activeTasks,
+			ApiVersion:            "2"}, nil
 	} else {
 		urisByNode := map[string]string{
 			"master": c.baseUri,
@@ -161,31 +161,28 @@ func (c *CouchdbClient) getStats() (Stats, error) {
 			return Stats{}, err
 		}
 		return Stats{
-			StatsByNodeName:         nodeStats,
-			DatabaseStatsByNodeName: databaseStats,
-			ActiveTasksResponse:     activeTasks,
-			ApiVersion:              "1"}, nil
+			StatsByNodeName:       nodeStats,
+			DatabaseStatsByDbName: databaseStats,
+			ActiveTasksResponse:   activeTasks,
+			ApiVersion:            "1"}, nil
 	}
 }
 
-func (c *CouchdbClient) getDatabasesStatsByNodeName(urisByNodeName map[string]string) (map[string]DatabaseStatsByDbName, error) {
-	dbStatsByDbName := make(map[string]DatabaseStatsByDbName)
-	for name, _ := range urisByNodeName {
-		dbStatsByDbName[name] = make(map[string]DatabaseStats)
-		for _, dbName := range c.databases {
-			data, err := c.request("GET", fmt.Sprintf("%s/%s", c.baseUri, dbName))
-			if err != nil {
-				return nil, fmt.Errorf("Error reading database '%s' stats: %v", dbName, err)
-			}
-
-			var dbStats DatabaseStats
-			err = json.Unmarshal(data, &dbStats)
-			if err != nil {
-				return nil, fmt.Errorf("error unmarshalling database '%s' stats: %v", dbName, err)
-			}
-			dbStats.DiskSizeOverhead = dbStats.DiskSize - dbStats.DataSize
-			dbStatsByDbName[name][dbName] = dbStats
+func (c *CouchdbClient) getDatabasesStatsByNodeName(urisByNodeName map[string]string) (map[string]DatabaseStats, error) {
+	dbStatsByDbName := make(map[string]DatabaseStats)
+	for _, dbName := range c.databases {
+		data, err := c.request("GET", fmt.Sprintf("%s/%s", c.baseUri, dbName))
+		if err != nil {
+			return nil, fmt.Errorf("Error reading database '%s' stats: %v", dbName, err)
 		}
+
+		var dbStats DatabaseStats
+		err = json.Unmarshal(data, &dbStats)
+		if err != nil {
+			return nil, fmt.Errorf("error unmarshalling database '%s' stats: %v", dbName, err)
+		}
+		dbStats.DiskSizeOverhead = dbStats.DiskSize - dbStats.DataSize
+		dbStatsByDbName[dbName] = dbStats
 	}
 	return dbStatsByDbName, nil
 }
@@ -203,7 +200,7 @@ func (c *CouchdbClient) getActiveTasks() (ActiveTasksResponse, error) {
 	}
 	for _, activeTask := range activeTasks {
 		// CouchDB 1.x doesn't know anything about nodes.
-		if activeTask.Node != "" {
+		if activeTask.Node == "" {
 			activeTask.Node = "master"
 		}
 	}

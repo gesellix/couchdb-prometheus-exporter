@@ -36,12 +36,10 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, datab
 		e.viewReads.WithLabelValues(name).Set(nodeStats.Couchdb.Httpd.ViewReads.Value)
 	}
 
-	for name, dbStats := range stats.DatabaseStatsByNodeName {
-		for _, dbName := range databases {
-			e.diskSize.WithLabelValues(name, dbName).Set(dbStats[dbName].DiskSize)
-			e.dataSize.WithLabelValues(name, dbName).Set(dbStats[dbName].DataSize)
-			e.diskSizeOverhead.WithLabelValues(name, dbName).Set(dbStats[dbName].DiskSizeOverhead)
-		}
+	for _, dbName := range databases {
+		e.diskSize.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DiskSize)
+		e.dataSize.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DataSize)
+		e.diskSizeOverhead.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DiskSizeOverhead)
 	}
 
 	activeTasksByNode := make(map[string]ActiveTaskTypes)

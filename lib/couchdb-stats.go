@@ -99,8 +99,8 @@ type ActiveTask struct {
 type ActiveTasksResponse []ActiveTask
 
 type Stats struct {
-	StatsByNodeName         map[string]StatsResponse
-	DatabaseStatsByNodeName map[string]DatabaseStatsByDbName
-	ActiveTasksResponse     ActiveTasksResponse
-	ApiVersion              string
+	StatsByNodeName       map[string]StatsResponse
+	DatabaseStatsByDbName DatabaseStatsByDbName
+	ActiveTasksResponse   ActiveTasksResponse
+	ApiVersion            string
 }

@@ -48,16 +48,16 @@ The node name makes more sense in a clustered CouchDB 2.x environment with sever
 
     # HELP couchdb_database_data_size data size
     # TYPE couchdb_database_data_size gauge
-    couchdb_database_data_size{db_name="db-1",node_name="nonode@nohost"} 1.764941e+06
-    couchdb_database_data_size{db_name="db-2",node_name="nonode@nohost"} 4.93011369e+08
+    couchdb_database_data_size{db_name="db-1"} 1.764941e+06
+    couchdb_database_data_size{db_name="db-2"} 4.93011369e+08
     # HELP couchdb_database_disk_size disk size
     # TYPE couchdb_database_disk_size gauge
-    couchdb_database_disk_size{db_name="db-1",node_name="nonode@nohost"} 2.098663e+06
-    couchdb_database_disk_size{db_name="db-2",node_name="nonode@nohost"} 6.60108847e+08
+    couchdb_database_disk_size{db_name="db-1"} 2.098663e+06
+    couchdb_database_disk_size{db_name="db-2"} 6.60108847e+08
     # HELP couchdb_database_overhead disk size overhead
     # TYPE couchdb_database_overhead gauge
-    couchdb_database_overhead{db_name="db-1",node_name="nonode@nohost"} 333722
-    couchdb_database_overhead{db_name="db-2",node_name="nonode@nohost"} 1.67097478e+08
+    couchdb_database_overhead{db_name="db-1"} 333722
+    couchdb_database_overhead{db_name="db-2"} 1.67097478e+08
     # HELP couchdb_httpd_auth_cache_hits number of authentication cache hits
     # TYPE couchdb_httpd_auth_cache_hits gauge
     couchdb_httpd_auth_cache_hits{node_name="nonode@nohost"} 0

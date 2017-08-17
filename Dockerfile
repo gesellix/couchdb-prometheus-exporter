@@ -8,7 +8,9 @@ COPY . $APPPATH
 
 RUN apk add --update -t build-deps go git mercurial libc-dev gcc libgcc \
     && cd $APPPATH && go get -d && go build -o /bin/couchdb-prometheus-exporter \
-    && apk del --purge build-deps && rm -rf $GOPATH
+    && apk del --purge build-deps && rm -rf $GOPATH \
+    && adduser -DH user
+USER user
 
 ENTRYPOINT [ "/bin/couchdb-prometheus-exporter", "-telemetry.address=0.0.0.0:9984" ]
 CMD [ "-logtostderr" ]

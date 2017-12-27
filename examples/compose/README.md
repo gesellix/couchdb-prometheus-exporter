@@ -21,7 +21,7 @@ Configure the cluster, including the root (admin) user.
 
     curl -X POST "http://localhost:5984/_cluster_setup" \
          -H "Content-Type: application/json" \
-         -d '{"action":"enable_cluster", "username":"root", "password":"a-secret", "bind_address":"0.0.0.0", "port":5984}'
+         -d '{"action":"enable_cluster", "username":"root", "password":"a-secret", "bind_address":"0.0.0.0", "port":5984, "node_count": 1}'
     curl -X POST "http://localhost:5984/_session" \
          -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" \
          -d 'name=root&password=a-secret' \

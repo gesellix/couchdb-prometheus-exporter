@@ -10,7 +10,7 @@ function prop {
 
 curl -X POST "${COUCHDB_ADDRESS}/_cluster_setup" \
      -H "Content-Type: application/json" \
-     -d "{\"action\":\"enable_cluster\", \"username\":\"$(prop couchdb.username)\", \"password\":\"$(prop couchdb.password)\", \"bind_address\":\"0.0.0.0\", \"port\":5984}"
+     -d "{\"action\":\"enable_cluster\", \"username\":\"$(prop couchdb.username)\", \"password\":\"$(prop couchdb.password)\", \"bind_address\":\"0.0.0.0\", \"port\":5984, \"node_count\": 1}"
 curl -X POST "${COUCHDB_ADDRESS}/_session" \
      -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" \
      -d "name=$(prop couchdb.username)&password=$(prop couchdb.password)" \

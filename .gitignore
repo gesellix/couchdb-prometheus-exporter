@@ -33,5 +33,6 @@ couchdb-exporter
 
 couchdb-cookies.txt
 .couchdb-env
+/logs
 
 .DS_Store

@@ -5,7 +5,7 @@ import (
 	goflag "flag"
 	"net/http"
 	"strconv"
-	"github.com/gesellix/couchdb-exporter/lib"
+	"github.com/gesellix/couchdb-prometheus-exporter/lib"
 	"github.com/golang/glog"
 	"github.com/namsral/flag"
 	"github.com/prometheus/client_golang/prometheus"
@@ -24,6 +24,10 @@ type exporterConfigType struct {
 
 var exporterConfig exporterConfigType
 
+// If non-empty, overrides the choice of directory in which to write logs.
+// See glog.createLogDirs for the full list of possible destinations.
+var logDir string
+
 func init() {
 	flag.String(flag.DefaultConfigFlagname, "", "path to config file")
 	flag.StringVar(&exporterConfig.listenAddress, "telemetry.address", "localhost:9984", "Address on which to expose metrics.")
@@ -37,6 +41,7 @@ func init() {
 	flag.BoolVar(&logging.alsoToStderr, "alsologtostderr", false, "log to standard error as well as files")
 	flag.Var(&logging.verbosity, "v", "log level for V logs")
 	flag.Var(&logging.stderrThreshold, "stderrthreshold", "logs at or above this threshold go to stderr")
+	flag.StringVar(&logDir, "log_dir", "", "If non-empty, write log files in this directory")
 
 	// Default stderrThreshold is ERROR.
 	logging.stderrThreshold = errorLog
@@ -52,6 +57,7 @@ func main() {
 	goflag.Lookup("alsologtostderr").Value.Set(strconv.FormatBool(*&logging.alsoToStderr))
 	goflag.Lookup("v").Value.Set(logging.verbosity.String())
 	goflag.Lookup("stderrthreshold").Value.Set(logging.stderrThreshold.String())
+	goflag.Lookup("log_dir").Value.Set(*&logDir)
 
 	databases := strings.Split(*&exporterConfig.databases, ",")
 

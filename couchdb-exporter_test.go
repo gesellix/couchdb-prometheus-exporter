@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/gesellix/couchdb-exporter/lib"
+	"github.com/gesellix/couchdb-prometheus-exporter/lib"
 	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
 	dto "github.com/prometheus/client_model/go"
@@ -15,9 +15,9 @@ import (
 	"testing"
 )
 
-type handler func(w http.ResponseWriter, r *http.Request)
+type Handler func(w http.ResponseWriter, r *http.Request)
 
-func BasicAuth(basicAuth lib.BasicAuth, pass handler) handler {
+func BasicAuth(basicAuth lib.BasicAuth, pass Handler) Handler {
 
 	validate := func(basicAuth lib.BasicAuth, username, password string) bool {
 		if username == basicAuth.Username && password == basicAuth.Password {
@@ -59,7 +59,7 @@ func readFile(t *testing.T, filename string) []byte {
 	return fileContent
 }
 
-func couchdbResponse(t *testing.T, versionSuffix string) handler {
+func couchdbResponse(t *testing.T, versionSuffix string) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/" {
 			file := readFile(t, fmt.Sprintf("./testdata/couchdb-%s.json", versionSuffix))

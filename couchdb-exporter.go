@@ -5,12 +5,13 @@ import (
 	goflag "flag"
 	"net/http"
 	"strconv"
+	"strings"
+	"github.com/gesellix/couchdb-prometheus-exporter/glogadapt"
 	"github.com/gesellix/couchdb-prometheus-exporter/lib"
 	"github.com/golang/glog"
 	"github.com/namsral/flag"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"strings"
 )
 
 type exporterConfigType struct {
@@ -24,10 +25,6 @@ type exporterConfigType struct {
 
 var exporterConfig exporterConfigType
 
-// If non-empty, overrides the choice of directory in which to write logs.
-// See glog.createLogDirs for the full list of possible destinations.
-var logDir string
-
 func init() {
 	flag.String(flag.DefaultConfigFlagname, "", "path to config file")
 	flag.StringVar(&exporterConfig.listenAddress, "telemetry.address", "localhost:9984", "Address on which to expose metrics.")
@@ -37,14 +34,11 @@ func init() {
 	flag.StringVar(&exporterConfig.couchdbPassword, "couchdb.password", "", "Basic auth password for the CouchDB instance")
 	flag.StringVar(&exporterConfig.databases, "databases", "", "Comma separated list of database names")
 
-	flag.BoolVar(&logging.toStderr, "logtostderr", false, "log to standard error instead of files")
-	flag.BoolVar(&logging.alsoToStderr, "alsologtostderr", false, "log to standard error as well as files")
-	flag.Var(&logging.verbosity, "v", "log level for V logs")
-	flag.Var(&logging.stderrThreshold, "stderrthreshold", "logs at or above this threshold go to stderr")
-	flag.StringVar(&logDir, "log_dir", "", "If non-empty, write log files in this directory")
-
-	// Default stderrThreshold is ERROR.
-	logging.stderrThreshold = errorLog
+	flag.BoolVar(&glogadapt.Logging.ToStderr, "logtostderr", false, "log to standard error instead of files")
+	flag.BoolVar(&glogadapt.Logging.AlsoToStderr, "alsologtostderr", false, "log to standard error as well as files")
+	flag.Var(&glogadapt.Logging.Verbosity, "v", "log level for V logs")
+	flag.Var(&glogadapt.Logging.StderrThreshold, "stderrthreshold", "logs at or above this threshold go to stderr")
+	flag.StringVar(&glogadapt.Logging.LogDir, "log_dir", "", "If non-empty, write log files in this directory")
 }
 
 func main() {
@@ -53,11 +47,11 @@ func main() {
 	// Necessary due to https://github.com/golang/glog/commit/65d674618f712aa808a7d0104131b9206fc3d5ad
 	// and us using another flags package.
 	goflag.CommandLine.Parse([]string{})
-	goflag.Lookup("logtostderr").Value.Set(strconv.FormatBool(*&logging.toStderr))
-	goflag.Lookup("alsologtostderr").Value.Set(strconv.FormatBool(*&logging.alsoToStderr))
-	goflag.Lookup("v").Value.Set(logging.verbosity.String())
-	goflag.Lookup("stderrthreshold").Value.Set(logging.stderrThreshold.String())
-	goflag.Lookup("log_dir").Value.Set(*&logDir)
+	goflag.Lookup("logtostderr").Value.Set(strconv.FormatBool(*&glogadapt.Logging.ToStderr))
+	goflag.Lookup("alsologtostderr").Value.Set(strconv.FormatBool(*&glogadapt.Logging.AlsoToStderr))
+	goflag.Lookup("v").Value.Set(glogadapt.Logging.Verbosity.String())
+	goflag.Lookup("stderrthreshold").Value.Set(glogadapt.Logging.StderrThreshold.String())
+	goflag.Lookup("log_dir").Value.Set(glogadapt.Logging.LogDir)
 
 	databases := strings.Split(*&exporterConfig.databases, ",")
 

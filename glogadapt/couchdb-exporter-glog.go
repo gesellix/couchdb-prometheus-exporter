@@ -1,12 +1,14 @@
+// Adapts parts of the golang/glog package
+// to allow us passing glog flags via our own flags package.
 // Idea taken from https://github.com/kubernetes/kubernetes/pull/3342
 
-package main
+package glogadapt
 
 import (
-	"github.com/golang/glog"
 	"strconv"
-	"sync/atomic"
 	"strings"
+	"sync/atomic"
+	"github.com/golang/glog"
 )
 
 // severity identifies the sort of log: info, warning etc. It also implements
@@ -47,11 +49,6 @@ func (s *severity) String() string {
 	return strconv.FormatInt(int64(*s), 10)
 }
 
-// Get is part of the flag.Value interface.
-//func (s *severity) Get() interface{} {
-//	return *s
-//}
-
 // Set is part of the flag.Value interface.
 func (s *severity) Set(value string) error {
 	var threshold severity
@@ -65,7 +62,7 @@ func (s *severity) Set(value string) error {
 		}
 		threshold = severity(v)
 	}
-	logging.stderrThreshold.set(threshold)
+	Logging.StderrThreshold.set(threshold)
 	return nil
 }
 
@@ -80,17 +77,26 @@ func severityByName(s string) (severity, bool) {
 }
 
 // loggingT collects all the global state of the logging setup.
-type loggingT struct {
+type LoggingT struct {
 	// Boolean flags. Not handled atomically because the flag.Value interface
 	// does not let us avoid the =true, and that shorthand is necessary for
 	// compatibility. TODO: does this matter enough to fix? Seems unlikely.
-	toStderr     bool // The -logtostderr flag.
-	alsoToStderr bool // The -alsologtostderr flag.
+	ToStderr     bool // The -logtostderr flag.
+	AlsoToStderr bool // The -alsologtostderr flag.
 
 	// Level flag. Handled atomically.
-	stderrThreshold severity // The -stderrthreshold flag.
+	StderrThreshold severity // The -stderrthreshold flag.
 
-	verbosity glog.Level // V logging level, the value of the -v flag/
+	Verbosity glog.Level // V logging level, the value of the -v flag/
+
+	// If non-empty, overrides the choice of directory in which to write logs.
+	// See glog.createLogDirs for the full list of possible destinations.
+	LogDir string
 }
 
-var logging loggingT
+var Logging LoggingT
+
+func init() {
+	// Default stderrThreshold is ERROR.
+	Logging.StderrThreshold = errorLog
+}

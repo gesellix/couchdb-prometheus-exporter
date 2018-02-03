@@ -104,7 +104,7 @@ func (c *CouchdbClient) getStatsByNodeName(urisByNodeName map[string]string) (ma
 	for name, uri := range urisByNodeName {
 		data, err := c.request("GET", fmt.Sprintf("%s/_stats", uri))
 		if err != nil {
-			return nil, fmt.Errorf("Error reading couchdb stats: %v", err)
+			return nil, fmt.Errorf("error reading couchdb stats: %v", err)
 		}
 
 		var stats StatsResponse
@@ -173,7 +173,7 @@ func (c *CouchdbClient) getDatabasesStatsByNodeName(urisByNodeName map[string]st
 	for _, dbName := range c.databases {
 		data, err := c.request("GET", fmt.Sprintf("%s/%s", c.baseUri, dbName))
 		if err != nil {
-			return nil, fmt.Errorf("Error reading database '%s' stats: %v", dbName, err)
+			return nil, fmt.Errorf("error reading database '%s' stats: %v", dbName, err)
 		}
 
 		var dbStats DatabaseStats
@@ -190,7 +190,7 @@ func (c *CouchdbClient) getDatabasesStatsByNodeName(urisByNodeName map[string]st
 func (c *CouchdbClient) getActiveTasks() (ActiveTasksResponse, error) {
 	data, err := c.request("GET", fmt.Sprintf("%s/_active_tasks", c.baseUri))
 	if err != nil {
-		return ActiveTasksResponse{}, fmt.Errorf("Error reading active tasks: %v", err)
+		return ActiveTasksResponse{}, fmt.Errorf("error reading active tasks: %v", err)
 	}
 
 	var activeTasks ActiveTasksResponse
@@ -227,7 +227,7 @@ func (c *CouchdbClient) request(method string, uri string) (respData []byte, err
 		if err != nil {
 			respData = []byte(err.Error())
 		}
-		return nil, fmt.Errorf("Status %s (%d): %s", resp.Status, resp.StatusCode, respData)
+		return nil, fmt.Errorf("status %s (%d): %s", resp.Status, resp.StatusCode, respData)
 	}
 
 	return respData, nil

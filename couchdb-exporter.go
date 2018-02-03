@@ -69,7 +69,7 @@ func main() {
 		http.Redirect(w, r, *&exporterConfig.metricsEndpoint, http.StatusMovedPermanently)
 	})
 
-	glog.Infof("Starting exporter at %s to read from CouchDB at %s", *&exporterConfig.listenAddress, *&exporterConfig.couchdbURI)
+	glog.Infof("Starting exporter at '%s' to read from CouchDB at '%s'", *&exporterConfig.listenAddress, *&exporterConfig.couchdbURI)
 	err := http.ListenAndServe(*&exporterConfig.listenAddress, nil)
 	if err != nil {
 		glog.Fatal(err)

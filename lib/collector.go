@@ -63,7 +63,7 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	e.up.Set(0)
 	stats, err := e.client.getStats()
 	if err != nil {
-		return fmt.Errorf("Error reading couchdb stats: %v", err)
+		return fmt.Errorf("error collecting couchdb stats: %v", err)
 	}
 
 	e.up.Set(1)

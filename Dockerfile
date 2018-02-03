@@ -10,7 +10,7 @@ COPY . $APPPATH
 RUN cd $APPPATH && go get -d && go build -o /bin/couchdb-prometheus-exporter
 
 
-FROM alpine:edge
+FROM scratch
 LABEL maintainer="Tobias Gesellchen <tobias@gesellix.de> (@gesellix)"
 
 EXPOSE 9984

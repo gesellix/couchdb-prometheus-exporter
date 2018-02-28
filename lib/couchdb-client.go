@@ -110,6 +110,7 @@ func (c *CouchdbClient) getStatsByNodeName(urisByNodeName map[string]string) (ma
 				return nil, err
 			}
 
+			delete(urisByNodeName, name)
 			glog.Error(fmt.Errorf("continuing despite error: %v", err))
 			continue
 		}
@@ -121,6 +122,11 @@ func (c *CouchdbClient) getStatsByNodeName(urisByNodeName map[string]string) (ma
 		}
 		statsByNodeName[name] = stats
 	}
+
+	if len(urisByNodeName) == 0 {
+		return nil, fmt.Errorf("all nodes down")
+	}
+
 	return statsByNodeName, nil
 }
 

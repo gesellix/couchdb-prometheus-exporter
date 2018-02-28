@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/go-version"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 var (
@@ -104,7 +105,13 @@ func (c *CouchdbClient) getStatsByNodeName(urisByNodeName map[string]string) (ma
 	for name, uri := range urisByNodeName {
 		data, err := c.request("GET", fmt.Sprintf("%s/_stats", uri))
 		if err != nil {
-			return nil, fmt.Errorf("error reading couchdb stats: %v", err)
+			err = fmt.Errorf("error reading couchdb stats: %v", err)
+			if !strings.Contains(err.Error(), "\"error\":\"nodedown\"") {
+				return nil, err
+			}
+
+			glog.Error(fmt.Errorf("continuing despite error: %v", err))
+			continue
 		}
 
 		var stats StatsResponse

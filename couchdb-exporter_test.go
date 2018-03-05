@@ -146,5 +146,5 @@ func TestCouchdbStatsV1(t *testing.T) {
 }
 
 func TestCouchdbStatsV2(t *testing.T) {
-	performCouchdbStatsTest(t, "v2", 74, 4712, 58570)
+	performCouchdbStatsTest(t, "v2", 76, 4712, 58570)
 }

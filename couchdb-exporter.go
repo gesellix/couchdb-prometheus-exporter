@@ -57,7 +57,9 @@ func main() {
 
 	exporter := lib.NewExporter(
 		*&exporterConfig.couchdbURI,
-		lib.BasicAuth{Username: *&exporterConfig.couchdbUsername, Password: *&exporterConfig.couchdbPassword},
+		lib.BasicAuth{
+			Username: *&exporterConfig.couchdbUsername,
+			Password: *&exporterConfig.couchdbPassword},
 		databases)
 	prometheus.MustRegister(exporter)
 

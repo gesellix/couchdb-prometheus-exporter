@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"io"
 )
 
 var (
@@ -22,7 +23,7 @@ type BasicAuth struct {
 }
 
 type CouchdbClient struct {
-	baseUri   string
+	BaseUri   string
 	basicAuth BasicAuth
 	databases []string
 	client    *http.Client
@@ -39,7 +40,7 @@ type MembershipResponse struct {
 }
 
 func (c *CouchdbClient) getServerVersion() (string, error) {
-	data, err := c.request("GET", fmt.Sprintf("%s/", c.baseUri))
+	data, err := c.Request("GET", fmt.Sprintf("%s/", c.BaseUri), nil)
 	if err != nil {
 		return "", err
 	}
@@ -73,7 +74,7 @@ func (c *CouchdbClient) isCouchDbV2() (bool, error) {
 }
 
 func (c *CouchdbClient) getNodeNames() ([]string, error) {
-	data, err := c.request("GET", fmt.Sprintf("%s/_membership", c.baseUri))
+	data, err := c.Request("GET", fmt.Sprintf("%s/_membership", c.BaseUri), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +104,7 @@ func (c *CouchdbClient) getNodeBaseUrisByNodeName(baseUri string) (map[string]st
 func (c *CouchdbClient) getStatsByNodeName(urisByNodeName map[string]string) (map[string]StatsResponse, error) {
 	statsByNodeName := make(map[string]StatsResponse)
 	for name, uri := range urisByNodeName {
-		data, err := c.request("GET", fmt.Sprintf("%s/_stats", uri))
+		data, err := c.Request("GET", fmt.Sprintf("%s/_stats", uri), nil)
 		if err != nil {
 			err = fmt.Errorf("error reading couchdb stats: %v", err)
 			if !strings.Contains(err.Error(), "\"error\":\"nodedown\"") {
@@ -136,7 +137,7 @@ func (c *CouchdbClient) getStats() (Stats, error) {
 		return Stats{}, err
 	}
 	if isCouchDbV2 {
-		urisByNode, err := c.getNodeBaseUrisByNodeName(c.baseUri)
+		urisByNode, err := c.getNodeBaseUrisByNodeName(c.BaseUri)
 		if err != nil {
 			return Stats{}, err
 		}
@@ -159,7 +160,7 @@ func (c *CouchdbClient) getStats() (Stats, error) {
 			ApiVersion:            "2"}, nil
 	} else {
 		urisByNode := map[string]string{
-			"master": c.baseUri,
+			"master": c.BaseUri,
 		}
 		nodeStats, err := c.getStatsByNodeName(urisByNode)
 		if err != nil {
@@ -184,7 +185,7 @@ func (c *CouchdbClient) getStats() (Stats, error) {
 func (c *CouchdbClient) getDatabasesStatsByNodeName(urisByNodeName map[string]string) (map[string]DatabaseStats, error) {
 	dbStatsByDbName := make(map[string]DatabaseStats)
 	for _, dbName := range c.databases {
-		data, err := c.request("GET", fmt.Sprintf("%s/%s", c.baseUri, dbName))
+		data, err := c.Request("GET", fmt.Sprintf("%s/%s", c.BaseUri, dbName), nil)
 		if err != nil {
 			return nil, fmt.Errorf("error reading database '%s' stats: %v", dbName, err)
 		}
@@ -201,7 +202,7 @@ func (c *CouchdbClient) getDatabasesStatsByNodeName(urisByNodeName map[string]st
 }
 
 func (c *CouchdbClient) getActiveTasks() (ActiveTasksResponse, error) {
-	data, err := c.request("GET", fmt.Sprintf("%s/_active_tasks", c.baseUri))
+	data, err := c.Request("GET", fmt.Sprintf("%s/_active_tasks", c.BaseUri), nil)
 	if err != nil {
 		return ActiveTasksResponse{}, fmt.Errorf("error reading active tasks: %v", err)
 	}
@@ -220,10 +221,15 @@ func (c *CouchdbClient) getActiveTasks() (ActiveTasksResponse, error) {
 	return activeTasks, nil
 }
 
-func (c *CouchdbClient) request(method string, uri string) (respData []byte, err error) {
-	req, err := http.NewRequest(method, uri, nil)
+func (c *CouchdbClient) Request(method string, uri string, body io.Reader) (respData []byte, err error) {
+	req, err := http.NewRequest(method, uri, body)
 	if err != nil {
 		return nil, err
+	}
+	if body != nil {
+		req.Header = http.Header{
+			"Content-Type": []string{"application/json"},
+		}
 	}
 	if len(c.basicAuth.Username) > 0 {
 		req.SetBasicAuth(c.basicAuth.Username, c.basicAuth.Password)
@@ -254,7 +260,7 @@ func NewCouchdbClient(uri string, basicAuth BasicAuth, databases []string) *Couc
 	}
 
 	return &CouchdbClient{
-		baseUri:   uri,
+		BaseUri:   uri,
 		basicAuth: basicAuth,
 		databases: databases,
 		client:    httpClient,

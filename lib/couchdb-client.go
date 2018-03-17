@@ -104,6 +104,7 @@ func (c *CouchdbClient) getNodeBaseUrisByNodeName(baseUri string) (map[string]st
 func (c *CouchdbClient) getStatsByNodeName(urisByNodeName map[string]string) (map[string]StatsResponse, error) {
 	statsByNodeName := make(map[string]StatsResponse)
 	for name, uri := range urisByNodeName {
+		var stats StatsResponse
 		data, err := c.Request("GET", fmt.Sprintf("%s/_stats", uri), nil)
 		if err != nil {
 			err = fmt.Errorf("error reading couchdb stats: %v", err)
@@ -111,12 +112,13 @@ func (c *CouchdbClient) getStatsByNodeName(urisByNodeName map[string]string) (ma
 				return nil, err
 			}
 
-			delete(urisByNodeName, name)
+			stats.Up = 0
 			glog.Error(fmt.Errorf("continuing despite error: %v", err))
 			continue
 		}
 
-		var stats StatsResponse
+		stats.Up = 1
+
 		err = json.Unmarshal(data, &stats)
 		if err != nil {
 			return nil, fmt.Errorf("error unmarshalling stats: %v", err)

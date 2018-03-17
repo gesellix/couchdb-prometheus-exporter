@@ -77,6 +77,7 @@ type Httpd struct {
 
 type StatsResponse struct {
 	Couchdb CouchdbStats `json:"couchdb"`
+	Up      float64      `json:"-"`
 	// v1.x api
 	Httpd               Httpd               `json:"httpd"`
 	HttpdRequestMethods HttpdRequestMethods `json:"httpd_request_methods"`

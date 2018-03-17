@@ -44,16 +44,17 @@ services:
     ports:
       - "9984:9984"
 
-  cluster-init:
-    image: cluster-init
+  cluster-setup:
+    image: gesellix/couchdb-cluster-config
+    command: -nodes 172.16.238.11 -nodes 172.16.238.12 -nodes 172.16.238.13
     networks:
       couchdb-cluster:
         ipv4_address: 172.16.238.99
 
 networks:
   couchdb-cluster:
-   driver: overlay
-   ipam:
-    driver: default
-    config:
-      - subnet: "172.16.238.0/24"
+    driver: overlay
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.238.0/24"

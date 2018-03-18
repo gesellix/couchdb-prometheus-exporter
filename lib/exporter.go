@@ -45,10 +45,10 @@ type Exporter struct {
 	activeTasksReplication        *prometheus.GaugeVec
 }
 
-func NewExporter(uri string, basicAuth BasicAuth, databases []string) *Exporter {
+func NewExporter(uri string, basicAuth BasicAuth, databases []string, insecure bool) *Exporter {
 
 	return &Exporter{
-		client:    NewCouchdbClient(uri, basicAuth, databases),
+		client:    NewCouchdbClient(uri, basicAuth, databases, insecure),
 		databases: databases,
 
 		up: prometheus.NewGauge(

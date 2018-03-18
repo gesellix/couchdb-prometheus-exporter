@@ -20,6 +20,7 @@ type exporterConfigType struct {
 	couchdbURI      string
 	couchdbUsername string
 	couchdbPassword string
+	couchdbInsecure bool
 	databases       string
 }
 
@@ -32,6 +33,7 @@ func init() {
 	flag.StringVar(&exporterConfig.couchdbURI, "couchdb.uri", "http://localhost:5984", "URI to the CouchDB instance")
 	flag.StringVar(&exporterConfig.couchdbUsername, "couchdb.username", "", "Basic auth username for the CouchDB instance")
 	flag.StringVar(&exporterConfig.couchdbPassword, "couchdb.password", "", "Basic auth password for the CouchDB instance")
+	flag.BoolVar(&exporterConfig.couchdbInsecure, "couchdb.insecure", true, "Ignore server certificate if using https")
 	flag.StringVar(&exporterConfig.databases, "databases", "", "Comma separated list of database names")
 
 	flag.BoolVar(&glogadapt.Logging.ToStderr, "logtostderr", false, "log to standard error instead of files")
@@ -60,7 +62,8 @@ func main() {
 		lib.BasicAuth{
 			Username: *&exporterConfig.couchdbUsername,
 			Password: *&exporterConfig.couchdbPassword},
-		databases)
+		databases,
+		*&exporterConfig.couchdbInsecure)
 	prometheus.MustRegister(exporter)
 
 	http.Handle(*&exporterConfig.metricsEndpoint, promhttp.Handler())

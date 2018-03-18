@@ -35,7 +35,7 @@ services:
       - "35984:5984"
 
   couchdbstats:
-    image: gesellix/couchdb-prometheus-exporter
+    image: "gesellix/couchdb-prometheus-exporter:${COUCHDB_EXPORTER_VERSION:-latest}"
     command: -couchdb.uri=http://couchdb1:5984 -logtostderr
     env_file: .couchdb-env
     networks:

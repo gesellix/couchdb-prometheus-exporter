@@ -9,19 +9,15 @@ services:
       - couchdb-test:/opt/couchdb/data
     networks:
       - couchdb-test
-    expose:
-      - 5984
     ports:
       - "5984:5984"
 
   couchdbstats:
-    image: gesellix/couchdb-prometheus-exporter
+    image: "gesellix/couchdb-prometheus-exporter:${COUCHDB_EXPORTER_VERSION:-latest}"
     command: -couchdb.uri=http://couchdb:5984 -logtostderr
     env_file: .couchdb-env
     networks:
       - couchdb-test
-    expose:
-      - 9984
     ports:
       - "9984:9984"
 

@@ -1,4 +1,13 @@
+sudo: required
+
+services:
+  - docker
+
 language: go
 go:
   - "1.10"
 #  - tip
+
+before_script: ./integration-test.sh
+
+#after_script: ./integration-test.sh

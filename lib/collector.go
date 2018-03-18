@@ -66,7 +66,6 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	if err != nil {
 		return fmt.Errorf("error collecting couchdb stats: %v", err)
 	}
-
 	e.up.Set(1)
 
 	if stats.ApiVersion == "2" {

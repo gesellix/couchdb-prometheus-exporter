@@ -3,16 +3,15 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/gesellix/couchdb-prometheus-exporter/lib"
-	"github.com/golang/protobuf/proto"
-	"github.com/prometheus/client_golang/prometheus"
-	dto "github.com/prometheus/client_model/go"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"sort"
 	"strings"
 	"testing"
+	"github.com/gesellix/couchdb-cluster-config/pkg"
+	"github.com/gesellix/couchdb-prometheus-exporter/lib"
+	"github.com/gesellix/couchdb-prometheus-exporter/testutil"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type Handler func(w http.ResponseWriter, r *http.Request)
@@ -83,68 +82,105 @@ func couchdbResponse(t *testing.T, versionSuffix string) Handler {
 	}
 }
 
-func getGaugeValue(metrics []*dto.Metric, labelName string, labelValue string) float64 {
-	for _, metric := range metrics {
-		for _, label := range metric.Label {
-			if *label.Name == labelName && *label.Value == labelValue {
-				return *metric.Gauge.Value
-			}
-		}
-	}
-	return 0
-}
-
-func printMetrics(metrics []*dto.Metric) {
-	metricStrings := []string{}
-	for _, metric := range metrics {
-		metricStrings = append(metricStrings, proto.MarshalTextString(metric))
-	}
-
-	sort.Strings(metricStrings)
-	fmt.Println(metricStrings)
-}
-
 func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetricsCount int, expectedGetRequestCount float64, expectedDiskSize float64) {
 	basicAuth := lib.BasicAuth{Username: "username", Password: "password"}
 	handler := http.HandlerFunc(BasicAuth(basicAuth, couchdbResponse(t, couchdbVersion)))
 	server := httptest.NewServer(handler)
 
-	e := lib.NewExporter(server.URL, basicAuth, []string{"example", "another-example"})
-	ch := make(chan prometheus.Metric)
+	e := lib.NewExporter(server.URL, basicAuth, []string{"example", "another-example"}, true)
 
+	ch := make(chan prometheus.Metric)
 	go func() {
 		defer close(ch)
 		e.Collect(ch)
 	}()
 
-	metrics := []*dto.Metric{}
-	for metric := range ch {
-		dtoMetric := &dto.Metric{}
-		metric.Write(dtoMetric)
-		metrics = append(metrics, dtoMetric)
-	}
-	//printMetrics(metrics)
-	actualGetRequestCount := getGaugeValue(metrics, "method", "GET")
-	actualDiskSize := getGaugeValue(metrics, "db_name", "example")
+	metricFamilies := testutil.CollectMetrics(ch, false)
+	metricsCount := testutil.CountMetrics(metricFamilies)
 
-	if len(metrics) < expectedMetricsCount {
-		t.Errorf("got less metrics (%d) as expected (%d)", len(metrics), expectedMetricsCount)
+	if metricsCount < expectedMetricsCount {
+		t.Errorf("got less metrics (%d) as expected (%d)", metricsCount, expectedMetricsCount)
 	}
-	if len(metrics) > expectedMetricsCount {
-		t.Errorf("got more metrics (%d) as expected (%d)", len(metrics), expectedMetricsCount)
+	if metricsCount > expectedMetricsCount {
+		t.Errorf("got more metrics (%d) as expected (%d)", metricsCount, expectedMetricsCount)
 	}
+
+	actualGetRequestCount := testutil.GetGaugeValue(metricFamilies, "couchdb_httpd_request_methods", "method", "GET")
 	if expectedGetRequestCount != actualGetRequestCount {
 		t.Errorf("expected %f GET requests, but got %f instead", expectedGetRequestCount, actualGetRequestCount)
 	}
+
+	actualDiskSize := testutil.GetGaugeValue(metricFamilies, "couchdb_database_disk_size", "db_name", "example")
 	if expectedDiskSize != actualDiskSize {
 		t.Errorf("expected %f disk size, but got %f instead", expectedDiskSize, actualDiskSize)
 	}
 }
 
 func TestCouchdbStatsV1(t *testing.T) {
-	performCouchdbStatsTest(t, "v1", 43, 4711, 12396)
+	performCouchdbStatsTest(t, "v1", 44, 4711, 12396)
 }
 
 func TestCouchdbStatsV2(t *testing.T) {
 	performCouchdbStatsTest(t, "v2", 76, 4712, 58570)
+}
+
+func TestIntegrationCouchdbStatsV1(t *testing.T) {
+	dbAddress := "localhost:4895"
+	err := cluster_config.AwaitNodes([]string{dbAddress})
+	if err != nil {
+		t.Error(err)
+	}
+	dbUrl := fmt.Sprintf("http://%s", dbAddress)
+
+	t.Run("node_up", func(t *testing.T) {
+		basicAuth := lib.BasicAuth{Username: "root", Password: "a-secret"}
+		e := lib.NewExporter(dbUrl, basicAuth, []string{}, true)
+
+		ch := make(chan prometheus.Metric)
+		go func() {
+			defer close(ch)
+			e.Collect(ch)
+		}()
+
+		metricFamilies := testutil.CollectMetrics(ch, false)
+
+		nodeName := "master"
+		actualNodeUp := testutil.GetGaugeValue(metricFamilies, "couchdb_httpd_node_up", "node_name", nodeName)
+		if actualNodeUp != 1 {
+			t.Errorf("Expected node '%s' at '%s' to be available.", nodeName, dbUrl)
+		}
+	})
+}
+
+func TestIntegrationCouchdbStatsV2(t *testing.T) {
+	// <setup code>
+	// TODO await the cluster being available AND configured as cluster...
+	dbAddress := "localhost:15984"
+	err := cluster_config.AwaitNodes([]string{dbAddress})
+	if err != nil {
+		t.Error(err)
+	}
+	dbUrl := fmt.Sprintf("http://%s", dbAddress)
+
+	t.Run("node_up", func(t *testing.T) {
+		basicAuth := lib.BasicAuth{Username: "root", Password: "a-secret"}
+		e := lib.NewExporter(dbUrl, basicAuth, []string{}, true)
+
+		ch := make(chan prometheus.Metric)
+		go func() {
+			defer close(ch)
+			e.Collect(ch)
+		}()
+
+		metricFamilies := testutil.CollectMetrics(ch, false)
+
+		nodeName := "couchdb@172.16.238.11"
+		actualNodeUp := testutil.GetGaugeValue(metricFamilies, "couchdb_httpd_node_up", "node_name", nodeName)
+		if actualNodeUp != 1 {
+			t.Errorf("Expected node '%s' at '%s' to be available.", nodeName, dbUrl)
+		}
+	})
+
+	// <tear-down code>
+	// (nothing to do)
 }

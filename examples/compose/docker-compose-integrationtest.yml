@@ -1,10 +1,18 @@
 version: "2.3"
 
 services:
+  couchdb0:
+    image: apache/couchdb:1.7.1
+    environment:
+      - "COUCHDB_USER=${COUCHDB_USER:-root}"
+      - "COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
+    restart: always
+    ports:
+      - "4895:5984"
+
   couchdb1:
     image: apache/couchdb:2.1.1
     command: -name couchdb@172.16.238.11 -setcookie thecookie
-    env_file: .couchdb-env
     restart: always
     networks:
       couchdb-cluster:
@@ -15,7 +23,6 @@ services:
   couchdb2:
     image: apache/couchdb:2.1.1
     command: -name couchdb@172.16.238.12 -setcookie thecookie
-    env_file: .couchdb-env
     restart: always
     networks:
       couchdb-cluster:
@@ -26,7 +33,6 @@ services:
   couchdb3:
     image: apache/couchdb:2.1.1
     command: -name couchdb@172.16.238.13 -setcookie thecookie
-    env_file: .couchdb-env
     restart: always
     networks:
       couchdb-cluster:
@@ -37,7 +43,9 @@ services:
   couchdbstats:
     image: "gesellix/couchdb-prometheus-exporter:${COUCHDB_EXPORTER_VERSION:-latest}"
     command: -couchdb.uri=http://couchdb1:5984 -logtostderr
-    env_file: .couchdb-env
+    environment:
+      - "COUCHDB.USERNAME=${COUCHDB_USER:-root}"
+      - "COUCHDB.PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
     networks:
       couchdb-cluster:
         ipv4_address: 172.16.238.10

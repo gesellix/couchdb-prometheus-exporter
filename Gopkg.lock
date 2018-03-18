@@ -8,6 +8,12 @@
   revision = "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9"
 
 [[projects]]
+  name = "github.com/gesellix/couchdb-cluster-config"
+  packages = ["pkg"]
+  revision = "0a1191968ebe85653747c68f559da0f9de498dc6"
+  version = "5"
+
+[[projects]]
   branch = "master"
   name = "github.com/golang/glog"
   packages = ["."]
@@ -60,7 +66,7 @@
     "internal/bitbucket.org/ww/goautoneg",
     "model"
   ]
-  revision = "89604d197083d4781071d3c65855d24ecfb0a563"
+  revision = "e4aa40a9169a88835b849a6efb71e05dc04b88f0"
 
 [[projects]]
   branch = "master"
@@ -71,11 +77,11 @@
     "nfs",
     "xfs"
   ]
-  revision = "cb4147076ac75738c9a7d279075a253c0cc5acbd"
+  revision = "54d17b57dd7d4a3aa092476596b3f8a933bde349"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "93d487dee228e7a89991ffe720c2eda00e54493b973c4987a49cfa3b3c6cddf9"
+  inputs-digest = "c2a9f78d5c521359a62a5dc3961139d561136c81530638e4fc7d977bd9ae859b"
   solver-name = "gps-cdcl"
   solver-version = 1

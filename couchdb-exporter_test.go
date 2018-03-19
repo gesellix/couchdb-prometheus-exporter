@@ -159,8 +159,9 @@ func TestCouchdbStatsV1Integration(t *testing.T) {
 	})
 }
 
-func membership(t *testing.T, dbUrl string, basicAuth lib.BasicAuth) (func(address string) (bool, error)) {
+func membership(t *testing.T, basicAuth lib.BasicAuth) (func(address string) (bool, error)) {
 	return func(address string) (bool, error) {
+		dbUrl := fmt.Sprintf("http://%s", address)
 		c := lib.NewCouchdbClient(dbUrl, basicAuth, []string{}, true)
 		nodeNames, err := c.GetNodeNames()
 		if err != nil {
@@ -170,7 +171,7 @@ func membership(t *testing.T, dbUrl string, basicAuth lib.BasicAuth) (func(addre
 			return false, nil
 			//return false, err
 		}
-		log.Println(fmt.Sprintf("%v", nodeNames))
+		log.Println(fmt.Sprintf("%v (%d)", nodeNames, len(nodeNames)))
 		return assert.ElementsMatch(t, nodeNames, []string{
 			"couchdb@172.16.238.11",
 			"couchdb@172.16.238.12",
@@ -194,7 +195,7 @@ func TestCouchdbStatsV2Integration(t *testing.T) {
 	dbUrl := fmt.Sprintf("http://%s", dbAddress)
 	basicAuth := lib.BasicAuth{Username: "root", Password: "a-secret"}
 
-	err = cluster_config.AwaitNodes([]string{dbAddress}, membership(t, dbUrl, basicAuth))
+	err = cluster_config.AwaitNodes([]string{dbAddress}, membership(t, basicAuth))
 	if err != nil {
 		t.Error(err)
 	}

@@ -11,6 +11,8 @@ Prepare the container env.
     cat << EOB > .couchdb-env 
     COUCHDB.USERNAME=root
     COUCHDB.PASSWORD=a-secret
+    COUCHDB_USER=root
+    COUCHDB_PASSWORD=a-secret
     EOB
 
 Run a CouchDB instance along with the CouchDB exporter.

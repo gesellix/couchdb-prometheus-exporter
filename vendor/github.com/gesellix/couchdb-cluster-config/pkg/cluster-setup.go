@@ -27,7 +27,7 @@ func SetupClusterNodes(ipAddresses []string, insecure bool) error {
 	for i, ip := range ipAddresses {
 		hosts[i] = fmt.Sprintf("%s:5984", ip)
 	}
-	err := AwaitNodes(hosts)
+	err := AwaitNodes(hosts, Available)
 	if err != nil {
 		return err
 	}

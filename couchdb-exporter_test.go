@@ -4,6 +4,8 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io/ioutil"
+	"log"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -12,6 +14,7 @@ import (
 	"github.com/gesellix/couchdb-prometheus-exporter/lib"
 	"github.com/gesellix/couchdb-prometheus-exporter/testutil"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/stretchr/testify/assert"
 )
 
 type Handler func(w http.ResponseWriter, r *http.Request)
@@ -124,9 +127,13 @@ func TestCouchdbStatsV2(t *testing.T) {
 	performCouchdbStatsTest(t, "v2", 76, 4712, 58570)
 }
 
-func TestIntegrationCouchdbStatsV1(t *testing.T) {
+func TestCouchdbStatsV1Integration(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration test")
+	}
+
 	dbAddress := "localhost:4895"
-	err := cluster_config.AwaitNodes([]string{dbAddress})
+	err := cluster_config.AwaitNodes([]string{dbAddress}, cluster_config.Available)
 	if err != nil {
 		t.Error(err)
 	}
@@ -152,18 +159,47 @@ func TestIntegrationCouchdbStatsV1(t *testing.T) {
 	})
 }
 
-func TestIntegrationCouchdbStatsV2(t *testing.T) {
+func membership(t *testing.T, dbUrl string, basicAuth lib.BasicAuth) (func(address string) (bool, error)) {
+	return func(address string) (bool, error) {
+		c := lib.NewCouchdbClient(dbUrl, basicAuth, []string{}, true)
+		nodeNames, err := c.GetNodeNames()
+		if err != nil {
+			if err, ok := err.(net.Error); ok && (err.Timeout() || err.Temporary()) {
+				return false, nil
+			}
+			return false, nil
+			//return false, err
+		}
+		log.Println(fmt.Sprintf("%v", nodeNames))
+		return assert.ElementsMatch(t, nodeNames, []string{
+			"couchdb@172.16.238.11",
+			"couchdb@172.16.238.12",
+			"couchdb@172.16.238.13",
+		}), nil
+	}
+}
+
+func TestCouchdbStatsV2Integration(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration test")
+	}
+
 	// <setup code>
-	// TODO await the cluster being available AND configured as cluster...
 	dbAddress := "localhost:15984"
-	err := cluster_config.AwaitNodes([]string{dbAddress})
+	err := cluster_config.AwaitNodes([]string{dbAddress}, cluster_config.Available)
 	if err != nil {
 		t.Error(err)
 	}
+
 	dbUrl := fmt.Sprintf("http://%s", dbAddress)
+	basicAuth := lib.BasicAuth{Username: "root", Password: "a-secret"}
+
+	err = cluster_config.AwaitNodes([]string{dbAddress}, membership(t, dbUrl, basicAuth))
+	if err != nil {
+		t.Error(err)
+	}
 
 	t.Run("node_up", func(t *testing.T) {
-		basicAuth := lib.BasicAuth{Username: "root", Password: "a-secret"}
 		e := lib.NewExporter(dbUrl, basicAuth, []string{}, true)
 
 		ch := make(chan prometheus.Metric)

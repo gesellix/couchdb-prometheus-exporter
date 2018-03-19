@@ -38,11 +38,12 @@ type Exporter struct {
 	dataSize         *prometheus.GaugeVec
 	diskSizeOverhead *prometheus.GaugeVec
 
-	activeTasks                   *prometheus.GaugeVec
-	activeTasksDatabaseCompaction *prometheus.GaugeVec
-	activeTasksViewCompaction     *prometheus.GaugeVec
-	activeTasksIndexer            *prometheus.GaugeVec
-	activeTasksReplication        *prometheus.GaugeVec
+	activeTasks                      *prometheus.GaugeVec
+	activeTasksDatabaseCompaction    *prometheus.GaugeVec
+	activeTasksViewCompaction        *prometheus.GaugeVec
+	activeTasksIndexer               *prometheus.GaugeVec
+	activeTasksReplication           *prometheus.GaugeVec
+	activeTasksReplicationLastUpdate *prometheus.GaugeVec
 }
 
 func NewExporter(uri string, basicAuth BasicAuth, databases []string, insecure bool) *Exporter {
@@ -248,5 +249,14 @@ func NewExporter(uri string, basicAuth BasicAuth, databases []string, insecure b
 				Help:      "active tasks",
 			},
 			[]string{"node_name"}),
+
+		activeTasksReplicationLastUpdate: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "server",
+				Name:      "active_tasks_replication_updated_on",
+				Help:      "active tasks",
+			},
+			[]string{"node_name", "doc_id", "continuous", "source", "target"}),
 	}
 }

@@ -2,6 +2,7 @@ package lib
 
 import (
 	"fmt"
+	"strconv"
 )
 
 func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, databases []string) error {
@@ -46,6 +47,13 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, datab
 
 	activeTasksByNode := make(map[string]ActiveTaskTypes)
 	for _, task := range stats.ActiveTasksResponse {
+		e.activeTasksReplicationLastUpdate.WithLabelValues(
+			task.Node,
+			task.DocId,
+			strconv.FormatBool(task.Continuous),
+			task.Source,
+			task.Target).Set(task.UpdatedOn)
+
 		if _, ok := activeTasksByNode[task.Node]; !ok {
 			activeTasksByNode[task.Node] = ActiveTaskTypes{}
 		}

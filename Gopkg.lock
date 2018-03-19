@@ -8,10 +8,16 @@
   revision = "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9"
 
 [[projects]]
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  revision = "346938d642f2ec3594ed81d874461961cd0faa76"
+  version = "v1.1.0"
+
+[[projects]]
   name = "github.com/gesellix/couchdb-cluster-config"
   packages = ["pkg"]
-  revision = "0a1191968ebe85653747c68f559da0f9de498dc6"
-  version = "5"
+  revision = "97aeb7edc94e474c1ff1833a60ed5597aeef439a"
+  version = "6"
 
 [[projects]]
   branch = "master"
@@ -42,6 +48,12 @@
   packages = ["."]
   revision = "71ceffbeb0ba60fccc853971bb3ed4d7d90bfd04"
   version = "v1.7.4-pre"
+
+[[projects]]
+  name = "github.com/pmezard/go-difflib"
+  packages = ["difflib"]
+  revision = "792786c7400a136282c1664665ae0a8db921c6c2"
+  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/prometheus/client_golang"
@@ -79,9 +91,15 @@
   ]
   revision = "54d17b57dd7d4a3aa092476596b3f8a933bde349"
 
+[[projects]]
+  name = "github.com/stretchr/testify"
+  packages = ["assert"]
+  revision = "12b6f73e6084dad08a7c6e575284b177ecafbc71"
+  version = "v1.2.1"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c2a9f78d5c521359a62a5dc3961139d561136c81530638e4fc7d977bd9ae859b"
+  inputs-digest = "21bb4f2e739bb5d894243055f1ed8708103860d490ee7fc9b28231445e6ddf8b"
   solver-name = "gps-cdcl"
   solver-version = 1

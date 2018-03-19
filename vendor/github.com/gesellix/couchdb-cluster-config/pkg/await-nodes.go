@@ -7,12 +7,12 @@ import (
 	"time"
 )
 
-func AwaitNodes(addresses []string) error {
+func AwaitNodes(addresses []string, check func(address string) (bool, error)) error {
 	resc, errc := make(chan bool), make(chan error)
 
 	for _, address := range addresses {
 		go func(address string) {
-			success, err := awaitNode(address)
+			success, err := awaitNode(address, check)
 			if err != nil {
 				errc <- err
 				return
@@ -35,7 +35,7 @@ func AwaitNodes(addresses []string) error {
 	return nil
 }
 
-func awaitNode(address string) (bool, error) {
+func awaitNode(address string, check func(address string) (bool, error)) (bool, error) {
 	timeout := time.After(20 * time.Second)
 	tick := time.Tick(1000 * time.Millisecond)
 	for {
@@ -46,7 +46,7 @@ func awaitNode(address string) (bool, error) {
 		case <-tick:
 			fmt.Println(fmt.Sprintf("tick@%s", address))
 
-			ok, err := fetch(address)
+			ok, err := check(address)
 			if err != nil {
 				return false, err
 			} else if ok {
@@ -56,7 +56,7 @@ func awaitNode(address string) (bool, error) {
 	}
 }
 
-func fetch(address string) (bool, error) {
+func Available(address string) (bool, error) {
 	conn, err := net.DialTimeout("tcp", address, time.Second)
 	if err != nil {
 		if err, ok := err.(net.Error); ok && err.Timeout() || err.Temporary() {

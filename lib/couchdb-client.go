@@ -68,7 +68,7 @@ func (c *CouchdbClient) isCouchDbV2() (bool, error) {
 	return clusteredCouch.Check(couchDbVersion), nil
 }
 
-func (c *CouchdbClient) getNodeNames() ([]string, error) {
+func (c *CouchdbClient) GetNodeNames() ([]string, error) {
 	data, err := c.Request("GET", fmt.Sprintf("%s/_membership", c.BaseUri), nil)
 	if err != nil {
 		return nil, err
@@ -85,7 +85,7 @@ func (c *CouchdbClient) getNodeNames() ([]string, error) {
 }
 
 func (c *CouchdbClient) getNodeBaseUrisByNodeName(baseUri string) (map[string]string, error) {
-	names, err := c.getNodeNames()
+	names, err := c.GetNodeNames()
 	if err != nil {
 		return nil, err
 	}

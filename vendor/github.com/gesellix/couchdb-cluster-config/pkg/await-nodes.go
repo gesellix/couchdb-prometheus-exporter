@@ -36,7 +36,7 @@ func AwaitNodes(addresses []string, check func(address string) (bool, error)) er
 }
 
 func awaitNode(address string, check func(address string) (bool, error)) (bool, error) {
-	timeout := time.After(30 * time.Second)
+	timeout := time.After(20 * time.Second)
 	tick := time.Tick(1000 * time.Millisecond)
 	for {
 		select {

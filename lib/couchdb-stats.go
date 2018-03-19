@@ -99,6 +99,7 @@ type ActiveTask struct {
 	UpdatedOn  float64 `json:"updated_on,omitempty"`
 	Source     string  `json:"source,omitempty"`
 	Target     string  `json:"target,omitempty"`
+	DocId      string  `json:"doc_id,omitempty"`
 }
 
 type ActiveTasksResponse []ActiveTask

@@ -102,6 +102,7 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	e.activeTasksViewCompaction.Collect(ch)
 	e.activeTasksIndexer.Collect(ch)
 	e.activeTasksReplication.Collect(ch)
+	e.activeTasksReplicationLastUpdate.Collect(ch)
 
 	return nil
 }

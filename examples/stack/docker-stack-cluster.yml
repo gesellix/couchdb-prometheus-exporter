@@ -3,6 +3,7 @@ version: "3.3"
 
 services:
   couchdb:
+  # TODO use apache/couchdb:2.1.1
     image: klaemo/couchdb:2.0-dev
     command: --admin root:a-secret --with-haproxy
     volumes:

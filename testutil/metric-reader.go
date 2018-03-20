@@ -40,20 +40,20 @@ func CollectMetrics(ch chan prometheus.Metric, debugMetrics bool) map[string]*dt
 	return metricFamiliesByName
 }
 
-func GetGaugeValue(metricFamilies map[string]*dto.MetricFamily, metricDesc string, labelName string, labelValue string) float64 {
+func GetGaugeValue(metricFamilies map[string]*dto.MetricFamily, metricDesc string, labelName string, labelValue string) (float64, error) {
 	//func getGaugeValue(metrics []*dto.Metric, metricDesc string, labelName string, labelValue string) float64 {
 	for desc, metrics := range metricFamilies {
 		if metricDesc == "" || desc == metricDesc {
 			for _, metric := range metrics.Metric {
 				for _, label := range metric.Label {
 					if *label.Name == labelName && *label.Value == labelValue {
-						return *metric.Gauge.Value
+						return *metric.Gauge.Value, nil
 					}
 				}
 			}
 		}
 	}
-	return 0
+	return 0, fmt.Errorf("no gauge found")
 }
 
 func CountMetrics(metricFamilies map[string]*dto.MetricFamily) int {

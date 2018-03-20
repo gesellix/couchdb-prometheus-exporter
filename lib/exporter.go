@@ -49,7 +49,7 @@ type Exporter struct {
 func NewExporter(uri string, basicAuth BasicAuth, databases []string, insecure bool) *Exporter {
 
 	return &Exporter{
-		client:    NewCouchdbClient(uri, basicAuth, databases, insecure),
+		client:    NewCouchdbClient(uri, basicAuth, insecure),
 		databases: databases,
 
 		up: prometheus.NewGauge(

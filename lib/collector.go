@@ -55,23 +55,35 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	e.activeTasksReplication.Describe(ch)
 }
 
+func (e *Exporter) getMonitoredDatabaseNames(candidates []string) ([]string, error) {
+	if len(candidates) == 1 && candidates[0] == "_all_dbs" {
+		return e.client.getDatabaseList()
+	}
+	return candidates, nil
+}
+
 func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
+	e.up.Set(0)
 	sendStatus := func() {
 		ch <- e.up
 	}
 	defer sendStatus()
 
-	e.up.Set(0)
-	stats, err := e.client.getStats()
+	var databases, err = e.getMonitoredDatabaseNames(e.databases)
+	if err != nil {
+		return err
+	}
+
+	stats, err := e.client.getStats(databases)
 	if err != nil {
 		return fmt.Errorf("error collecting couchdb stats: %v", err)
 	}
 	e.up.Set(1)
 
 	if stats.ApiVersion == "2" {
-		e.collectV2(stats, exposedHttpStatusCodes, e.databases)
+		e.collectV2(stats, exposedHttpStatusCodes, databases)
 	} else {
-		e.collectV1(stats, exposedHttpStatusCodes, e.databases)
+		e.collectV1(stats, exposedHttpStatusCodes, databases)
 	}
 
 	e.nodeUp.Collect(ch)

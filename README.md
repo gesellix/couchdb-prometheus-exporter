@@ -23,9 +23,16 @@ credentials, e.g. like this:
 
     docker run -p 9984:9984 gesellix/couchdb-prometheus-exporter -couchdb.uri=http://couchdb:5984 -couchdb.username=root -couchdb.password=a-secret
 
-If you need database disk usage stats, simply add a comma separated list of database names like this:
+## Database disk usage stats
+
+If you need database disk usage stats, add a comma separated list of database names like this:
 
     docker run -p 9984:9984 gesellix/couchdb-prometheus-exporter -couchdb.uri=http://couchdb:5984 -databases=db-1,db-2 -couchdb.username=root -couchdb.password=a-secret
+
+Or, if you want to get stats for every database, please use `_all_dbs` as database name:
+
+    docker run -p 9984:9984 gesellix/couchdb-prometheus-exporter -couchdb.uri=http://couchdb:5984 -databases=_all_dbs -couchdb.username=root -couchdb.password=a-secret
+
 
 ## Monitoring CouchDB with Prometheus, Grafana and Docker
 

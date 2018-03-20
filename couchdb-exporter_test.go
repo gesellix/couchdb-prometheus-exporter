@@ -20,7 +20,7 @@ import (
 
 type Handler func(w http.ResponseWriter, r *http.Request)
 
-func BasicAuth(basicAuth lib.BasicAuth, pass Handler) Handler {
+func BasicAuthHandler(basicAuth lib.BasicAuth, pass Handler) Handler {
 
 	validate := func(basicAuth lib.BasicAuth, username, password string) bool {
 		if username == basicAuth.Username && password == basicAuth.Password {
@@ -88,7 +88,7 @@ func couchdbResponse(t *testing.T, versionSuffix string) Handler {
 
 func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetricsCount int, expectedGetRequestCount float64, expectedDiskSize float64) {
 	basicAuth := lib.BasicAuth{Username: "username", Password: "password"}
-	handler := http.HandlerFunc(BasicAuth(basicAuth, couchdbResponse(t, couchdbVersion)))
+	handler := http.HandlerFunc(BasicAuthHandler(basicAuth, couchdbResponse(t, couchdbVersion)))
 	server := httptest.NewServer(handler)
 
 	e := lib.NewExporter(server.URL, basicAuth, []string{"example", "another-example"}, true)
@@ -109,12 +109,18 @@ func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetric
 		t.Errorf("got more metrics (%d) as expected (%d)", metricsCount, expectedMetricsCount)
 	}
 
-	actualGetRequestCount := testutil.GetGaugeValue(metricFamilies, "couchdb_httpd_request_methods", "method", "GET")
+	actualGetRequestCount, err := testutil.GetGaugeValue(metricFamilies, "couchdb_httpd_request_methods", "method", "GET")
+	if err != nil {
+		t.Error(err)
+	}
 	if expectedGetRequestCount != actualGetRequestCount {
 		t.Errorf("expected %f GET requests, but got %f instead", expectedGetRequestCount, actualGetRequestCount)
 	}
 
-	actualDiskSize := testutil.GetGaugeValue(metricFamilies, "couchdb_database_disk_size", "db_name", "example")
+	actualDiskSize, err := testutil.GetGaugeValue(metricFamilies, "couchdb_database_disk_size", "db_name", "example")
+	if err != nil {
+		t.Error(err)
+	}
 	if expectedDiskSize != actualDiskSize {
 		t.Errorf("expected %f disk size, but got %f instead", expectedDiskSize, actualDiskSize)
 	}
@@ -139,9 +145,18 @@ func TestCouchdbStatsV1Integration(t *testing.T) {
 		t.Error(err)
 	}
 	dbUrl := fmt.Sprintf("http://%s", dbAddress)
+	basicAuth := lib.BasicAuth{Username: "root", Password: "a-secret"}
+
+	client := lib.NewCouchdbClient(dbUrl, basicAuth, true)
+	databases := []string{"v1_testdb1", "v1_testdb2"}
+	for _, db := range databases {
+		_, err = client.Request("PUT", fmt.Sprintf("%s/%s", client.BaseUri, db), nil)
+		if err != nil {
+			t.Error(err)
+		}
+	}
 
 	t.Run("node_up", func(t *testing.T) {
-		basicAuth := lib.BasicAuth{Username: "root", Password: "a-secret"}
 		e := lib.NewExporter(dbUrl, basicAuth, []string{}, true)
 
 		ch := make(chan prometheus.Metric)
@@ -153,19 +168,52 @@ func TestCouchdbStatsV1Integration(t *testing.T) {
 		metricFamilies := testutil.CollectMetrics(ch, false)
 
 		nodeName := "master"
-		actualNodeUp := testutil.GetGaugeValue(metricFamilies, "couchdb_httpd_node_up", "node_name", nodeName)
+		actualNodeUp, err := testutil.GetGaugeValue(metricFamilies, "couchdb_httpd_node_up", "node_name", nodeName)
+		if err != nil {
+			t.Error(err)
+		}
 		if actualNodeUp != 1 {
 			t.Errorf("Expected node '%s' at '%s' to be available.", nodeName, dbUrl)
 		}
 	})
+
+	t.Run("_all_dbs", func(t *testing.T) {
+		e := lib.NewExporter(dbUrl, basicAuth, []string{"_all_dbs"}, true)
+
+		ch := make(chan prometheus.Metric)
+		go func() {
+			defer close(ch)
+			e.Collect(ch)
+		}()
+
+		metricFamilies := testutil.CollectMetrics(ch, false)
+
+		for _, db := range databases {
+			databaseDataSize, err := testutil.GetGaugeValue(metricFamilies, "couchdb_database_data_size", "db_name", db)
+			if err != nil {
+				log.Println(err)
+				t.Errorf("Expected stats to be collected for database '%s'.", db)
+			}
+			if databaseDataSize != 0 {
+				t.Errorf("Expected database data size to be 0 for database '%s'.", db)
+			}
+		}
+	})
+
+	for _, db := range databases {
+		_, err = client.Request("DELETE", fmt.Sprintf("%s/%s", client.BaseUri, db), nil)
+		if err != nil {
+			t.Error(err)
+		}
+	}
 }
 
-func membership(t *testing.T, basicAuth lib.BasicAuth) (func(address string) (bool, error)) {
+func awaitMembership(t *testing.T, basicAuth lib.BasicAuth) (func(address string) (bool, error)) {
 	time.Sleep(5 * time.Second)
 
 	return func(address string) (bool, error) {
 		dbUrl := fmt.Sprintf("http://%s", address)
-		c := lib.NewCouchdbClient(dbUrl, basicAuth, []string{}, true)
+		c := lib.NewCouchdbClient(dbUrl, basicAuth, true)
 		nodeNames, err := c.GetNodeNames()
 		if err != nil {
 			if err, ok := err.(net.Error); ok && (err.Timeout() || err.Temporary()) {
@@ -198,9 +246,18 @@ func TestCouchdbStatsV2Integration(t *testing.T) {
 	dbUrl := fmt.Sprintf("http://%s", dbAddress)
 	basicAuth := lib.BasicAuth{Username: "root", Password: "a-secret"}
 
-	err = cluster_config.AwaitNodes([]string{dbAddress}, membership(t, basicAuth))
+	err = cluster_config.AwaitNodes([]string{dbAddress}, awaitMembership(t, basicAuth))
 	if err != nil {
 		t.Error(err)
+	}
+
+	client := lib.NewCouchdbClient(dbUrl, basicAuth, true)
+	databases := []string{"v2_testdb1", "v2_testdb2"}
+	for _, db := range databases {
+		_, err = client.Request("PUT", fmt.Sprintf("%s/%s", client.BaseUri, db), nil)
+		if err != nil {
+			t.Error(err)
+		}
 	}
 
 	t.Run("node_up", func(t *testing.T) {
@@ -215,12 +272,42 @@ func TestCouchdbStatsV2Integration(t *testing.T) {
 		metricFamilies := testutil.CollectMetrics(ch, false)
 
 		nodeName := "couchdb@172.16.238.11"
-		actualNodeUp := testutil.GetGaugeValue(metricFamilies, "couchdb_httpd_node_up", "node_name", nodeName)
+		actualNodeUp, err := testutil.GetGaugeValue(metricFamilies, "couchdb_httpd_node_up", "node_name", nodeName)
+		if err != nil {
+			t.Error(err)
+		}
 		if actualNodeUp != 1 {
 			t.Errorf("Expected node '%s' at '%s' to be available.", nodeName, dbUrl)
 		}
 	})
 
-	// <tear-down code>
-	// (nothing to do)
+	t.Run("_all_dbs", func(t *testing.T) {
+		e := lib.NewExporter(dbUrl, basicAuth, []string{"_all_dbs"}, true)
+
+		ch := make(chan prometheus.Metric)
+		go func() {
+			defer close(ch)
+			e.Collect(ch)
+		}()
+
+		metricFamilies := testutil.CollectMetrics(ch, false)
+
+		for _, db := range databases {
+			databaseDataSize, err := testutil.GetGaugeValue(metricFamilies, "couchdb_database_data_size", "db_name", db)
+			if err != nil {
+				log.Println(err)
+				t.Errorf("Expected stats to be collected for database '%s'.", db)
+			}
+			if databaseDataSize != 0 {
+				t.Errorf("Expected database data size to be 0 for database '%s'.", db)
+			}
+		}
+	})
+
+	for _, db := range databases {
+		_, err = client.Request("DELETE", fmt.Sprintf("%s/%s", client.BaseUri, db), nil)
+		if err != nil {
+			t.Error(err)
+		}
+	}
 }

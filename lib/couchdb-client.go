@@ -20,7 +20,6 @@ type BasicAuth struct {
 type CouchdbClient struct {
 	BaseUri   string
 	basicAuth BasicAuth
-	databases []string
 	client    *http.Client
 }
 
@@ -128,7 +127,7 @@ func (c *CouchdbClient) getStatsByNodeName(urisByNodeName map[string]string) (ma
 	return statsByNodeName, nil
 }
 
-func (c *CouchdbClient) getStats() (Stats, error) {
+func (c *CouchdbClient) getStats(databases []string) (Stats, error) {
 	isCouchDbV2, err := c.isCouchDbV2()
 	if err != nil {
 		return Stats{}, err
@@ -142,7 +141,7 @@ func (c *CouchdbClient) getStats() (Stats, error) {
 		if err != nil {
 			return Stats{}, err
 		}
-		databaseStats, err := c.getDatabasesStatsByNodeName(urisByNode)
+		databaseStats, err := c.getDatabasesStatsByNodeName(databases)
 		if err != nil {
 			return Stats{}, err
 		}
@@ -163,7 +162,7 @@ func (c *CouchdbClient) getStats() (Stats, error) {
 		if err != nil {
 			return Stats{}, err
 		}
-		databaseStats, err := c.getDatabasesStatsByNodeName(urisByNode)
+		databaseStats, err := c.getDatabasesStatsByNodeName(databases)
 		if err != nil {
 			return Stats{}, err
 		}
@@ -179,9 +178,9 @@ func (c *CouchdbClient) getStats() (Stats, error) {
 	}
 }
 
-func (c *CouchdbClient) getDatabasesStatsByNodeName(urisByNodeName map[string]string) (map[string]DatabaseStats, error) {
+func (c *CouchdbClient) getDatabasesStatsByNodeName(databases []string) (map[string]DatabaseStats, error) {
 	dbStatsByDbName := make(map[string]DatabaseStats)
-	for _, dbName := range c.databases {
+	for _, dbName := range databases {
 		data, err := c.Request("GET", fmt.Sprintf("%s/%s", c.BaseUri, dbName), nil)
 		if err != nil {
 			return nil, fmt.Errorf("error reading database '%s' stats: %v", dbName, err)
@@ -218,6 +217,19 @@ func (c *CouchdbClient) getActiveTasks() (ActiveTasksResponse, error) {
 	return activeTasks, nil
 }
 
+func (c *CouchdbClient) getDatabaseList() ([]string, error) {
+	data, err := c.Request("GET", fmt.Sprintf("%s/_all_dbs", c.BaseUri), nil)
+	if err != nil {
+		return nil, err
+	}
+	var dbs []string
+	err = json.Unmarshal(data, &dbs)
+	if err != nil {
+		return nil, err
+	}
+	return dbs, nil
+}
+
 func (c *CouchdbClient) Request(method string, uri string, body io.Reader) (respData []byte, err error) {
 	req, err := http.NewRequest(method, uri, body)
 	if err != nil {
@@ -249,7 +261,7 @@ func (c *CouchdbClient) Request(method string, uri string, body io.Reader) (resp
 	return respData, nil
 }
 
-func NewCouchdbClient(uri string, basicAuth BasicAuth, databases []string, insecure bool) *CouchdbClient {
+func NewCouchdbClient(uri string, basicAuth BasicAuth, insecure bool) *CouchdbClient {
 	httpClient := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure},
@@ -259,7 +271,6 @@ func NewCouchdbClient(uri string, basicAuth BasicAuth, databases []string, insec
 	return &CouchdbClient{
 		BaseUri:   uri,
 		basicAuth: basicAuth,
-		databases: databases,
 		client:    httpClient,
 	}
 }

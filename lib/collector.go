@@ -53,6 +53,48 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	e.activeTasksViewCompaction.Describe(ch)
 	e.activeTasksIndexer.Describe(ch)
 	e.activeTasksReplication.Describe(ch)
+	e.activeTasksReplicationLastUpdate.Describe(ch)
+}
+
+func (e *Exporter) resetAllMetrics() {
+	metrics := []*prometheus.GaugeVec{
+		e.nodeUp,
+
+		e.authCacheHits,
+		e.authCacheMisses,
+		e.databaseReads,
+		e.databaseWrites,
+		e.openDatabases,
+		e.openOsFiles,
+		e.requestTime,
+
+		e.httpdStatusCodes,
+		e.httpdRequestMethods,
+
+		e.clientsRequestingChanges,
+		e.temporaryViewReads,
+		e.requests,
+		e.bulkRequests,
+		e.viewReads,
+
+		e.diskSize,
+		e.dataSize,
+		e.diskSizeOverhead,
+
+		e.activeTasks,
+		e.activeTasksDatabaseCompaction,
+		e.activeTasksViewCompaction,
+		e.activeTasksIndexer,
+		e.activeTasksReplication,
+		e.activeTasksReplicationLastUpdate,
+	}
+	e.resetMetrics(metrics)
+}
+
+func (e *Exporter) resetMetrics(metrics []*prometheus.GaugeVec) {
+	for _, metricVec := range metrics {
+		metricVec.Reset()
+	}
 }
 
 func (e *Exporter) getMonitoredDatabaseNames(candidates []string) ([]string, error) {
@@ -68,6 +110,8 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 		ch <- e.up
 	}
 	defer sendStatus()
+
+	e.resetAllMetrics()
 
 	var databases, err = e.getMonitoredDatabaseNames(e.databases)
 	if err != nil {

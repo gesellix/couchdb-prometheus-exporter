@@ -47,12 +47,14 @@ func (e *Exporter) collectV1(stats Stats, exposedHttpStatusCodes []string, datab
 
 	activeTasksByNode := make(map[string]ActiveTaskTypes)
 	for _, task := range stats.ActiveTasksResponse {
-		e.activeTasksReplicationLastUpdate.WithLabelValues(
-			task.Node,
-			task.DocId,
-			strconv.FormatBool(task.Continuous),
-			task.Source,
-			task.Target).Set(task.UpdatedOn)
+		if task.Type == "replication" {
+			e.activeTasksReplicationLastUpdate.WithLabelValues(
+				task.Node,
+				task.DocId,
+				strconv.FormatBool(task.Continuous),
+				task.Source,
+				task.Target).Set(task.UpdatedOn)
+		}
 
 		if _, ok := activeTasksByNode[task.Node]; !ok {
 			activeTasksByNode[task.Node] = ActiveTaskTypes{}

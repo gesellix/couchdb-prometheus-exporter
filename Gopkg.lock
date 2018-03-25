@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/beorn7/perks"
   packages = ["quantile"]
-  revision = "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9"
+  revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -16,8 +16,8 @@
 [[projects]]
   name = "github.com/gesellix/couchdb-cluster-config"
   packages = ["pkg"]
-  revision = "97aeb7edc94e474c1ff1833a60ed5597aeef439a"
-  version = "6"
+  revision = "e0d56e1582e5fb768584a180de64e7c07f8cf686"
+  version = "8"
 
 [[projects]]
   branch = "master"
@@ -35,7 +35,7 @@
   branch = "master"
   name = "github.com/hashicorp/go-version"
   packages = ["."]
-  revision = "4fe82ae3040f80a03d04d2cccb5606a626b8e1ee"
+  revision = "23480c0665776210b5fbbac6eaaee40e3e6a96b7"
 
 [[projects]]
   name = "github.com/matttproud/golang_protobuf_extensions"
@@ -89,7 +89,7 @@
     "nfs",
     "xfs"
   ]
-  revision = "54d17b57dd7d4a3aa092476596b3f8a933bde349"
+  revision = "780932d4fbbe0e69b84c34c20f5c8d0981e109ea"
 
 [[projects]]
   name = "github.com/stretchr/testify"
@@ -100,6 +100,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "21bb4f2e739bb5d894243055f1ed8708103860d490ee7fc9b28231445e6ddf8b"
+  inputs-digest = "d58d49210f88c73fd8f5a3569db5f8816423b24622825e757a7974ae43b2619e"
   solver-name = "gps-cdcl"
   solver-version = 1

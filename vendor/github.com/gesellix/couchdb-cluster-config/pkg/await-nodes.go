@@ -8,7 +8,7 @@ import (
 )
 
 func AwaitNodes(addresses []string, check func(address string) (bool, error)) error {
-	resc, errc := make(chan bool), make(chan error)
+	resc, errc := make(chan string), make(chan error)
 
 	for _, address := range addresses {
 		go func(address string) {
@@ -17,7 +17,7 @@ func AwaitNodes(addresses []string, check func(address string) (bool, error)) er
 				errc <- err
 				return
 			}
-			resc <- success
+			resc <- fmt.Sprintf("%v@%s", success, address)
 		}(address)
 	}
 
@@ -41,8 +41,8 @@ func awaitNode(address string, check func(address string) (bool, error)) (bool, 
 	for {
 		select {
 		case <-timeout:
-			fmt.Println("timeout")
-			return false, errors.New(fmt.Sprintf("timed out @%s", address))
+			//fmt.Println("timeout")
+			return false, errors.New(fmt.Sprintf("timeout@%s", address))
 		case <-tick:
 			fmt.Println(fmt.Sprintf("tick@%s", address))
 

@@ -3,9 +3,9 @@ package cluster_config
 import (
 	"crypto/tls"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
-	"io"
 )
 
 type BasicAuth struct {
@@ -16,11 +16,10 @@ type BasicAuth struct {
 type CouchdbClient struct {
 	BaseUri   string
 	basicAuth BasicAuth
-	databases []string
 	client    *http.Client
 }
 
-func (c *CouchdbClient) Request(method string, uri string, body io.Reader) (respData []byte, err error) {
+func (c *CouchdbClient) Request(method string, uri string, body io.Reader) (resp *http.Response, err error) {
 	req, err := http.NewRequest(method, uri, body)
 	if err != nil {
 		return nil, err
@@ -35,26 +34,30 @@ func (c *CouchdbClient) Request(method string, uri string, body io.Reader) (resp
 	}
 
 	fmt.Printf("[REQ] %s %s@%v\n", req.Method, c.basicAuth.Username, req.URL)
-	resp, err := c.client.Do(req)
+	resp, err = c.client.Do(req)
 	if err != nil {
 		fmt.Printf("[RES-ERR] %v\n", err)
 		return nil, err
 	}
 	fmt.Printf("[RES-OK] %v\n", resp)
+	return resp, nil
+}
 
-	respData, err = ioutil.ReadAll(resp.Body)
+func (c *CouchdbClient) RequestBody(method string, uri string, body io.Reader) (respBody []byte, err error) {
+	resp, err := c.Request(method, uri, body)
+	respBody, err = ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode >= 400 {
 		if err != nil {
-			respData = []byte(err.Error())
+			respBody = []byte(err.Error())
 		}
-		return nil, fmt.Errorf("status %s (%d): %s", resp.Status, resp.StatusCode, respData)
+		return nil, fmt.Errorf("status %s (%d): %s", resp.Status, resp.StatusCode, respBody)
 	}
 
-	return respData, nil
+	return respBody, nil
 }
 
-func NewCouchdbClient(uri string, basicAuth BasicAuth, databases []string, insecure bool) *CouchdbClient {
+func NewCouchdbClient(uri string, basicAuth BasicAuth, insecure bool) *CouchdbClient {
 	httpClient := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure},
@@ -64,7 +67,6 @@ func NewCouchdbClient(uri string, basicAuth BasicAuth, databases []string, insec
 	return &CouchdbClient{
 		BaseUri:   uri,
 		basicAuth: basicAuth,
-		databases: databases,
 		client:    httpClient,
 	}
 }

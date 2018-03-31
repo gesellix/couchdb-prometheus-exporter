@@ -75,9 +75,23 @@ type Httpd struct {
 	ViewReads                Counter `json:"view_reads"`
 }
 
+type NodeFeatures []string
+
+type Vendor struct {
+	Name string `json:"name"`
+}
+
+type NodeInfo struct {
+	Couchdb  string       `json:"couchdb"`
+	Features NodeFeatures `json:"features"`
+	Vendor   Vendor       `json:"vendor"`
+	Version  string       `json:"version"`
+}
+
 type StatsResponse struct {
-	Couchdb CouchdbStats `json:"couchdb"`
-	Up      float64      `json:"-"`
+	Couchdb  CouchdbStats `json:"couchdb"`
+	Up       float64      `json:"-"`
+	NodeInfo NodeInfo     `json:"-"`
 	// v1.x api
 	Httpd               Httpd               `json:"httpd"`
 	HttpdRequestMethods HttpdRequestMethods `json:"httpd_request_methods"`

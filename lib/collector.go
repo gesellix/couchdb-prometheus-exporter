@@ -26,6 +26,7 @@ type ActiveTaskTypesByNodeName map[string]ActiveTaskTypes
 func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	ch <- e.up.Desc()
 	e.nodeUp.Describe(ch)
+	e.nodeInfo.Describe(ch)
 
 	e.authCacheHits.Describe(ch)
 	e.authCacheMisses.Describe(ch)
@@ -59,6 +60,7 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 func (e *Exporter) resetAllMetrics() {
 	metrics := []*prometheus.GaugeVec{
 		e.nodeUp,
+		e.nodeInfo,
 
 		e.authCacheHits,
 		e.authCacheMisses,
@@ -131,6 +133,7 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	}
 
 	e.nodeUp.Collect(ch)
+	e.nodeInfo.Collect(ch)
 
 	e.authCacheHits.Collect(ch)
 	e.authCacheMisses.Collect(ch)

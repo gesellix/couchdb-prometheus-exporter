@@ -23,27 +23,30 @@ type CouchdbClient struct {
 	client    *http.Client
 }
 
-type RootResponse struct {
-	Couchdb string `json:"couchdb"`
-	Version string `json:"version"`
-}
-
 type MembershipResponse struct {
 	AllNodes     []string `json:"all_nodes"`
 	ClusterNodes []string `json:"cluster_nodes"`
 }
 
-func (c *CouchdbClient) getServerVersion() (string, error) {
+func (c *CouchdbClient) getNodeInfo() (NodeInfo, error) {
 	data, err := c.Request("GET", fmt.Sprintf("%s/", c.BaseUri), nil)
 	if err != nil {
-		return "", err
+		return NodeInfo{}, err
 	}
-	var root RootResponse
+	var root NodeInfo
 	err = json.Unmarshal(data, &root)
+	if err != nil {
+		return NodeInfo{}, err
+	}
+	return root, nil
+}
+
+func (c *CouchdbClient) getServerVersion() (string, error) {
+	nodeInfo, err := c.getNodeInfo()
 	if err != nil {
 		return "", err
 	}
-	return root.Version, nil
+	return nodeInfo.Version, nil
 }
 
 func (c *CouchdbClient) isCouchDbV2() (bool, error) {
@@ -62,8 +65,6 @@ func (c *CouchdbClient) isCouchDbV2() (bool, error) {
 		return false, err
 	}
 
-	glog.Infof("relaxing on couch@%s", couchDbVersion)
-	//fmt.Printf("relaxing on couch@%s\n", couchDbVersion)
 	return clusteredCouch.Check(couchDbVersion), nil
 }
 
@@ -117,6 +118,12 @@ func (c *CouchdbClient) getStatsByNodeName(urisByNodeName map[string]string) (ma
 		if err != nil {
 			return nil, fmt.Errorf("error unmarshalling stats: %v", err)
 		}
+
+		nodeInfo, err := c.getNodeInfo()
+		if err != nil {
+			return nil, err
+		}
+		stats.NodeInfo = nodeInfo
 		statsByNodeName[name] = stats
 	}
 

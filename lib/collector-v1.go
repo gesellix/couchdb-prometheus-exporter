@@ -10,6 +10,7 @@ func (e *Exporter) collectV1(stats Stats, exposedHttpStatusCodes []string, datab
 		//fmt.Printf("%s -> %v\n", name, stats)
 		//glog.Info(fmt.Sprintf("name: %s -> stats: %v\n", name, stats))
 		e.nodeUp.WithLabelValues(name).Set(nodeStats.Up)
+``		e.nodeInfo.WithLabelValues(name, nodeStats.NodeInfo.Version, nodeStats.NodeInfo.Vendor.Name).Set(1)
 
 		e.authCacheHits.WithLabelValues(name).Set(nodeStats.Couchdb.AuthCacheHits.Current)
 		e.authCacheMisses.WithLabelValues(name).Set(nodeStats.Couchdb.AuthCacheMisses.Current)

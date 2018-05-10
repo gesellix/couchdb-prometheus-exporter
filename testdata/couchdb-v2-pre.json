@@ -1,0 +1,8 @@
+{
+  "couchdb": "Welcome",
+  "version": "2.2.0-302bd8b",
+  "features": ["scheduler"],
+  "vendor": {
+    "name": "The Apache Software Foundation"
+  }
+}

@@ -134,6 +134,10 @@ func TestCouchdbStatsV2(t *testing.T) {
 	performCouchdbStatsTest(t, "v2", 79, 4712, 58570)
 }
 
+func TestCouchdbStatsV2Prerelease(t *testing.T) {
+	performCouchdbStatsTest(t, "v2-pre", 79, 4712, 58570)
+}
+
 func TestCouchdbStatsV1Integration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping integration test")

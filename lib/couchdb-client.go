@@ -4,12 +4,13 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/golang/glog"
-	"github.com/hashicorp/go-version"
+	"io"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
-	"io"
+
+	"github.com/golang/glog"
 )
 
 type BasicAuth struct {
@@ -50,22 +51,18 @@ func (c *CouchdbClient) getServerVersion() (string, error) {
 }
 
 func (c *CouchdbClient) isCouchDbV2() (bool, error) {
-	clusteredCouch, err := version.NewConstraint(">= 2.0")
-	if err != nil {
-		return false, err
-	}
-
 	serverVersion, err := c.getServerVersion()
 	if err != nil {
 		return false, err
 	}
 
-	couchDbVersion, err := version.NewVersion(serverVersion)
+	versionParts := strings.Split(serverVersion, ".")
+	major, err := strconv.Atoi(versionParts[0])
 	if err != nil {
 		return false, err
 	}
 
-	return clusteredCouch.Check(couchDbVersion), nil
+	return major >= 2, nil
 }
 
 func (c *CouchdbClient) GetNodeNames() ([]string, error) {

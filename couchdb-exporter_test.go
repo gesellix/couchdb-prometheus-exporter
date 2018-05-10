@@ -10,12 +10,13 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
+
 	"github.com/gesellix/couchdb-cluster-config/pkg"
 	"github.com/gesellix/couchdb-prometheus-exporter/lib"
 	"github.com/gesellix/couchdb-prometheus-exporter/testutil"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
-	"time"
 )
 
 type Handler func(w http.ResponseWriter, r *http.Request)
@@ -212,7 +213,7 @@ func TestCouchdbStatsV1Integration(t *testing.T) {
 	}
 }
 
-func awaitMembership(t *testing.T, basicAuth lib.BasicAuth) (func(address string) (bool, error)) {
+func awaitMembership(t *testing.T, basicAuth lib.BasicAuth) func(address string) (bool, error) {
 	time.Sleep(5 * time.Second)
 
 	return func(address string) (bool, error) {

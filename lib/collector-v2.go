@@ -48,7 +48,7 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, datab
 
 	activeTasksByNode := make(map[string]ActiveTaskTypes)
 	for _, task := range stats.ActiveTasksResponse {
-		if task.Type == "replication" {
+		if e.replsUpdate && task.Type == "replication" {
 			e.activeTasksReplicationLastUpdate.WithLabelValues(
 				task.Node,
 				task.DocId,

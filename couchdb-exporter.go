@@ -1,11 +1,12 @@
 package main
 
 import (
-	"fmt"
 	goflag "flag"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
+
 	"github.com/gesellix/couchdb-prometheus-exporter/glogadapt"
 	"github.com/gesellix/couchdb-prometheus-exporter/lib"
 	"github.com/golang/glog"
@@ -15,13 +16,14 @@ import (
 )
 
 type exporterConfigType struct {
-	listenAddress   string
-	metricsEndpoint string
-	couchdbURI      string
-	couchdbUsername string
-	couchdbPassword string
-	couchdbInsecure bool
-	databases       string
+	listenAddress      string
+	metricsEndpoint    string
+	couchdbURI         string
+	couchdbUsername    string
+	couchdbPassword    string
+	couchdbInsecure    bool
+	couchdbReplsUpdate bool
+	databases          string
 }
 
 var exporterConfig exporterConfigType
@@ -34,6 +36,7 @@ func init() {
 	flag.StringVar(&exporterConfig.couchdbUsername, "couchdb.username", "", "Basic auth username for the CouchDB instance")
 	flag.StringVar(&exporterConfig.couchdbPassword, "couchdb.password", "", "Basic auth password for the CouchDB instance")
 	flag.BoolVar(&exporterConfig.couchdbInsecure, "couchdb.insecure", true, "Ignore server certificate if using https")
+	flag.BoolVar(&exporterConfig.couchdbReplsUpdate, "couchdb.replsupdate", true, "Report on each replication task's updated_on.")
 	flag.StringVar(&exporterConfig.databases, "databases", "", "Comma separated list of database names")
 
 	flag.BoolVar(&glogadapt.Logging.ToStderr, "logtostderr", false, "log to standard error instead of files")
@@ -63,7 +66,9 @@ func main() {
 			Username: *&exporterConfig.couchdbUsername,
 			Password: *&exporterConfig.couchdbPassword},
 		databases,
-		*&exporterConfig.couchdbInsecure)
+		*&exporterConfig.couchdbInsecure,
+		*&exporterConfig.couchdbReplsUpdate,
+	)
 	prometheus.MustRegister(exporter)
 
 	http.Handle(*&exporterConfig.metricsEndpoint, promhttp.Handler())

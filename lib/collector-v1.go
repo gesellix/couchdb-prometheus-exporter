@@ -6,7 +6,7 @@ import (
 )
 
 func (e *Exporter) collectV1(stats Stats, exposedHttpStatusCodes []string, databases []string) error {
-	e.totalDatabases.Set(float64(stats.TotalDatabases))
+	e.databasesTotal.Set(float64(stats.DatabasesTotal))
 
 	for name, nodeStats := range stats.StatsByNodeName {
 		//fmt.Printf("%s -> %v\n", name, stats)

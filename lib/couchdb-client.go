@@ -162,7 +162,7 @@ func (c *CouchdbClient) getStats(databases []string) (Stats, error) {
 		}
 		return Stats{
 			StatsByNodeName:       nodeStats,
-			TotalDatabases:        len(databasesList),
+			DatabasesTotal:        len(databasesList),
 			DatabaseStatsByDbName: databaseStats,
 			ActiveTasksResponse:   activeTasks,
 			ApiVersion:            "2"}, nil
@@ -188,7 +188,7 @@ func (c *CouchdbClient) getStats(databases []string) (Stats, error) {
 		}
 		return Stats{
 			StatsByNodeName:       nodeStats,
-			TotalDatabases:        len(databasesList),
+			DatabasesTotal:        len(databasesList),
 			DatabaseStatsByDbName: databaseStats,
 			ActiveTasksResponse:   activeTasks,
 			ApiVersion:            "1"}, nil

@@ -120,7 +120,7 @@ type ActiveTasksResponse []ActiveTask
 
 type Stats struct {
 	StatsByNodeName       map[string]StatsResponse
-	TotalDatabases        int
+	DatabasesTotal        int
 	DatabaseStatsByDbName DatabaseStatsByDbName
 	ActiveTasksResponse   ActiveTasksResponse
 	ApiVersion            string

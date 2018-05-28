@@ -25,6 +25,7 @@ type ActiveTaskTypesByNodeName map[string]ActiveTaskTypes
 // implements prometheus.Collector.
 func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	ch <- e.up.Desc()
+	e.totalDatabases.Describe(ch)
 	e.nodeUp.Describe(ch)
 	e.nodeInfo.Describe(ch)
 
@@ -132,6 +133,7 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 		e.collectV1(stats, exposedHttpStatusCodes, databases)
 	}
 
+	e.totalDatabases.Collect(ch)
 	e.nodeUp.Collect(ch)
 	e.nodeInfo.Collect(ch)
 

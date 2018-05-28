@@ -14,9 +14,10 @@ type Exporter struct {
 	databases []string
 	mutex     sync.RWMutex
 
-	up       prometheus.Gauge
-	nodeUp   *prometheus.GaugeVec
-	nodeInfo *prometheus.GaugeVec
+	up             prometheus.Gauge
+	totalDatabases prometheus.Gauge
+	nodeUp         *prometheus.GaugeVec
+	nodeInfo       *prometheus.GaugeVec
 
 	authCacheHits   *prometheus.GaugeVec
 	authCacheMisses *prometheus.GaugeVec
@@ -59,6 +60,13 @@ func NewExporter(uri string, basicAuth BasicAuth, databases []string, insecure b
 				Subsystem: "httpd",
 				Name:      "up",
 				Help:      "Was the last query of CouchDB stats successful.",
+			}),
+		totalDatabases: prometheus.NewGauge(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "httpd",
+				Name:      "total_databases",
+				Help:      "Total number of databases in the cluster",
 			}),
 		nodeUp: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{

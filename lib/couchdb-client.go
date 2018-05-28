@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"github.com/golang/glog"
 	"github.com/hashicorp/go-version"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
-	"io"
 )
 
 type BasicAuth struct {
@@ -156,8 +156,13 @@ func (c *CouchdbClient) getStats(databases []string) (Stats, error) {
 		if err != nil {
 			return Stats{}, err
 		}
+		databasesList, err := c.getDatabaseList()
+		if err != nil {
+			return Stats{}, err
+		}
 		return Stats{
 			StatsByNodeName:       nodeStats,
+			TotalDatabases:        len(databasesList),
 			DatabaseStatsByDbName: databaseStats,
 			ActiveTasksResponse:   activeTasks,
 			ApiVersion:            "2"}, nil
@@ -177,8 +182,13 @@ func (c *CouchdbClient) getStats(databases []string) (Stats, error) {
 		if err != nil {
 			return Stats{}, err
 		}
+		databasesList, err := c.getDatabaseList()
+		if err != nil {
+			return Stats{}, err
+		}
 		return Stats{
 			StatsByNodeName:       nodeStats,
+			TotalDatabases:        len(databasesList),
 			DatabaseStatsByDbName: databaseStats,
 			ActiveTasksResponse:   activeTasks,
 			ApiVersion:            "1"}, nil

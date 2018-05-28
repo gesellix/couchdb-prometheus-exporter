@@ -3,6 +3,11 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
+	"github.com/gesellix/couchdb-cluster-config/pkg"
+	"github.com/gesellix/couchdb-prometheus-exporter/lib"
+	"github.com/gesellix/couchdb-prometheus-exporter/testutil"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"log"
 	"net"
@@ -10,11 +15,6 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
-	"github.com/gesellix/couchdb-cluster-config/pkg"
-	"github.com/gesellix/couchdb-prometheus-exporter/lib"
-	"github.com/gesellix/couchdb-prometheus-exporter/testutil"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/stretchr/testify/assert"
 	"time"
 )
 
@@ -66,6 +66,9 @@ func couchdbResponse(t *testing.T, versionSuffix string) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/" {
 			file := readFile(t, fmt.Sprintf("./testdata/couchdb-%s.json", versionSuffix))
+			w.Write([]byte(file))
+		} else if r.URL.Path == "/_all_dbs" {
+			file := readFile(t, "./testdata/all-dbs.json")
 			w.Write([]byte(file))
 		} else if r.URL.Path == "/_membership" {
 			file := readFile(t, fmt.Sprintf("./testdata/couchdb-membership-response-%s.json", versionSuffix))
@@ -127,11 +130,11 @@ func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetric
 }
 
 func TestCouchdbStatsV1(t *testing.T) {
-	performCouchdbStatsTest(t, "v1", 46, 4711, 12396)
+	performCouchdbStatsTest(t, "v1", 47, 4711, 12396)
 }
 
 func TestCouchdbStatsV2(t *testing.T) {
-	performCouchdbStatsTest(t, "v2", 79, 4712, 58570)
+	performCouchdbStatsTest(t, "v2", 80, 4712, 58570)
 }
 
 func TestCouchdbStatsV1Integration(t *testing.T) {
@@ -208,7 +211,7 @@ func TestCouchdbStatsV1Integration(t *testing.T) {
 	}
 }
 
-func awaitMembership(t *testing.T, basicAuth lib.BasicAuth) (func(address string) (bool, error)) {
+func awaitMembership(t *testing.T, basicAuth lib.BasicAuth) func(address string) (bool, error) {
 	time.Sleep(5 * time.Second)
 
 	return func(address string) (bool, error) {

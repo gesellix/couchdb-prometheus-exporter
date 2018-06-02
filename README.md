@@ -11,10 +11,10 @@ environment variables, and config file.
 
 ## Run it as container
 
-    docker run -p 9984:9984 gesellix/couchdb-prometheus-exporter -couchdb.uri=http://couchdb:5984
+    docker run -p 9984:9984 gesellix/couchdb-prometheus-exporter -couchdb.uri=http://couchdb:5984 -logtostderr
 
 The couchdb-exporter uses the [glog](https://godoc.org/github.com/golang/glog) library for logging.
-With the default parameters nothing will be logged.
+With the default parameters everything will be logged to `/tmp/`.
 Use `-logtostderr` to enable logging to stderr and `--help` to see all options.
 
 For CouchDB 2.x, you should configure the exporter to fetch the stats from one node, to get

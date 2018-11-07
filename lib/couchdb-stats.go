@@ -101,6 +101,8 @@ type StatsResponse struct {
 type DatabaseStats struct {
 	DiskSize         float64 `json:"disk_size"`
 	DataSize         float64 `json:"data_size"`
+	DocCount         float64 `json:"doc_count"`
+	DocDelCount      float64 `json:"doc_del_count"`
 	DiskSizeOverhead float64
 }
 

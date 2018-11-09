@@ -39,7 +39,8 @@ type Exporter struct {
 	diskSize         *prometheus.GaugeVec
 	dataSize         *prometheus.GaugeVec
 	docCount         *prometheus.GaugeVec
-	docDelCount         *prometheus.GaugeVec
+	docDelCount      *prometheus.GaugeVec
+	compactRunning   *prometheus.GaugeVec
 	diskSizeOverhead *prometheus.GaugeVec
 
 	activeTasks                      *prometheus.GaugeVec
@@ -232,6 +233,14 @@ func NewExporter(uri string, basicAuth BasicAuth, databases []string, insecure b
 				Subsystem: "database",
 				Name:      "doc_del_count",
 				Help:      "deleted document count",
+			},
+			[]string{"db_name"}),
+		compactRunning: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "database",
+				Name:      "compact_running",
+				Help:      "database compaction running",
 			},
 			[]string{"db_name"}),
 		diskSizeOverhead: prometheus.NewGaugeVec(

@@ -50,6 +50,7 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	e.dataSize.Describe(ch)
 	e.docCount.Describe(ch)
 	e.docDelCount.Describe(ch)
+	e.compactRunning.Describe(ch)
 	e.diskSizeOverhead.Describe(ch)
 
 	e.activeTasks.Describe(ch)
@@ -86,6 +87,7 @@ func (e *Exporter) resetAllMetrics() {
 		e.dataSize,
 		e.docCount,
 		e.docDelCount,
+		e.compactRunning,
 		e.diskSizeOverhead,
 
 		e.activeTasks,
@@ -162,6 +164,7 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	e.dataSize.Collect(ch)
 	e.docCount.Collect(ch)
 	e.docDelCount.Collect(ch)
+	e.compactRunning.Collect(ch)
 	e.diskSizeOverhead.Collect(ch)
 
 	e.activeTasks.Collect(ch)

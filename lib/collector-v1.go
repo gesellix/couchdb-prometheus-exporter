@@ -47,6 +47,7 @@ func (e *Exporter) collectV1(stats Stats, exposedHttpStatusCodes []string, datab
 		e.dataSize.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DataSize)
 		e.docCount.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DocCount)
 		e.docDelCount.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DocDelCount)
+		e.compactRunning.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].CompactRunning)
 		e.diskSizeOverhead.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DiskSizeOverhead)
 	}
 

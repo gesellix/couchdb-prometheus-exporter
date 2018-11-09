@@ -11,7 +11,7 @@ COPY . $APPPATH
 RUN cd $APPPATH && go get -d \
  && go get -u github.com/golang/dep/cmd/dep \
  && $GOPATH/bin/dep ensure \
- && go test ./... \
+ && go test -short ./... \
  && go build \
     -a \
     -ldflags '-s -w -extldflags "-static"' \

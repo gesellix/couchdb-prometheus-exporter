@@ -1,0 +1,48 @@
+version: "2.3"
+
+services:
+  couchdb1:
+    image: apache/couchdb:2.1.1
+    command: -name couchdb@172.16.238.11 -setcookie thecookie
+    restart: always
+    networks:
+      couchdb-cluster:
+        ipv4_address: 172.16.238.11
+    ports:
+      - "15984:5984"
+
+  couchdb2:
+    image: apache/couchdb:2.1.1
+    command: -name couchdb@172.16.238.12 -setcookie thecookie
+    restart: always
+    networks:
+      couchdb-cluster:
+        ipv4_address: 172.16.238.12
+    ports:
+      - "25984:5984"
+
+  couchdb3:
+    image: apache/couchdb:2.1.1
+    command: -name couchdb@172.16.238.13 -setcookie thecookie
+    restart: always
+    networks:
+      couchdb-cluster:
+        ipv4_address: 172.16.238.13
+    ports:
+      - "35984:5984"
+
+  cluster-setup:
+    build: .
+#    image: gesellix/couchdb-cluster-config:latest
+    command: setup --username ${COUCHDB_USER:-root} --password ${COUCHDB_PASSWORD:-a-secret} -nodes 172.16.238.11 -nodes 172.16.238.12 -nodes 172.16.238.13
+    networks:
+      couchdb-cluster:
+        ipv4_address: 172.16.238.99
+
+networks:
+  couchdb-cluster:
+    driver: overlay
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.238.0/24"

@@ -1,4 +1,4 @@
-FROM alpine:edge AS builder
+FROM alpine:3.8 AS builder
 LABEL builder=true
 
 ENV CGO_ENABLED=0
@@ -9,9 +9,12 @@ RUN adduser -DH user
 RUN apk add --update -t build-deps go git mercurial libc-dev gcc libgcc
 COPY . $APPPATH
 RUN cd $APPPATH && go get -d \
+ && go get -u github.com/golang/dep/cmd/dep \
+ && $GOPATH/bin/dep ensure \
+ && go test ./... \
  && go build \
     -a \
-    -ldflags '-extldflags "-static"' \
+    -ldflags '-s -w -extldflags "-static"' \
     -o /bin/couchdb-prometheus-exporter
 
 FROM scratch

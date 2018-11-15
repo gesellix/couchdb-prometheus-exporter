@@ -130,11 +130,11 @@ func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetric
 }
 
 func TestCouchdbStatsV1(t *testing.T) {
-	performCouchdbStatsTest(t, "v1", 51, 4711, 12396)
+	performCouchdbStatsTest(t, "v1", 53, 4711, 12396)
 }
 
 func TestCouchdbStatsV2(t *testing.T) {
-	performCouchdbStatsTest(t, "v2", 84, 4712, 58570)
+	performCouchdbStatsTest(t, "v2", 86, 4712, 58570)
 }
 
 func TestCouchdbStatsV1Integration(t *testing.T) {

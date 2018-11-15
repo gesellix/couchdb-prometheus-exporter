@@ -101,11 +101,11 @@ type StatsResponse struct {
 type DatabaseStats struct {
 	DiskSize           float64 `json:"disk_size"`
 	DataSize           float64 `json:"data_size"`
+	DiskSizeOverhead   float64
 	DocCount           float64 `json:"doc_count"`
 	DocDelCount        float64 `json:"doc_del_count"`
 	CompactRunningBool bool    `json:"compact_running"`
 	CompactRunning     float64
-	DiskSizeOverhead   float64
 }
 
 type DatabaseStatsByDbName map[string]DatabaseStats

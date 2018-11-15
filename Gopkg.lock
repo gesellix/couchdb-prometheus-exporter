@@ -35,11 +35,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:fd681619adeb0216bf8aa126dece533cc108c733f245748d73fc350d034ae5fa"
+  digest = "1:c825b6eaa1b2d1f9df831f668d682db879a8e4885827168b2894ba967e6e0dc9"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   pruneopts = ""
-  revision = "951a149f90371fb8858c6c979d03bb2583611052"
+  revision = "52132540909e117f2b98b0694383dc0ab1e1deca"
 
 [[projects]]
   branch = "master"
@@ -94,7 +94,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:ec33e022d27019d9ef386bf1d952df0fb24427ad2d2731e77c013f6ab228a445"
+  digest = "1:d522feb599bd02a4b76d3ad20b91668c87028a6b5fd19a1bed994e26f6cd3c6d"
   name = "github.com/prometheus/common"
   packages = [
     "expfmt",
@@ -102,7 +102,7 @@
     "model",
   ]
   pruneopts = ""
-  revision = "0b1957f9d949dfa3084171a6ec5642b38055276a"
+  revision = "41aa239b4cce3c56ab88fc366ae8b0a6423fa239"
 
 [[projects]]
   branch = "master"

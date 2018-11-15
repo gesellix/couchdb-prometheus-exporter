@@ -103,7 +103,7 @@ type DatabaseStats struct {
 	DataSize         float64 `json:"data_size"`
 	DocCount         float64 `json:"doc_count"`
 	DocDelCount      float64 `json:"doc_del_count"`
-	CompactRunningImport   bool    `json:"compact_running"`
+	CompactRunningBool   bool    `json:"compact_running"`
 	CompactRunning   float64
 	DiskSizeOverhead float64
 }

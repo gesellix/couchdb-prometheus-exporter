@@ -209,7 +209,7 @@ func (c *CouchdbClient) getDatabasesStatsByNodeName(databases []string) (map[str
 			return nil, fmt.Errorf("error unmarshalling database '%s' stats: %v", dbName, err)
 		}
 		dbStats.DiskSizeOverhead = dbStats.DiskSize - dbStats.DataSize
-		if (dbStats.CompactRunningImport) {
+		if (dbStats.CompactRunningBool) {
 			dbStats.CompactRunning = 1
 		} else {
 			dbStats.CompactRunning = 0

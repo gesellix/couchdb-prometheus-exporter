@@ -11,7 +11,7 @@ services:
       - "4895:5984"
 
   couchdb1:
-    image: apache/couchdb:2.1.1
+    image: couchdb:2.2
     command: -name couchdb@172.16.238.11 -setcookie thecookie
     restart: always
     networks:
@@ -21,7 +21,7 @@ services:
       - "15984:5984"
 
   couchdb2:
-    image: apache/couchdb:2.1.1
+    image: couchdb:2.2
     command: -name couchdb@172.16.238.12 -setcookie thecookie
     restart: always
     networks:
@@ -31,7 +31,7 @@ services:
       - "25984:5984"
 
   couchdb3:
-    image: apache/couchdb:2.1.1
+    image: couchdb:2.2
     command: -name couchdb@172.16.238.13 -setcookie thecookie
     restart: always
     networks:
@@ -51,6 +51,18 @@ services:
         ipv4_address: 172.16.238.10
     ports:
       - "9984:9984"
+
+  couchdbstats2:
+    image: "gesellix/couchdb-prometheus-exporter:${COUCHDB_EXPORTER_VERSION:-latest}"
+    command: -couchdb.uri=http://couchdb2:5984 -logtostderr
+    environment:
+      - "COUCHDB.USERNAME=${COUCHDB_USER:-root}"
+      - "COUCHDB.PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
+    networks:
+      couchdb-cluster:
+        ipv4_address: 172.16.238.20
+    ports:
+      - "9985:9984"
 
   cluster-setup:
     image: gesellix/couchdb-cluster-config:8

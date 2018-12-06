@@ -1,0 +1,17 @@
+language: go
+go:
+  - 1.6
+  - 1.7
+  - 1.8.x
+  - 1.9.x
+  - 1.10.x
+  - master
+branches:
+  only:
+    - master
+notifications:
+  irc:
+    channels:
+      - "chat.freenode.net#cloudi"
+    on_success: change
+    on_failure: always

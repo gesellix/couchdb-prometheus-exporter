@@ -66,6 +66,14 @@
   version = "v1.7.4-pre"
 
 [[projects]]
+  digest = "1:e997294e029878fc0d982254d6498b586957fb4065a04db6b76269fd4c231f7b"
+  name = "github.com/okeuday/erlang_go"
+  packages = ["src/erlang"]
+  pruneopts = ""
+  revision = "e7a8a8e9fa64a8fd7a0bf5133c9baa633e3f6eca"
+  version = "v1.7.4"
+
+[[projects]]
   digest = "1:256484dbbcd271f9ecebc6795b2df8cad4c458dd0f5fd82a8c2fa0c29f233411"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
@@ -134,6 +142,7 @@
     "github.com/golang/protobuf/proto",
     "github.com/hashicorp/go-version",
     "github.com/namsral/flag",
+    "github.com/okeuday/erlang_go/src/erlang",
     "github.com/prometheus/client_golang/prometheus",
     "github.com/prometheus/client_golang/prometheus/promhttp",
     "github.com/prometheus/client_model/go",

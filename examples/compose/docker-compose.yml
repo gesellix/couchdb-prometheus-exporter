@@ -2,7 +2,7 @@ version: "2"
 
 services:
   couchdb:
-    image: apache/couchdb:2.1.1
+    image: couchdb:2.3.0
     env_file: .couchdb-env
     restart: always
     volumes:

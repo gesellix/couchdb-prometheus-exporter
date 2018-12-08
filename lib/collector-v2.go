@@ -49,6 +49,35 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, datab
 		e.docDelCount.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DocDelCount)
 		e.compactRunning.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].CompactRunning)
 		e.diskSizeOverhead.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DiskSizeOverhead)
+
+		for designDoc, view := range stats.DatabaseStatsByDbName[dbName].Views {
+			for viewName, updateSeq := range view {
+				dbUpdateSeq, err := DecodeUpdateSeq(stats.DatabaseStatsByDbName[dbName].UpdateSeq.String())
+				if err != nil {
+					return err
+				}
+
+				viewUpdateSeq, err := DecodeUpdateSeq(updateSeq)
+				if err != nil {
+					return err
+				}
+
+				for _, viewRangeSeq := range viewUpdateSeq {
+					for _, dbRangeSeq := range dbUpdateSeq {
+						if viewRangeSeq.Range[0].Cmp(dbRangeSeq.Range[0]) == 0 {
+							age := dbRangeSeq.Seq - viewRangeSeq.Seq
+							//glog.Infof("dbRangeSeq.Seq %d, viewRangeSeq.Seq %d, age %d", dbRangeSeq.Seq, viewRangeSeq.Seq, age)
+							e.viewStaleness.WithLabelValues(
+								dbName,
+								designDoc,
+								viewName,
+								viewRangeSeq.Range[0].String(),
+								viewRangeSeq.Range[1].String()).Set(float64(age))
+						}
+					}
+				}
+			}
+		}
 	}
 
 	activeTasksByNode := make(map[string]ActiveTaskTypes)

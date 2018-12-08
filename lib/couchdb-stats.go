@@ -1,5 +1,7 @@
 package lib
 
+import "encoding/json"
+
 type Counter struct {
 	// v1.x api
 	Description string
@@ -98,6 +100,32 @@ type StatsResponse struct {
 	HttpdStatusCodes    HttpdStatusCodes    `json:"httpd_status_codes"`
 }
 
+type View map[string]interface{}
+
+type Doc struct {
+	Id    string          `json:"_id"`
+	Views map[string]View `json:"views"`
+}
+
+type Row struct {
+	Id  string `json:"id"`
+	Doc Doc    `json:"doc"`
+}
+
+type Rows []Row
+
+type DocsResponse struct {
+	Rows Rows `json:"rows"`
+}
+
+type ViewResponse struct {
+	UpdateSeq json.Number `json:"update_seq"`
+}
+
+type ViewStats map[string]string
+
+type ViewStatsByDesignDocName map[string]ViewStats
+
 type DatabaseStats struct {
 	DiskSize           float64 `json:"disk_size"`
 	DataSize           float64 `json:"data_size"`
@@ -106,6 +134,8 @@ type DatabaseStats struct {
 	DocDelCount        float64 `json:"doc_del_count"`
 	CompactRunningBool bool    `json:"compact_running"`
 	CompactRunning     float64
+	UpdateSeq          json.Number `json:"update_seq"`
+	Views              ViewStatsByDesignDocName
 }
 
 type DatabaseStatsByDbName map[string]DatabaseStats

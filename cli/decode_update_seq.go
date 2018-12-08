@@ -9,12 +9,14 @@ import (
 
 func main() {
 	updateSeq := os.Args[1]
-	fmt.Printf("** updateSeq:\n%s\n", updateSeq)
+	//fmt.Printf("%s\n", updateSeq)
 
 	decoded, err := lib.DecodeUpdateSeq(updateSeq)
 	if err != nil {
 		panic(err)
 	}
+	//fmt.Printf("%v\n", decoded)
+
 	decodedJson, _ := json.Marshal(decoded)
-	fmt.Printf("** decoded:\n%v\n** json:\n%s\n", decoded, decodedJson)
+	fmt.Printf("%s\n", decodedJson)
 }

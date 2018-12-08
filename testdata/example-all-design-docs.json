@@ -1,0 +1,22 @@
+{
+  "total_rows": 2,
+  "offset": 0,
+  "rows": [
+    {
+      "id": "_design/views",
+      "key": "_design/views",
+      "value": {
+        "rev": "1-3f7b35543d91173e73a9e62162dc4e32"
+      },
+      "doc": {
+        "_id": "_design/views",
+        "_rev": "1-3f7b35543d91173e73a9e62162dc4e32",
+        "views": {
+          "by_id": {
+            "map": "function(doc) { emit(doc._id, null) }"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "total_rows": 1,
+  "offset": 0,
+  "update_seq": 2,
+  "rows": [
+    {
+      "id": "doc1",
+      "key": "doc1",
+      "value": null
+    }
+  ]
+}

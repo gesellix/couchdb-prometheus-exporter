@@ -82,6 +82,24 @@ func couchdbResponse(t *testing.T, versionSuffix string) Handler {
 		} else if r.URL.Path == "/another-example" {
 			file := readFile(t, fmt.Sprintf("./testdata/example-meta-%s.json", versionSuffix))
 			w.Write([]byte(file))
+		} else if r.URL.String() == "/example/_all_docs?startkey=\"_design/\"&endkey=\"_design0\"&include_docs=true" {
+			file := readFile(t, "./testdata/example-all-design-docs.json")
+			w.Write([]byte(file))
+		} else if r.URL.String() == "/another-example/_all_docs?startkey=\"_design/\"&endkey=\"_design0\"&include_docs=true" {
+			file := readFile(t, "./testdata/example-all-design-docs.json")
+			w.Write([]byte(file))
+		} else if r.URL.String() == "/example/_design/views/_view/by_id?stale=ok&update=false&stable=true&update_seq=true&include_docs=false&limit=0" {
+			file := readFile(t, fmt.Sprintf("./testdata/example-view-stale-%s.json", versionSuffix))
+			w.Write([]byte(file))
+		} else if r.URL.String() == "/another-example/_design/views/_view/by_id?stale=ok&update=false&stable=true&update_seq=true&include_docs=false&limit=0" {
+			file := readFile(t, fmt.Sprintf("./testdata/example-view-stale-%s.json", versionSuffix))
+			w.Write([]byte(file))
+		} else if r.URL.String() == "/example/_design/views/_view/by_id?stale=ok&update=false&stable=true&update_seq=true&include_docs=false&limit=0" {
+			file := readFile(t, fmt.Sprintf("./testdata/example-view-stale-%s.json", versionSuffix))
+			w.Write([]byte(file))
+		} else if r.URL.String() == "/another-example/_design/views/_view/by_id?stale=ok&update=false&stable=true&update_seq=true&include_docs=false&limit=0" {
+			file := readFile(t, fmt.Sprintf("./testdata/example-view-stale-%s.json", versionSuffix))
+			w.Write([]byte(file))
 		} else {
 			file := readFile(t, fmt.Sprintf("./testdata/couchdb-stats-response-%s.json", versionSuffix))
 			w.Write([]byte(file))
@@ -94,7 +112,10 @@ func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetric
 	handler := http.HandlerFunc(BasicAuthHandler(basicAuth, couchdbResponse(t, couchdbVersion)))
 	server := httptest.NewServer(handler)
 
-	e := lib.NewExporter(server.URL, basicAuth, []string{"example", "another-example"}, true)
+	e := lib.NewExporter(server.URL, basicAuth, lib.CollectorConfig{
+		Databases:    []string{"example", "another-example"},
+		CollectViews: true,
+	}, true)
 
 	ch := make(chan prometheus.Metric)
 	go func() {
@@ -130,11 +151,11 @@ func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetric
 }
 
 func TestCouchdbStatsV1(t *testing.T) {
-	performCouchdbStatsTest(t, "v1", 53, 4711, 12396)
+	performCouchdbStatsTest(t, "v1", 55, 4711, 12396)
 }
 
 func TestCouchdbStatsV2(t *testing.T) {
-	performCouchdbStatsTest(t, "v2", 86, 4712, 58570)
+	performCouchdbStatsTest(t, "v2", 102, 4712, 58570)
 }
 
 func TestCouchdbStatsV1Integration(t *testing.T) {
@@ -160,7 +181,10 @@ func TestCouchdbStatsV1Integration(t *testing.T) {
 	}
 
 	t.Run("node_up", func(t *testing.T) {
-		e := lib.NewExporter(dbUrl, basicAuth, []string{}, true)
+		e := lib.NewExporter(dbUrl, basicAuth, lib.CollectorConfig{
+			Databases:    []string{},
+			CollectViews: true,
+		}, true)
 
 		ch := make(chan prometheus.Metric)
 		go func() {
@@ -181,7 +205,10 @@ func TestCouchdbStatsV1Integration(t *testing.T) {
 	})
 
 	t.Run("_all_dbs", func(t *testing.T) {
-		e := lib.NewExporter(dbUrl, basicAuth, []string{"_all_dbs"}, true)
+		e := lib.NewExporter(dbUrl, basicAuth, lib.CollectorConfig{
+			Databases:    []string{"_all_dbs"},
+			CollectViews: true,
+		}, true)
 
 		ch := make(chan prometheus.Metric)
 		go func() {
@@ -264,7 +291,10 @@ func TestCouchdbStatsV2Integration(t *testing.T) {
 	}
 
 	t.Run("node_up", func(t *testing.T) {
-		e := lib.NewExporter(dbUrl, basicAuth, []string{}, true)
+		e := lib.NewExporter(dbUrl, basicAuth, lib.CollectorConfig{
+			Databases:    []string{},
+			CollectViews: true,
+		}, true)
 
 		ch := make(chan prometheus.Metric)
 		go func() {
@@ -285,7 +315,10 @@ func TestCouchdbStatsV2Integration(t *testing.T) {
 	})
 
 	t.Run("_all_dbs", func(t *testing.T) {
-		e := lib.NewExporter(dbUrl, basicAuth, []string{"_all_dbs"}, true)
+		e := lib.NewExporter(dbUrl, basicAuth, lib.CollectorConfig{
+			Databases:    []string{"_all_dbs"},
+			CollectViews: true,
+		}, true)
 
 		ch := make(chan prometheus.Metric)
 		go func() {

@@ -1,17 +1,17 @@
 package main
 
 import (
-	"fmt"
 	goflag "flag"
-	"net/http"
-	"strconv"
-	"strings"
+	"fmt"
 	"github.com/gesellix/couchdb-prometheus-exporter/glogadapt"
 	"github.com/gesellix/couchdb-prometheus-exporter/lib"
 	"github.com/golang/glog"
 	"github.com/namsral/flag"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"net/http"
+	"strconv"
+	"strings"
 )
 
 type exporterConfigType struct {
@@ -55,14 +55,20 @@ func main() {
 	goflag.Lookup("stderrthreshold").Value.Set(glogadapt.Logging.StderrThreshold.String())
 	goflag.Lookup("log_dir").Value.Set(glogadapt.Logging.LogDir)
 
-	databases := strings.Split(*&exporterConfig.databases, ",")
+	var databases []string
+	if *&exporterConfig.databases != "" {
+		databases = strings.Split(*&exporterConfig.databases, ",")
+	}
 
 	exporter := lib.NewExporter(
 		*&exporterConfig.couchdbURI,
 		lib.BasicAuth{
 			Username: *&exporterConfig.couchdbUsername,
 			Password: *&exporterConfig.couchdbPassword},
-		databases,
+		lib.CollectorConfig{
+			Databases:    databases,
+			CollectViews: true,
+		},
 		*&exporterConfig.couchdbInsecure)
 	prometheus.MustRegister(exporter)
 

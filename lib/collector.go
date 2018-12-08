@@ -11,6 +11,11 @@ var (
 	exposedHttpStatusCodes = []string{"200", "201", "202", "301", "304", "400", "401", "403", "404", "405", "409", "412", "500"}
 )
 
+type CollectorConfig struct {
+	Databases    []string
+	CollectViews bool
+}
+
 type ActiveTaskTypes struct {
 	DatabaseCompaction float64
 	ViewCompaction     float64
@@ -59,6 +64,8 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	e.activeTasksIndexer.Describe(ch)
 	e.activeTasksReplication.Describe(ch)
 	e.activeTasksReplicationLastUpdate.Describe(ch)
+
+	e.viewStaleness.Describe(ch)
 }
 
 func (e *Exporter) resetAllMetrics() {
@@ -96,6 +103,8 @@ func (e *Exporter) resetAllMetrics() {
 		e.activeTasksIndexer,
 		e.activeTasksReplication,
 		e.activeTasksReplicationLastUpdate,
+
+		e.viewStaleness,
 	}
 	e.resetMetrics(metrics)
 }
@@ -122,21 +131,22 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 
 	e.resetAllMetrics()
 
-	var databases, err = e.getMonitoredDatabaseNames(e.databases)
+	var databases, err = e.getMonitoredDatabaseNames(e.collectorConfig.Databases)
 	if err != nil {
 		return err
 	}
+	e.collectorConfig.Databases = databases
 
-	stats, err := e.client.getStats(databases)
+	stats, err := e.client.getStats(e.collectorConfig)
 	if err != nil {
 		return fmt.Errorf("error collecting couchdb stats: %v", err)
 	}
 	e.up.Set(1)
 
 	if stats.ApiVersion == "2" {
-		e.collectV2(stats, exposedHttpStatusCodes, databases)
+		e.collectV2(stats, exposedHttpStatusCodes, e.collectorConfig.Databases)
 	} else {
-		e.collectV1(stats, exposedHttpStatusCodes, databases)
+		e.collectV1(stats, exposedHttpStatusCodes, e.collectorConfig.Databases)
 	}
 
 	e.databasesTotal.Collect(ch)
@@ -173,6 +183,8 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	e.activeTasksIndexer.Collect(ch)
 	e.activeTasksReplication.Collect(ch)
 	e.activeTasksReplicationLastUpdate.Collect(ch)
+
+	e.viewStaleness.Collect(ch)
 
 	return nil
 }

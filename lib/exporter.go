@@ -10,9 +10,9 @@ const (
 )
 
 type Exporter struct {
-	client    *CouchdbClient
-	databases []string
-	mutex     sync.RWMutex
+	client          *CouchdbClient
+	collectorConfig CollectorConfig
+	mutex           sync.RWMutex
 
 	up             prometheus.Gauge
 	databasesTotal prometheus.Gauge
@@ -49,13 +49,15 @@ type Exporter struct {
 	activeTasksIndexer               *prometheus.GaugeVec
 	activeTasksReplication           *prometheus.GaugeVec
 	activeTasksReplicationLastUpdate *prometheus.GaugeVec
+
+	viewStaleness *prometheus.GaugeVec
 }
 
-func NewExporter(uri string, basicAuth BasicAuth, databases []string, insecure bool) *Exporter {
+func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfig, insecure bool) *Exporter {
 
 	return &Exporter{
-		client:    NewCouchdbClient(uri, basicAuth, insecure),
-		databases: databases,
+		client:          NewCouchdbClient(uri, basicAuth, insecure),
+		collectorConfig: collectorConfig,
 
 		up: prometheus.NewGauge(
 			prometheus.GaugeOpts{
@@ -302,5 +304,14 @@ func NewExporter(uri string, basicAuth BasicAuth, databases []string, insecure b
 				Help:      "active tasks",
 			},
 			[]string{"node_name", "doc_id", "continuous", "source", "target"}),
+
+		viewStaleness: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "view",
+				Name:      "staleness",
+				Help:      "the view's staleness (the view's update_seq compared to the database's update_seq)",
+			},
+			[]string{"db_name", "design_doc_name", "view_name", "shard_begin", "shard_end"}),
 	}
 }

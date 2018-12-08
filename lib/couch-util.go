@@ -44,6 +44,8 @@ func convertSeq(t interface{}) int {
 	switch rType := t.(type) {
 	case uint8:
 		return int(rType)
+	case int32:
+		return int(rType)
 	case erlang.OtpErlangTuple:
 		return int(erlang.OtpErlangTuple(rType)[0].(uint8))
 	default:

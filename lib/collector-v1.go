@@ -49,6 +49,15 @@ func (e *Exporter) collectV1(stats Stats, exposedHttpStatusCodes []string, datab
 		e.docDelCount.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DocDelCount)
 		e.compactRunning.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].CompactRunning)
 		e.diskSizeOverhead.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DiskSizeOverhead)
+
+		for designDoc, view := range stats.DatabaseStatsByDbName[dbName].Views {
+			for viewName, updateSeq := range view {
+				dbUpdateSeq, _ := stats.DatabaseStatsByDbName[dbName].UpdateSeq.Int64()
+				viewUpdateSeq, _ := strconv.ParseInt(updateSeq, 10, 64)
+				age := dbUpdateSeq - viewUpdateSeq
+				e.viewStaleness.WithLabelValues(dbName, designDoc, viewName, "0", "1").Set(float64(age))
+			}
+		}
 	}
 
 	activeTasksByNode := make(map[string]ActiveTaskTypes)

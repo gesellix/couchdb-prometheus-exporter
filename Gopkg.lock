@@ -35,11 +35,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c825b6eaa1b2d1f9df831f668d682db879a8e4885827168b2894ba967e6e0dc9"
+  digest = "1:66c4f0faff05a23bbb921be3f21838d7d58e69f4d102e23347ea8080675d1efa"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   pruneopts = ""
-  revision = "52132540909e117f2b98b0694383dc0ab1e1deca"
+  revision = "1d3f30b51784bec5aad268e59fd3c2fc1c2fe73f"
 
 [[projects]]
   branch = "master"
@@ -66,12 +66,12 @@
   version = "v1.7.4-pre"
 
 [[projects]]
-  digest = "1:e997294e029878fc0d982254d6498b586957fb4065a04db6b76269fd4c231f7b"
+  digest = "1:27a944cff478bdbbfa4d10417bfae2abe6ad34429c12716376c96a6f7036cc3f"
   name = "github.com/okeuday/erlang_go"
   packages = ["src/erlang"]
   pruneopts = ""
-  revision = "e7a8a8e9fa64a8fd7a0bf5133c9baa633e3f6eca"
-  version = "v1.7.4"
+  revision = "2ed5ef9295bef5295ff47cac63d5391cc92d5b80"
+  version = "v1.7.5"
 
 [[projects]]
   digest = "1:256484dbbcd271f9ecebc6795b2df8cad4c458dd0f5fd82a8c2fa0c29f233411"
@@ -102,7 +102,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:d522feb599bd02a4b76d3ad20b91668c87028a6b5fd19a1bed994e26f6cd3c6d"
+  digest = "1:4c3c11c0cd3bb16e36fd94ed778a3136972459baa5e248989cbf8ed3e6b5a55e"
   name = "github.com/prometheus/common"
   packages = [
     "expfmt",
@@ -110,11 +110,11 @@
     "model",
   ]
   pruneopts = ""
-  revision = "41aa239b4cce3c56ab88fc366ae8b0a6423fa239"
+  revision = "67670fe90761d7ff18ec1d640135e53b9198328f"
 
 [[projects]]
   branch = "master"
-  digest = "1:1f62ed2c173c42c1edad2e94e127318ea11b0d28c62590c82a8d2d3cde189afe"
+  digest = "1:2a434946be9f2f5498b2405a8607768aab439237ea13deff2edc59d9a44f8891"
   name = "github.com/prometheus/procfs"
   packages = [
     ".",
@@ -123,7 +123,7 @@
     "xfs",
   ]
   pruneopts = ""
-  revision = "185b4288413d2a0dd0806f78c90dde719829e5ae"
+  revision = "1dc9a6cbc91aacc3e8b2d63db4d2e957a5394ac4"
 
 [[projects]]
   digest = "1:c587772fb8ad29ad4db67575dad25ba17a51f072ff18a22b4f0257a4d9c24f75"

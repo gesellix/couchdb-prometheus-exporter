@@ -10,9 +10,10 @@ const (
 )
 
 type Exporter struct {
-	client    *CouchdbClient
-	databases []string
-	mutex     sync.RWMutex
+	client      *CouchdbClient
+	databases   []string
+	replsUpdate bool
+	mutex       sync.RWMutex
 
 	up             prometheus.Gauge
 	databasesTotal prometheus.Gauge
@@ -51,11 +52,12 @@ type Exporter struct {
 	activeTasksReplicationLastUpdate *prometheus.GaugeVec
 }
 
-func NewExporter(uri string, basicAuth BasicAuth, databases []string, insecure bool) *Exporter {
+func NewExporter(uri string, basicAuth BasicAuth, databases []string, insecure, replsUpdate bool) *Exporter {
 
 	return &Exporter{
-		client:    NewCouchdbClient(uri, basicAuth, insecure),
-		databases: databases,
+		client:      NewCouchdbClient(uri, basicAuth, insecure),
+		databases:   databases,
+		replsUpdate: replsUpdate,
 
 		up: prometheus.NewGauge(
 			prometheus.GaugeOpts{

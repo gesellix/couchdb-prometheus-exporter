@@ -12,7 +12,7 @@ One example where one has to pay attention is the `vm.args` file
 to configure a common Erlang cookie, or to set the node
 names to something different than `localhost`.
 
-Since I also needed an automated setup via api to setup an integration test environment
+Since I also needed more automation via api to setup an integration test environment
 I played with same hacky [shell scripts](https://github.com/gesellix/couchdb-prometheus-exporter/commit/73fae7bc37194a0c8e63107fb16d7993d9cfef25),
 but a nice implementation in Golang promises better portability and maintainability.
 
@@ -47,6 +47,7 @@ You can run a setup like this:
     docker run --rm \
                --network couchdb-cluster \
                gesellix/couchdb-cluster-config \
+               setup \
                --nodes 172.16.238.11 \
                --nodes 172.16.238.12 \
                --nodes 172.16.238.13 \
@@ -55,9 +56,8 @@ You can run a setup like this:
 
 There are three nodes listed with their ip addresses, along with the admin credentials.
 The tool should work with freshly started nodes, so they usually don't know about an
-admin user and not even the core databases `_users` and `_replicator`.
-
-So, for every listed node the tool will ensure that the admin user and core databases exist.
+admin user and not even the core databases `_users` and `_replicator`. For every listed node
+the couchdb-cluster-config will ensure that the admin user and core databases exist.
 Only then the cluster setup is performed by creating a cluster of all nodes.
 
 ### Some more details

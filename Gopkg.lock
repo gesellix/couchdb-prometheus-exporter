@@ -18,12 +18,12 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:e8bbf097414072082ea627ba64b923e1b683c9271d70d8dbb5fc857719473662"
+  digest = "1:37566bc8151eba2ae81100d02cb6d6c50e99bb888625b7d547c0964758159b8a"
   name = "github.com/gesellix/couchdb-cluster-config"
   packages = ["pkg"]
   pruneopts = ""
-  revision = "e0d56e1582e5fb768584a180de64e7c07f8cf686"
-  version = "8"
+  revision = "55b53b83dcee4ca4d7abacd7d60e44549327991e"
+  version = "9"
 
 [[projects]]
   branch = "master"
@@ -35,19 +35,19 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:66c4f0faff05a23bbb921be3f21838d7d58e69f4d102e23347ea8080675d1efa"
+  digest = "1:d3d38150b6d77b2aad42a9e105170538b6563518993d43df78a1add6e31cce62"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   pruneopts = ""
-  revision = "1d3f30b51784bec5aad268e59fd3c2fc1c2fe73f"
+  revision = "c823c79ea1570fb5ff454033735a8e68575d1d0f"
 
 [[projects]]
   branch = "master"
-  digest = "1:8c7fb7f81c06add10a17362abc1ae569ff9765a26c061c6b6e67c909f4f414db"
+  digest = "1:b759103c9b4135568253c17d2866064cde398e93764b611caabf5aa8e3059685"
   name = "github.com/hashicorp/go-version"
   packages = ["."]
   pruneopts = ""
-  revision = "b5a281d3160aa11950a6182bd9a9dc2cb1e02d50"
+  revision = "d40cf49b3a77bba84a7afdbd7f1dc295d114efb1"
 
 [[projects]]
   digest = "1:63722a4b1e1717be7b98fc686e0b30d5e7f734b9e93d7dee86293b6deab7ea28"
@@ -94,15 +94,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:185cf55b1f44a1bf243558901c3f06efa5c64ba62cfdcbb1bf7bbe8c3fb68561"
+  digest = "1:cd67319ee7536399990c4b00fae07c3413035a53193c644549a676091507cadc"
   name = "github.com/prometheus/client_model"
   packages = ["go"]
   pruneopts = ""
-  revision = "5c3871d89910bfb32f5fcab2aa4b9ec68e65a99f"
+  revision = "fd36f4220a901265f90734c3183c5f0c91daa0b8"
 
 [[projects]]
-  branch = "master"
-  digest = "1:4c3c11c0cd3bb16e36fd94ed778a3136972459baa5e248989cbf8ed3e6b5a55e"
+  digest = "1:96af18a3819d2ff7d6aa07e6e50955b11e477dbc8b890324c67462b84adca56b"
   name = "github.com/prometheus/common"
   packages = [
     "expfmt",
@@ -110,28 +109,30 @@
     "model",
   ]
   pruneopts = ""
-  revision = "67670fe90761d7ff18ec1d640135e53b9198328f"
+  revision = "cfeb6f9992ffa54aaa4f2170ade4067ee478b250"
+  version = "v0.2.0"
 
 [[projects]]
   branch = "master"
-  digest = "1:2a434946be9f2f5498b2405a8607768aab439237ea13deff2edc59d9a44f8891"
+  digest = "1:1b7cd41afad7e1250d0582c2a12bccf995893b4e2a4265daf0f6a385005a87db"
   name = "github.com/prometheus/procfs"
   packages = [
     ".",
     "internal/util",
+    "iostats",
     "nfs",
     "xfs",
   ]
   pruneopts = ""
-  revision = "1dc9a6cbc91aacc3e8b2d63db4d2e957a5394ac4"
+  revision = "e4d4a2206da023361ed100d85c5f2cf9c8364e9f"
 
 [[projects]]
-  digest = "1:c587772fb8ad29ad4db67575dad25ba17a51f072ff18a22b4f0257a4d9c24f75"
+  digest = "1:381bcbeb112a51493d9d998bbba207a529c73dbb49b3fd789e48c63fac1f192c"
   name = "github.com/stretchr/testify"
   packages = ["assert"]
   pruneopts = ""
-  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
-  version = "v1.2.2"
+  revision = "ffdc059bfe9ce6a4e144ba849dbedead332c6053"
+  version = "v1.3.0"
 
 [solve-meta]
   analyzer-name = "dep"

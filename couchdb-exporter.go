@@ -46,16 +46,10 @@ func init() {
 }
 
 func main() {
-	flag.Parse()
-	// Convinces goflags that we have called Parse() to avoid noisy logs.
-	// Necessary due to https://github.com/golang/glog/commit/65d674618f712aa808a7d0104131b9206fc3d5ad
-	// and us using another flags package.
-	goflag.CommandLine.Parse([]string{})
-	goflag.Lookup("logtostderr").Value.Set(strconv.FormatBool(*&glogadapt.Logging.ToStderr))
-	goflag.Lookup("alsologtostderr").Value.Set(strconv.FormatBool(*&glogadapt.Logging.AlsoToStderr))
-	goflag.Lookup("v").Value.Set(glogadapt.Logging.Verbosity.String())
-	goflag.Lookup("stderrthreshold").Value.Set(glogadapt.Logging.StderrThreshold.String())
-	goflag.Lookup("log_dir").Value.Set(glogadapt.Logging.LogDir)
+	err := initFlags()
+	if err != nil {
+		glog.Fatal(err)
+	}
 
 	var databases []string
 	if *&exporterConfig.databases != "" {
@@ -76,15 +70,50 @@ func main() {
 
 	http.Handle(*&exporterConfig.metricsEndpoint, promhttp.Handler())
 	http.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "OK")
+		_, err = fmt.Fprint(w, "OK")
+		if err != nil {
+			glog.Error(err)
+		}
 	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("Please GET %s", *&exporterConfig.metricsEndpoint), http.StatusNotFound)
 	})
 
 	glog.Infof("Starting exporter at '%s' to read from CouchDB at '%s'", *&exporterConfig.listenAddress, *&exporterConfig.couchdbURI)
-	err := http.ListenAndServe(*&exporterConfig.listenAddress, nil)
+	err = http.ListenAndServe(*&exporterConfig.listenAddress, nil)
 	if err != nil {
 		glog.Fatal(err)
 	}
+}
+
+func initFlags() error {
+	flag.Parse()
+	// Convinces goflags that we have called Parse() to avoid noisy logs.
+	// Necessary due to https://github.com/golang/glog/commit/65d674618f712aa808a7d0104131b9206fc3d5ad
+	// and us using another flags package.
+	err := goflag.CommandLine.Parse([]string{})
+	if err != nil {
+		return err
+	}
+	err = goflag.Lookup("logtostderr").Value.Set(strconv.FormatBool(*&glogadapt.Logging.ToStderr))
+	if err != nil {
+		return err
+	}
+	err = goflag.Lookup("alsologtostderr").Value.Set(strconv.FormatBool(*&glogadapt.Logging.AlsoToStderr))
+	if err != nil {
+		return err
+	}
+	err = goflag.Lookup("v").Value.Set(glogadapt.Logging.Verbosity.String())
+	if err != nil {
+		return err
+	}
+	err = goflag.Lookup("stderrthreshold").Value.Set(glogadapt.Logging.StderrThreshold.String())
+	if err != nil {
+		return err
+	}
+	err = goflag.Lookup("log_dir").Value.Set(glogadapt.Logging.LogDir)
+	if err != nil {
+		return err
+	}
+	return nil
 }

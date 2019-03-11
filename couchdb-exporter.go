@@ -23,6 +23,7 @@ type exporterConfigType struct {
 	couchdbInsecure bool
 	databases       string
 	databaseViews   bool
+	schedulerJobs   bool
 }
 
 var exporterConfig exporterConfigType
@@ -37,6 +38,7 @@ func init() {
 	flag.BoolVar(&exporterConfig.couchdbInsecure, "couchdb.insecure", true, "Ignore server certificate if using https")
 	flag.StringVar(&exporterConfig.databases, "databases", "", fmt.Sprintf("Comma separated list of database names, or '%s'", lib.AllDbs))
 	flag.BoolVar(&exporterConfig.databaseViews, "databases.views", true, "Collect view details of every observed database")
+	flag.BoolVar(&exporterConfig.schedulerJobs, "scheduler.jobs", false, "Collect active replication jobs (CouchDB 2.x+ only)")
 
 	flag.BoolVar(&glogadapt.Logging.ToStderr, "logtostderr", false, "log to standard error instead of files")
 	flag.BoolVar(&glogadapt.Logging.AlsoToStderr, "alsologtostderr", false, "log to standard error as well as files")
@@ -62,8 +64,9 @@ func main() {
 			Username: *&exporterConfig.couchdbUsername,
 			Password: *&exporterConfig.couchdbPassword},
 		lib.CollectorConfig{
-			Databases:    databases,
-			CollectViews: *&exporterConfig.databaseViews,
+			Databases:            databases,
+			CollectViews:         *&exporterConfig.databaseViews,
+			CollectSchedulerJobs: *&exporterConfig.schedulerJobs,
 		},
 		*&exporterConfig.couchdbInsecure)
 	prometheus.MustRegister(exporter)

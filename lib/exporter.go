@@ -53,6 +53,8 @@ type Exporter struct {
 	activeTasksReplicationLastUpdate *prometheus.GaugeVec
 
 	viewStaleness *prometheus.GaugeVec
+
+	schedulerJobs *prometheus.GaugeVec
 }
 
 func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfig, insecure bool) *Exporter {
@@ -324,5 +326,14 @@ func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfi
 				Help:      "the view's staleness (the view's update_seq compared to the database's update_seq)",
 			},
 			[]string{"db_name", "design_doc_name", "view_name", "shard_begin", "shard_end"}),
+
+		schedulerJobs: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "scheduler",
+				Name:      "jobs",
+				Help:      "scheduler jobs",
+			},
+			[]string{"node_name", "job_id", "db_name", "doc_id", "source", "target"}),
 	}
 }

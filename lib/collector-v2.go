@@ -80,6 +80,18 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, colle
 		}
 	}
 
+	if collectorConfig.CollectSchedulerJobs {
+		for _, job := range stats.SchedulerJobsResponse.Jobs {
+			e.schedulerJobs.WithLabelValues(
+				job.Node,
+				job.ID,
+				job.Database,
+				job.DocID,
+				job.Source,
+				job.Target).Set(float64(len(job.History)))
+		}
+	}
+
 	activeTasksByNode := make(map[string]ActiveTaskTypes)
 	for _, task := range stats.ActiveTasksResponse {
 		if task.Type == "replication" {

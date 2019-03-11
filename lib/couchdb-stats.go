@@ -1,6 +1,9 @@
 package lib
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"time"
+)
 
 type Counter struct {
 	// v1.x api
@@ -152,10 +155,32 @@ type ActiveTask struct {
 
 type ActiveTasksResponse []ActiveTask
 
+type SchedulerJobsResponse struct {
+	TotalRows int `json:"total_rows"`
+	Offset    int `json:"offset"`
+	Jobs      []struct {
+		Database string `json:"database"`
+		ID       string `json:"id"`
+		Pid      string `json:"pid"`
+		Source   string `json:"source"`
+		Target   string `json:"target"`
+		User     string `json:"user"`
+		DocID    string `json:"doc_id"`
+		History  []struct {
+			Timestamp time.Time `json:"timestamp"`
+			Type      string    `json:"type"`
+		} `json:"history"`
+		Node      string    `json:"node"`
+		StartTime time.Time `json:"start_time"`
+	} `json:"jobs"`
+}
+
 type Stats struct {
 	StatsByNodeName       map[string]StatsResponse
 	DatabasesTotal        int
 	DatabaseStatsByDbName DatabaseStatsByDbName
 	ActiveTasksResponse   ActiveTasksResponse
+	// SchedulerJobsResponse: CouchDB 2.x+ only
+	SchedulerJobsResponse SchedulerJobsResponse
 	ApiVersion            string
 }

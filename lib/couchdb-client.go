@@ -18,9 +18,11 @@ type BasicAuth struct {
 }
 
 type CouchdbClient struct {
-	BaseUri   string
-	basicAuth BasicAuth
-	client    *http.Client
+	BaseUri           string
+	basicAuth         BasicAuth
+	client            *http.Client
+	ResetRequestCount func()
+	GetRequestCount   func() int
 }
 
 type MembershipResponse struct {
@@ -342,16 +344,38 @@ func (c *CouchdbClient) Request(method string, uri string, body io.Reader) (resp
 	return respData, nil
 }
 
+type requestCountingRoundTripper struct {
+	RequestCount int
+	rt           http.RoundTripper
+}
+
+func (rt *requestCountingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	rt.RequestCount = rt.RequestCount + 1
+	//glog.Infof("req[%d] %s", rt.RequestCount, req.URL.String())
+	return rt.rt.RoundTrip(req)
+}
+
 func NewCouchdbClient(uri string, basicAuth BasicAuth, insecure bool) *CouchdbClient {
-	httpClient := &http.Client{
-		Transport: &http.Transport{
+	countingRoundTripper := &requestCountingRoundTripper{
+		0,
+		&http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure},
 		},
+	}
+
+	httpClient := &http.Client{
+		Transport: countingRoundTripper,
 	}
 
 	return &CouchdbClient{
 		BaseUri:   uri,
 		basicAuth: basicAuth,
 		client:    httpClient,
+		ResetRequestCount: func() {
+			countingRoundTripper.RequestCount = 0
+		},
+		GetRequestCount: func() int {
+			return countingRoundTripper.RequestCount
+		},
 	}
 }

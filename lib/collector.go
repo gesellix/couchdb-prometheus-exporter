@@ -73,6 +73,8 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	e.activeTasksReplicationLastUpdate.Describe(ch)
 
 	e.viewStaleness.Describe(ch)
+
+	e.requestCount.Describe(ch)
 }
 
 func (e *Exporter) resetAllMetrics() {
@@ -138,6 +140,9 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 
 	e.resetAllMetrics()
 
+	e.requestCount.Set(-1)
+	e.client.ResetRequestCount()
+
 	var databases, err = e.getObservedDatabaseNames(e.collectorConfig.Databases)
 	if err != nil {
 		return err
@@ -149,6 +154,7 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 		return fmt.Errorf("error collecting couchdb stats: %v", err)
 	}
 	e.up.Set(1)
+	e.requestCount.Set(float64(e.client.GetRequestCount()))
 
 	if stats.ApiVersion == "2" {
 		err = e.collectV2(stats, exposedHttpStatusCodes, e.collectorConfig)
@@ -198,6 +204,8 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	e.activeTasksReplicationLastUpdate.Collect(ch)
 
 	e.viewStaleness.Collect(ch)
+
+	e.requestCount.Collect(ch)
 
 	return nil
 }

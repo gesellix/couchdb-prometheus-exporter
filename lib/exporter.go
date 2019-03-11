@@ -14,6 +14,8 @@ type Exporter struct {
 	collectorConfig CollectorConfig
 	mutex           sync.RWMutex
 
+	requestCount prometheus.Gauge
+
 	up             prometheus.Gauge
 	databasesTotal prometheus.Gauge
 	nodeUp         *prometheus.GaugeVec
@@ -59,6 +61,14 @@ func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfi
 		client:          NewCouchdbClient(uri, basicAuth, insecure),
 		collectorConfig: collectorConfig,
 
+		requestCount: prometheus.NewGauge(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "exporter",
+				Name:      "request_count",
+				Help:      "Number of CouchDB requests for this scrape.",
+			}),
+
 		up: prometheus.NewGauge(
 			prometheus.GaugeOpts{
 				Namespace: namespace,
@@ -66,6 +76,7 @@ func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfi
 				Name:      "up",
 				Help:      "Was the last query of CouchDB stats successful.",
 			}),
+
 		databasesTotal: prometheus.NewGauge(
 			prometheus.GaugeOpts{
 				Namespace: namespace,

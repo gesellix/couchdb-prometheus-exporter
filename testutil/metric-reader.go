@@ -45,6 +45,9 @@ func GetGaugeValue(metricFamilies map[string]*dto.MetricFamily, metricDesc strin
 	for desc, metrics := range metricFamilies {
 		if metricDesc == "" || desc == metricDesc {
 			for _, metric := range metrics.Metric {
+				if len(metric.Label) == 0 && labelName == "" && labelValue == "" {
+					return *metric.Gauge.Value, nil
+				}
 				for _, label := range metric.Label {
 					if *label.Name == labelName && *label.Value == labelValue {
 						return *metric.Gauge.Value, nil

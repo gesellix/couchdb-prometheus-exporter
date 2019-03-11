@@ -107,7 +107,7 @@ func couchdbResponse(t *testing.T, versionSuffix string) Handler {
 	}
 }
 
-func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetricsCount int, expectedGetRequestCount float64, expectedDiskSize float64) {
+func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetricsCount int, expectedGetRequestCount float64, expectedDiskSize float64, expectedRequestCount float64) {
 	basicAuth := lib.BasicAuth{Username: "username", Password: "password"}
 	handler := http.HandlerFunc(BasicAuthHandler(basicAuth, couchdbResponse(t, couchdbVersion)))
 	server := httptest.NewServer(handler)
@@ -148,14 +148,22 @@ func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetric
 	if expectedDiskSize != actualDiskSize {
 		t.Errorf("expected %f disk size, but got %f instead", expectedDiskSize, actualDiskSize)
 	}
+
+	actualRequestCount, err := testutil.GetGaugeValue(metricFamilies, "couchdb_exporter_request_count", "", "")
+	if err != nil {
+		t.Error(err)
+	}
+	if expectedRequestCount != actualRequestCount {
+		t.Errorf("expected %f request count, but got %f instead", expectedRequestCount, actualRequestCount)
+	}
 }
 
 func TestCouchdbStatsV1(t *testing.T) {
-	performCouchdbStatsTest(t, "v1", 55, 4711, 12396)
+	performCouchdbStatsTest(t, "v1", 56, 4711, 12396, 11)
 }
 
 func TestCouchdbStatsV2(t *testing.T) {
-	performCouchdbStatsTest(t, "v2", 102, 4712, 58570)
+	performCouchdbStatsTest(t, "v2", 103, 4712, 58570, 14)
 }
 
 func TestCouchdbStatsV1Integration(t *testing.T) {

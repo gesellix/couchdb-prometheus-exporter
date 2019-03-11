@@ -28,8 +28,8 @@ type MembershipResponse struct {
 	ClusterNodes []string `json:"cluster_nodes"`
 }
 
-func (c *CouchdbClient) getNodeInfo() (NodeInfo, error) {
-	data, err := c.Request("GET", fmt.Sprintf("%s/", c.BaseUri), nil)
+func (c *CouchdbClient) getNodeInfo(uri string) (NodeInfo, error) {
+	data, err := c.Request("GET", fmt.Sprintf("%s/", uri), nil)
 	if err != nil {
 		return NodeInfo{}, err
 	}
@@ -42,7 +42,7 @@ func (c *CouchdbClient) getNodeInfo() (NodeInfo, error) {
 }
 
 func (c *CouchdbClient) getServerVersion() (string, error) {
-	nodeInfo, err := c.getNodeInfo()
+	nodeInfo, err := c.getNodeInfo(c.BaseUri)
 	if err != nil {
 		return "", err
 	}
@@ -119,7 +119,8 @@ func (c *CouchdbClient) getStatsByNodeName(urisByNodeName map[string]string) (ma
 			return nil, fmt.Errorf("error unmarshalling stats: %v", err)
 		}
 
-		nodeInfo, err := c.getNodeInfo()
+		// TODO this one is expected to retrieve other nodes' info
+		nodeInfo, err := c.getNodeInfo(c.BaseUri)
 		if err != nil {
 			return nil, err
 		}

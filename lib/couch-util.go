@@ -80,7 +80,7 @@ func DecodeUpdateSeq(updateSeq string) ([]UpdateSequence, error) {
 	//	fmt.Printf("Duration: %s\n", time.Since(start))
 	//}()
 
-	encoded := string(regexp.MustCompile("^\\d+\\-").ReplaceAll([]byte(updateSeq), []byte{}))
+	encoded := string(regexp.MustCompile("^\\d+-").ReplaceAll([]byte(updateSeq), []byte{}))
 
 	b1 := strings.Replace(encoded, "-", "+", -1)
 	b2 := strings.Replace(b1, "_", "/", -1)

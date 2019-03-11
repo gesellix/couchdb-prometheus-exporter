@@ -331,14 +331,23 @@ func (c *CouchdbClient) Request(method string, uri string, body io.Reader) (resp
 	if err != nil {
 		return nil, err
 	}
+	if resp != nil {
+		defer func() {
+			if cerr := resp.Body.Close(); cerr != nil {
+				err = cerr
+			}
+		}()
+	}
 
 	respData, err = ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode >= 400 {
 		if err != nil {
 			respData = []byte(err.Error())
 		}
 		return nil, fmt.Errorf("status %s (%d): %s", resp.Status, resp.StatusCode, respData)
+	}
+	if err != nil {
+		return nil, err
 	}
 
 	return respData, nil

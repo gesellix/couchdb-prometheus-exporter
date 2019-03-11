@@ -161,6 +161,10 @@ func (c *CouchdbClient) getStats(config CollectorConfig) (Stats, error) {
 				return Stats{}, err
 			}
 		}
+		schedulerJobs := SchedulerJobsResponse{}
+		if config.CollectSchedulerJobs {
+			schedulerJobs, err = c.getSchedulerJobs()
+		}
 		activeTasks, err := c.getActiveTasks()
 		if err != nil {
 			return Stats{}, err
@@ -174,6 +178,7 @@ func (c *CouchdbClient) getStats(config CollectorConfig) (Stats, error) {
 			DatabasesTotal:        len(databasesList),
 			DatabaseStatsByDbName: databaseStats,
 			ActiveTasksResponse:   activeTasks,
+			SchedulerJobsResponse: schedulerJobs,
 			ApiVersion:            "2"}, nil
 	} else {
 		urisByNode := map[string]string{
@@ -278,6 +283,27 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 		dbStatsByDbName[dbName] = dbStats
 	}
 	return nil
+}
+
+// CouchDB 2.x+ only
+func (c *CouchdbClient) getSchedulerJobs() (SchedulerJobsResponse, error) {
+	data, err := c.Request("GET", fmt.Sprintf("%s/_scheduler/jobs", c.BaseUri), nil)
+	if err != nil {
+		return SchedulerJobsResponse{}, fmt.Errorf("error reading scheduler jobs: %v", err)
+	}
+
+	var schedulerJobs SchedulerJobsResponse
+	err = json.Unmarshal(data, &schedulerJobs)
+	if err != nil {
+		return SchedulerJobsResponse{}, fmt.Errorf("error unmarshalling scheduler jobs: %v", err)
+	}
+	//for _, job := range schedulerJobs.Jobs {
+	//	replDoc, err := c.Request("GET", fmt.Sprintf("%s/%s/%s", c.BaseUri, job.Database, job.DocID), nil)
+	//	if err != nil {
+	//		return SchedulerJobsResponse{}, fmt.Errorf("error reading replication doc '%s/%s': %v", job.Database, job.DocID, err)
+	//	}
+	//}
+	return schedulerJobs, nil
 }
 
 func (c *CouchdbClient) getActiveTasks() (ActiveTasksResponse, error) {

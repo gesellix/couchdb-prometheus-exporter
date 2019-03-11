@@ -21,6 +21,7 @@ type CollectorConfig struct {
 	Databases            []string
 	ObservedDatabases    []string
 	CollectViews         bool
+	CollectSchedulerJobs bool
 }
 
 type ActiveTaskTypes struct {
@@ -74,6 +75,8 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 
 	e.viewStaleness.Describe(ch)
 
+	e.schedulerJobs.Describe(ch)
+
 	e.requestCount.Describe(ch)
 }
 
@@ -114,6 +117,8 @@ func (e *Exporter) resetAllMetrics() {
 		e.activeTasksReplicationLastUpdate,
 
 		e.viewStaleness,
+
+		e.schedulerJobs,
 	}
 	e.resetMetrics(metrics)
 }
@@ -204,6 +209,8 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	e.activeTasksReplicationLastUpdate.Collect(ch)
 
 	e.viewStaleness.Collect(ch)
+
+	e.schedulerJobs.Collect(ch)
 
 	e.requestCount.Collect(ch)
 

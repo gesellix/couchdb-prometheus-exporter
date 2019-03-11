@@ -76,6 +76,9 @@ func couchdbResponse(t *testing.T, versionSuffix string) Handler {
 		} else if r.URL.Path == "/_active_tasks" {
 			file := readFile(t, fmt.Sprintf("./testdata/active-tasks-%s.json", versionSuffix))
 			w.Write([]byte(file))
+		} else if r.URL.Path == "/_scheduler/jobs" {
+			file := readFile(t, fmt.Sprintf("./testdata/scheduler-jobs-%s.json", versionSuffix))
+			w.Write([]byte(file))
 		} else if r.URL.Path == "/example" {
 			file := readFile(t, fmt.Sprintf("./testdata/example-meta-%s.json", versionSuffix))
 			w.Write([]byte(file))
@@ -113,8 +116,9 @@ func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetric
 	server := httptest.NewServer(handler)
 
 	e := lib.NewExporter(server.URL, basicAuth, lib.CollectorConfig{
-		Databases:    []string{"example", "another-example"},
-		CollectViews: true,
+		Databases:            []string{"example", "another-example"},
+		CollectViews:         true,
+		CollectSchedulerJobs: true,
 	}, true)
 
 	ch := make(chan prometheus.Metric)
@@ -163,7 +167,7 @@ func TestCouchdbStatsV1(t *testing.T) {
 }
 
 func TestCouchdbStatsV2(t *testing.T) {
-	performCouchdbStatsTest(t, "v2", 103, 4712, 58570, 14)
+	performCouchdbStatsTest(t, "v2", 106, 4712, 58570, 15)
 }
 
 func TestCouchdbStatsV1Integration(t *testing.T) {

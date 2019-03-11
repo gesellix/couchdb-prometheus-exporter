@@ -7,13 +7,20 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+const AllDbs = "_all_dbs"
+
 var (
-	exposedHttpStatusCodes = []string{"200", "201", "202", "301", "304", "400", "401", "403", "404", "405", "409", "412", "500"}
+	exposedHttpStatusCodes = []string{
+		"200", "201", "202",
+		"301", "304",
+		"400", "401", "403", "404", "405", "409", "412",
+		"500"}
 )
 
 type CollectorConfig struct {
-	Databases    []string
-	CollectViews bool
+	Databases            []string
+	ObservedDatabases    []string
+	CollectViews         bool
 }
 
 type ActiveTaskTypes struct {
@@ -115,8 +122,8 @@ func (e *Exporter) resetMetrics(metrics []*prometheus.GaugeVec) {
 	}
 }
 
-func (e *Exporter) getMonitoredDatabaseNames(candidates []string) ([]string, error) {
-	if len(candidates) == 1 && candidates[0] == "_all_dbs" {
+func (e *Exporter) getObservedDatabaseNames(candidates []string) ([]string, error) {
+	if len(candidates) == 1 && candidates[0] == AllDbs {
 		return e.client.getDatabaseList()
 	}
 	return candidates, nil
@@ -131,11 +138,11 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 
 	e.resetAllMetrics()
 
-	var databases, err = e.getMonitoredDatabaseNames(e.collectorConfig.Databases)
+	var databases, err = e.getObservedDatabaseNames(e.collectorConfig.Databases)
 	if err != nil {
 		return err
 	}
-	e.collectorConfig.Databases = databases
+	e.collectorConfig.ObservedDatabases = databases
 
 	stats, err := e.client.getStats(e.collectorConfig)
 	if err != nil {
@@ -144,9 +151,15 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	e.up.Set(1)
 
 	if stats.ApiVersion == "2" {
-		e.collectV2(stats, exposedHttpStatusCodes, e.collectorConfig.Databases)
+		err = e.collectV2(stats, exposedHttpStatusCodes, e.collectorConfig)
+		if err != nil {
+			return err
+		}
 	} else {
-		e.collectV1(stats, exposedHttpStatusCodes, e.collectorConfig.Databases)
+		err = e.collectV1(stats, exposedHttpStatusCodes, e.collectorConfig)
+		if err != nil {
+			return err
+		}
 	}
 
 	e.databasesTotal.Collect(ch)

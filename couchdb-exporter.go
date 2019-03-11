@@ -34,7 +34,7 @@ func init() {
 	flag.StringVar(&exporterConfig.couchdbUsername, "couchdb.username", "", "Basic auth username for the CouchDB instance")
 	flag.StringVar(&exporterConfig.couchdbPassword, "couchdb.password", "", "Basic auth password for the CouchDB instance")
 	flag.BoolVar(&exporterConfig.couchdbInsecure, "couchdb.insecure", true, "Ignore server certificate if using https")
-	flag.StringVar(&exporterConfig.databases, "databases", "", "Comma separated list of database names")
+	flag.StringVar(&exporterConfig.databases, "databases", "", fmt.Sprintf("Comma separated list of database names, or '%s'", lib.AllDbs))
 
 	flag.BoolVar(&glogadapt.Logging.ToStderr, "logtostderr", false, "log to standard error instead of files")
 	flag.BoolVar(&glogadapt.Logging.AlsoToStderr, "alsologtostderr", false, "log to standard error as well as files")

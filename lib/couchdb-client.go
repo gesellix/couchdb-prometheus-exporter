@@ -149,7 +149,7 @@ func (c *CouchdbClient) getStats(config CollectorConfig) (Stats, error) {
 		if err != nil {
 			return Stats{}, err
 		}
-		databaseStats, err := c.getDatabasesStatsByDbName(config.Databases)
+		databaseStats, err := c.getDatabasesStatsByDbName(config.ObservedDatabases)
 		if err != nil {
 			return Stats{}, err
 		}
@@ -181,7 +181,7 @@ func (c *CouchdbClient) getStats(config CollectorConfig) (Stats, error) {
 		if err != nil {
 			return Stats{}, err
 		}
-		databaseStats, err := c.getDatabasesStatsByDbName(config.Databases)
+		databaseStats, err := c.getDatabasesStatsByDbName(config.ObservedDatabases)
 		if err != nil {
 			return Stats{}, err
 		}
@@ -299,7 +299,7 @@ func (c *CouchdbClient) getActiveTasks() (ActiveTasksResponse, error) {
 }
 
 func (c *CouchdbClient) getDatabaseList() ([]string, error) {
-	data, err := c.Request("GET", fmt.Sprintf("%s/_all_dbs", c.BaseUri), nil)
+	data, err := c.Request("GET", fmt.Sprintf("%s/%s", c.BaseUri, AllDbs), nil)
 	if err != nil {
 		return nil, err
 	}

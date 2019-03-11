@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, databases []string) error {
+func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, collectorConfig CollectorConfig) error {
 	e.databasesTotal.Set(float64(stats.DatabasesTotal))
 
 	for name, nodeStats := range stats.StatsByNodeName {
@@ -42,7 +42,7 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, datab
 		e.viewReads.WithLabelValues(name).Set(nodeStats.Couchdb.Httpd.ViewReads.Value)
 	}
 
-	for _, dbName := range databases {
+	for _, dbName := range collectorConfig.ObservedDatabases {
 		e.diskSize.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DiskSize)
 		e.dataSize.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DataSize)
 		e.docCount.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DocCount)

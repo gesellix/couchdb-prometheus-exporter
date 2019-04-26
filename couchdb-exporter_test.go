@@ -18,6 +18,8 @@ import (
 	"time"
 )
 
+var clusterSetupTimeout = time.After(40 * time.Second)
+
 type Handler func(w http.ResponseWriter, r *http.Request)
 
 func BasicAuthHandler(basicAuth lib.BasicAuth, pass Handler) Handler {
@@ -176,7 +178,7 @@ func TestCouchdbStatsV1Integration(t *testing.T) {
 	}
 
 	dbAddress := "localhost:4895"
-	err := cluster_config.AwaitNodes([]string{dbAddress}, cluster_config.Available)
+	err := cluster_config.AwaitNodes([]string{dbAddress}, clusterSetupTimeout, cluster_config.Available)
 	if err != nil {
 		t.Error(err)
 	}
@@ -280,7 +282,7 @@ func TestCouchdbStatsV2Integration(t *testing.T) {
 
 	// <setup code>
 	dbAddress := "localhost:15984"
-	err := cluster_config.AwaitNodes([]string{dbAddress}, cluster_config.Available)
+	err := cluster_config.AwaitNodes([]string{dbAddress}, clusterSetupTimeout, cluster_config.Available)
 	if err != nil {
 		t.Error(err)
 	}
@@ -288,7 +290,7 @@ func TestCouchdbStatsV2Integration(t *testing.T) {
 	dbUrl := fmt.Sprintf("http://%s", dbAddress)
 	basicAuth := lib.BasicAuth{Username: "root", Password: "a-secret"}
 
-	err = cluster_config.AwaitNodes([]string{dbAddress}, awaitMembership(t, basicAuth))
+	err = cluster_config.AwaitNodes([]string{dbAddress}, clusterSetupTimeout, awaitMembership(t, basicAuth))
 	if err != nil {
 		t.Error(err)
 	}

@@ -2,12 +2,12 @@
 
 
 [[projects]]
-  branch = "master"
-  digest = "1:c0bec5f9b98d0bc872ff5e834fac186b807b656683bd29cb82fb207a1513fabb"
+  digest = "1:0d3deb8a6da8ffba5635d6fb1d2144662200def6c9d82a35a6d05d6c2d4a48f9"
   name = "github.com/beorn7/perks"
   packages = ["quantile"]
   pruneopts = ""
-  revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
+  revision = "4b2b341e8d7715fae06375aa633dbb6e91b3fb46"
+  version = "v1.0.0"
 
 [[projects]]
   digest = "1:0deddd908b6b4b768cfc272c16ee61e7088a60f7fe2f06c547bd3d8e1f8b8e77"
@@ -18,12 +18,12 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:37566bc8151eba2ae81100d02cb6d6c50e99bb888625b7d547c0964758159b8a"
+  digest = "1:6b8f9ae642df0aa04cb156168ee0468ca4b91a6cf7ac1188c4816e4bd7498eca"
   name = "github.com/gesellix/couchdb-cluster-config"
   packages = ["pkg"]
   pruneopts = ""
-  revision = "55b53b83dcee4ca4d7abacd7d60e44549327991e"
-  version = "9"
+  revision = "200ad6212ee806c05f41259fea233ca117d328c9"
+  version = "10"
 
 [[projects]]
   branch = "master"
@@ -35,19 +35,19 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:529d738b7976c3848cae5cf3a8036440166835e389c1f617af701eeb12a0518d"
+  digest = "1:4d197686fcd627da0b9d76901203272d24182ed4921342d9911e124777b3f5a2"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   pruneopts = ""
-  revision = "b5d812f8a3706043e23a9cd5babf2e5423744d30"
+  revision = "e91709a02e0e8ff8b86b7aa913fdc9ae9498e825"
 
 [[projects]]
   branch = "master"
-  digest = "1:b759103c9b4135568253c17d2866064cde398e93764b611caabf5aa8e3059685"
+  digest = "1:4fbfcfe715329e2f09ea644657aa791b81e73a0c835a4f79b9a0dfff0513e2b8"
   name = "github.com/hashicorp/go-version"
   packages = ["."]
   pruneopts = ""
-  revision = "d40cf49b3a77bba84a7afdbd7f1dc295d114efb1"
+  revision = "192140e6f3e645d971b134d4e35b5191adb9dfd3"
 
 [[projects]]
   digest = "1:63722a4b1e1717be7b98fc686e0b30d5e7f734b9e93d7dee86293b6deab7ea28"
@@ -101,7 +101,7 @@
   revision = "fd36f4220a901265f90734c3183c5f0c91daa0b8"
 
 [[projects]]
-  digest = "1:96af18a3819d2ff7d6aa07e6e50955b11e477dbc8b890324c67462b84adca56b"
+  digest = "1:cf0d0ad53268d7c0e6cbe9a037059a6583ffd58d25f1cd6d48920f8c3ccc537f"
   name = "github.com/prometheus/common"
   packages = [
     "expfmt",
@@ -109,22 +109,16 @@
     "model",
   ]
   pruneopts = ""
-  revision = "cfeb6f9992ffa54aaa4f2170ade4067ee478b250"
-  version = "v0.2.0"
+  revision = "a82f4c12f983cc2649298185f296632953e50d3e"
+  version = "v0.3.0"
 
 [[projects]]
   branch = "master"
-  digest = "1:a29813277de981ce33148b3f1906bba492af2ce97237c050f62a6b48cfdae721"
+  digest = "1:f3783cf4fcf5a7d1413afa1d8b1f21ad267097e8f107ab50fc315287da0daea1"
   name = "github.com/prometheus/procfs"
-  packages = [
-    ".",
-    "internal/util",
-    "iostats",
-    "nfs",
-    "xfs",
-  ]
+  packages = ["."]
   pruneopts = ""
-  revision = "d0f344d83b0c80a1bc03b547a2374a9ec6711144"
+  revision = "87a4384529e0652f5035fb5cc8095faf73ea9b0b"
 
 [[projects]]
   digest = "1:381bcbeb112a51493d9d998bbba207a529c73dbb49b3fd789e48c63fac1f192c"

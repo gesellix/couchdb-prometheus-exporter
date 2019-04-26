@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
+	"time"
 )
 
 type ClusterSetup struct {
@@ -86,12 +87,12 @@ func CreateCoreDatabases(databaseNames []string, ipAddresses []string, auth Basi
 	return nil
 }
 
-func SetupClusterNodes(ipAddresses []string, adminAuth BasicAuth, insecure bool) error {
+func SetupClusterNodes(ipAddresses []string, timeout <-chan time.Time, adminAuth BasicAuth, insecure bool) error {
 	hosts := make([]string, len(ipAddresses))
 	for i, ip := range ipAddresses {
 		hosts[i] = fmt.Sprintf("%s:5984", ip)
 	}
-	err := AwaitNodes(hosts, Available)
+	err := AwaitNodes(hosts, timeout, Available)
 	if err != nil {
 		return err
 	}

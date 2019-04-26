@@ -34,7 +34,7 @@ services:
   cluster-setup:
     build: .
 #    image: gesellix/couchdb-cluster-config:latest
-    command: setup --username ${COUCHDB_USER:-root} --password ${COUCHDB_PASSWORD:-a-secret} -nodes 172.16.238.11 -nodes 172.16.238.12 -nodes 172.16.238.13
+    command: setup --timeout 60s --username ${COUCHDB_USER:-root} --password ${COUCHDB_PASSWORD:-a-secret} -nodes 172.16.238.11 -nodes 172.16.238.12 -nodes 172.16.238.13
     networks:
       couchdb-cluster:
         ipv4_address: 172.16.238.99

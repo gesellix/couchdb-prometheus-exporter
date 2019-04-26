@@ -7,12 +7,12 @@ import (
 	"time"
 )
 
-func AwaitNodes(addresses []string, check func(address string) (bool, error)) error {
+func AwaitNodes(addresses []string, timeout <-chan time.Time, check func(address string) (bool, error)) error {
 	resc, errc := make(chan string), make(chan error)
 
 	for _, address := range addresses {
 		go func(address string) {
-			success, err := awaitNode(address, check)
+			success, err := awaitNode(address, timeout, check)
 			if err != nil {
 				errc <- err
 				return
@@ -35,8 +35,7 @@ func AwaitNodes(addresses []string, check func(address string) (bool, error)) er
 	return nil
 }
 
-func awaitNode(address string, check func(address string) (bool, error)) (bool, error) {
-	timeout := time.After(20 * time.Second)
+func awaitNode(address string, timeout <-chan time.Time, check func(address string) (bool, error)) (bool, error) {
 	tick := time.Tick(1000 * time.Millisecond)
 	for {
 		select {

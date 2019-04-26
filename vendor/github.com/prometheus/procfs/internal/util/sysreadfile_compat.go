@@ -1,4 +1,4 @@
-// Copyright 2017 The Prometheus Authors
+// Copyright 2019 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -11,24 +11,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package sysfs
+// +build linux,appengine !linux
 
-import "testing"
+package util
 
-const (
-	sysTestFixtures = "../fixtures/sys"
+import (
+	"fmt"
 )
 
-func TestNewFS(t *testing.T) {
-	if _, err := NewFS("foobar"); err == nil {
-		t.Error("want NewFS to fail for non-existing mount point")
-	}
-
-	if _, err := NewFS("doc.go"); err == nil {
-		t.Error("want NewFS to fail if mount point is not a directory")
-	}
-
-	if _, err := NewFS(sysTestFixtures); err != nil {
-		t.Error("want NewFS to succeed if mount point exists")
-	}
+// SysReadFile is here implemented as a noop for builds that do not support
+// the read syscall. For example Windows, or Linux on Google App Engine.
+func SysReadFile(file string) (string, error) {
+	return "", fmt.Errorf("not supported on this platform")
 }

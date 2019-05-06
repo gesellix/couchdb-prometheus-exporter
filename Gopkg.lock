@@ -18,12 +18,12 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:6b8f9ae642df0aa04cb156168ee0468ca4b91a6cf7ac1188c4816e4bd7498eca"
+  digest = "1:27a2935518e54cd3b2eb3a810b839afedd1bcaf69f5ac5b3e193bb4cb1dcba5d"
   name = "github.com/gesellix/couchdb-cluster-config"
   packages = ["pkg"]
   pruneopts = ""
-  revision = "200ad6212ee806c05f41259fea233ca117d328c9"
-  version = "10"
+  revision = "1d748eb6064e9e45b4d3c320f33a9ed5c00f96bd"
+  version = "11"
 
 [[projects]]
   branch = "master"
@@ -114,11 +114,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f3783cf4fcf5a7d1413afa1d8b1f21ad267097e8f107ab50fc315287da0daea1"
+  digest = "1:dc779f7f4ba08ea45b8feb99874f327389868c96aa48708b434af337bd398294"
   name = "github.com/prometheus/procfs"
-  packages = ["."]
+  packages = [
+    ".",
+    "internal/fs",
+  ]
   pruneopts = ""
-  revision = "87a4384529e0652f5035fb5cc8095faf73ea9b0b"
+  revision = "740c0778500738e56e1877d52904c431a3fdc573"
 
 [[projects]]
   digest = "1:381bcbeb112a51493d9d998bbba207a529c73dbb49b3fd789e48c63fac1f192c"

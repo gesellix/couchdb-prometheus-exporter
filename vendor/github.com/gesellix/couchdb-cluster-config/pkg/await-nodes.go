@@ -7,9 +7,10 @@ import (
 	"time"
 )
 
-func AwaitNodes(addresses []string, timeout <-chan time.Time, check func(address string) (bool, error)) error {
+func AwaitNodes(addresses []string, delay time.Duration, timeout time.Duration, check func(address string) (bool, error)) error {
 	resc, errc := make(chan string), make(chan error)
 
+	time.Sleep(delay)
 	for _, address := range addresses {
 		go func(address string) {
 			success, err := awaitNode(address, timeout, check)
@@ -35,15 +36,16 @@ func AwaitNodes(addresses []string, timeout <-chan time.Time, check func(address
 	return nil
 }
 
-func awaitNode(address string, timeout <-chan time.Time, check func(address string) (bool, error)) (bool, error) {
+func awaitNode(address string, timeout time.Duration, check func(address string) (bool, error)) (bool, error) {
+	timeoutReached := time.After(timeout)
 	tick := time.Tick(1000 * time.Millisecond)
 	for {
 		select {
-		case <-timeout:
+		case <-timeoutReached:
 			//fmt.Println("timeout")
 			return false, errors.New(fmt.Sprintf("timeout@%s", address))
 		case <-tick:
-			fmt.Println(fmt.Sprintf("tick@%s", address))
+			fmt.Println(fmt.Sprintf("check@%s", address))
 
 			ok, err := check(address)
 			if err != nil {

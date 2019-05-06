@@ -8,6 +8,24 @@ import (
 	"time"
 )
 
+type IpAddress string
+
+type IpAddresses []IpAddress
+
+func ToIpAddresses(s []string) IpAddresses {
+	c := make(IpAddresses, len(s))
+	for i, v := range s {
+		c[i] = IpAddress(v)
+	}
+	return c
+}
+
+type ClusterSetupConfig struct {
+	IpAddresses IpAddresses
+	Delay       time.Duration
+	Timeout     time.Duration
+}
+
 type ClusterSetup struct {
 	Action      string `json:"action"`
 	RemoteNode  string `json:"remote_node,omitempty"`
@@ -23,7 +41,7 @@ type ClusterSetupResponse struct {
 	State string `json:"state"`
 }
 
-func AdminExists(ip string, auth BasicAuth, insecure bool) (bool, error) {
+func AdminExists(ip IpAddress, auth BasicAuth, insecure bool) (bool, error) {
 	client := NewCouchdbClient(fmt.Sprintf("http://%s:5984", ip), BasicAuth{}, insecure)
 	resp, err := client.Request(
 		"POST",
@@ -35,7 +53,7 @@ func AdminExists(ip string, auth BasicAuth, insecure bool) (bool, error) {
 	return resp.StatusCode == 200, nil
 }
 
-func CreateAdmin(ipAddresses []string, auth BasicAuth, insecure bool) error {
+func CreateAdmin(ipAddresses IpAddresses, auth BasicAuth, insecure bool) error {
 	for _, ip := range ipAddresses {
 		if ok, err := AdminExists(ip, auth, insecure); !ok {
 			if err != nil {
@@ -54,7 +72,7 @@ func CreateAdmin(ipAddresses []string, auth BasicAuth, insecure bool) error {
 	return nil
 }
 
-func DatabaseExists(dbName string, ip string, auth BasicAuth, insecure bool) (bool, error) {
+func DatabaseExists(dbName string, ip IpAddress, auth BasicAuth, insecure bool) (bool, error) {
 	client := NewCouchdbClient(fmt.Sprintf("http://%s:5984", ip), auth, insecure)
 	resp, err := client.Request(
 		"GET",
@@ -66,7 +84,7 @@ func DatabaseExists(dbName string, ip string, auth BasicAuth, insecure bool) (bo
 	return resp.StatusCode == 200, nil
 }
 
-func CreateCoreDatabases(databaseNames []string, ipAddresses []string, auth BasicAuth, insecure bool) error {
+func CreateCoreDatabases(databaseNames []string, ipAddresses IpAddresses, auth BasicAuth, insecure bool) error {
 	for _, ip := range ipAddresses {
 		client := NewCouchdbClient(fmt.Sprintf("http://%s:5984", ip), auth, insecure)
 		for _, dbName := range databaseNames {
@@ -87,29 +105,29 @@ func CreateCoreDatabases(databaseNames []string, ipAddresses []string, auth Basi
 	return nil
 }
 
-func SetupClusterNodes(ipAddresses []string, timeout <-chan time.Time, adminAuth BasicAuth, insecure bool) error {
-	hosts := make([]string, len(ipAddresses))
-	for i, ip := range ipAddresses {
+func SetupClusterNodes(config ClusterSetupConfig, adminAuth BasicAuth, insecure bool) error {
+	hosts := make([]string, len(config.IpAddresses))
+	for i, ip := range config.IpAddresses {
 		hosts[i] = fmt.Sprintf("%s:5984", ip)
 	}
-	err := AwaitNodes(hosts, timeout, Available)
+	err := AwaitNodes(hosts, config.Delay, config.Timeout, Available)
 	if err != nil {
 		return err
 	}
 
-	err = CreateAdmin(ipAddresses, adminAuth, insecure)
+	err = CreateAdmin(config.IpAddresses, adminAuth, insecure)
 	if err != nil {
 		return err
 	}
 
-	err = CreateCoreDatabases([]string{"_users", "_replicator"}, ipAddresses, adminAuth, insecure)
+	err = CreateCoreDatabases([]string{"_users", "_replicator"}, config.IpAddresses, adminAuth, insecure)
 	if err != nil {
 		return err
 	}
 
-	setupNodeIp := ipAddresses[:1][0]
-	otherNodeIps := ipAddresses[1:]
-	nodeCount := len(ipAddresses)
+	setupNodeIp := config.IpAddresses[:1][0]
+	otherNodeIps := config.IpAddresses[1:]
+	nodeCount := len(config.IpAddresses)
 
 	client := NewCouchdbClient(fmt.Sprintf("http://%s:5984", setupNodeIp), adminAuth, insecure)
 
@@ -154,7 +172,7 @@ func SetupClusterNodes(ipAddresses []string, timeout <-chan time.Time, adminAuth
 	for _, ip := range otherNodeIps {
 		body, err = json.Marshal(ClusterSetup{
 			Action:      "enable_cluster",
-			RemoteNode:  ip,
+			RemoteNode:  string(ip),
 			Port:        "5984",
 			Username:    adminAuth.Username,
 			Password:    adminAuth.Password,
@@ -173,7 +191,7 @@ func SetupClusterNodes(ipAddresses []string, timeout <-chan time.Time, adminAuth
 
 		body, err = json.Marshal(ClusterSetup{
 			Action:   "add_node",
-			Host:     ip,
+			Host:     string(ip),
 			Port:     "5984",
 			Username: adminAuth.Username,
 			Password: adminAuth.Password})

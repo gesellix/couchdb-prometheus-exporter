@@ -9,8 +9,8 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, colle
 	e.databasesTotal.Set(float64(stats.DatabasesTotal))
 
 	for name, nodeStats := range stats.StatsByNodeName {
-		//fmt.Printf("%s -> %v\n", name, stats)
-		//glog.Info(fmt.Sprintf("name: %s -> stats: %v\n", name, stats))
+		// fmt.Printf("%s -> %v\n", name, stats)
+		// glog.Info(fmt.Sprintf("name: %s -> stats: %v\n", name, stats))
 		e.nodeUp.WithLabelValues(name).Set(nodeStats.Up)
 		e.nodeInfo.WithLabelValues(name, nodeStats.NodeInfo.Version, nodeStats.NodeInfo.Vendor.Name).Set(1)
 
@@ -21,6 +21,10 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, colle
 		e.openDatabases.WithLabelValues(name).Set(nodeStats.Couchdb.OpenDatabases.Value)
 		e.openOsFiles.WithLabelValues(name).Set(nodeStats.Couchdb.OpenOsFiles.Value)
 		e.requestTime.WithLabelValues(name).Set(nodeStats.Couchdb.RequestTime.Value.Median)
+
+		for _, level := range exposedLogLevels {
+			e.couchLog.WithLabelValues(level, name).Set(nodeStats.CouchLog.Level[level].Value)
+		}
 
 		for _, code := range exposedHttpStatusCodes {
 			if _, ok := nodeStats.Couchdb.HttpdStatusCodes[code]; ok {
@@ -66,7 +70,7 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, colle
 					for _, dbRangeSeq := range dbUpdateSeq {
 						if viewRangeSeq.Range[0].Cmp(dbRangeSeq.Range[0]) == 0 {
 							age := dbRangeSeq.Seq - viewRangeSeq.Seq
-							//glog.Infof("dbRangeSeq.Seq %d, viewRangeSeq.Seq %d, age %d", dbRangeSeq.Seq, viewRangeSeq.Seq, age)
+							// glog.Infof("dbRangeSeq.Seq %d, viewRangeSeq.Seq %d, age %d", dbRangeSeq.Seq, viewRangeSeq.Seq, age)
 							e.viewStaleness.WithLabelValues(
 								dbName,
 								designDoc,

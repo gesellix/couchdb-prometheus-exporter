@@ -4,12 +4,13 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/golang/glog"
-	"github.com/hashicorp/go-version"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"github.com/golang/glog"
+	"github.com/hashicorp/go-version"
 )
 
 type BasicAuth struct {
@@ -80,9 +81,9 @@ func (c *CouchdbClient) GetNodeNames() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	//for i, name := range membership.ClusterNodes {
-	//	glog.Infof("node[%d]: %s\n", i, name)
-	//}
+	// for i, name := range membership.ClusterNodes {
+	// 	glog.Infof("node[%d]: %s\n", i, name)
+	// }
 	return membership.ClusterNodes, nil
 }
 
@@ -260,7 +261,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 		for _, row := range designDocs.Rows {
 			updateSeqByView := make(ViewStats)
 			for viewName := range row.Doc.Views {
-				//glog.Infof("/%s/%s/_view/%s\n", dbName, row.Doc.Id, viewName)
+				// glog.Infof("/%s/%s/_view/%s\n", dbName, row.Doc.Id, viewName)
 				query = strings.Join([]string{
 					"stale=ok",
 					"update=false",
@@ -375,7 +376,6 @@ func (c *CouchdbClient) Request(method string, uri string, body io.Reader) (resp
 	if err != nil {
 		return nil, err
 	}
-
 	return respData, nil
 }
 

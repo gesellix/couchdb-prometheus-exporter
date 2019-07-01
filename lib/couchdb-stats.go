@@ -93,6 +93,10 @@ type NodeInfo struct {
 	Version  string       `json:"version"`
 }
 
+type LogLevel struct {
+	Level map[string]Counter `json:"level"`
+}
+
 type StatsResponse struct {
 	Couchdb  CouchdbStats `json:"couchdb"`
 	Up       float64      `json:"-"`
@@ -101,6 +105,8 @@ type StatsResponse struct {
 	Httpd               Httpd               `json:"httpd"`
 	HttpdRequestMethods HttpdRequestMethods `json:"httpd_request_methods"`
 	HttpdStatusCodes    HttpdStatusCodes    `json:"httpd_status_codes"`
+	// v2.x api
+	CouchLog LogLevel `json:"couch_log"`
 }
 
 type View map[string]interface{}

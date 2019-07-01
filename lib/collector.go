@@ -15,6 +15,16 @@ var (
 		"301", "304",
 		"400", "401", "403", "404", "405", "409", "412",
 		"500"}
+
+	exposedLogLevels = []string{
+		"alert",
+		"critical",
+		"debug",
+		"emergency",
+		"error",
+		"info",
+		"notice",
+		"warning"}
 )
 
 type CollectorConfig struct {
@@ -73,6 +83,8 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	e.activeTasksReplication.Describe(ch)
 	e.activeTasksReplicationLastUpdate.Describe(ch)
 
+	e.couchLog.Describe(ch)
+
 	e.viewStaleness.Describe(ch)
 
 	e.schedulerJobs.Describe(ch)
@@ -115,6 +127,8 @@ func (e *Exporter) resetAllMetrics() {
 		e.activeTasksIndexer,
 		e.activeTasksReplication,
 		e.activeTasksReplicationLastUpdate,
+
+		e.couchLog,
 
 		e.viewStaleness,
 
@@ -207,6 +221,8 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	e.activeTasksIndexer.Collect(ch)
 	e.activeTasksReplication.Collect(ch)
 	e.activeTasksReplicationLastUpdate.Collect(ch)
+
+	e.couchLog.Collect(ch)
 
 	e.viewStaleness.Collect(ch)
 

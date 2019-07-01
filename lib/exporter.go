@@ -1,8 +1,9 @@
 package lib
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
 	"sync"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 const (
@@ -51,6 +52,8 @@ type Exporter struct {
 	activeTasksIndexer               *prometheus.GaugeVec
 	activeTasksReplication           *prometheus.GaugeVec
 	activeTasksReplicationLastUpdate *prometheus.GaugeVec
+
+	couchLog *prometheus.GaugeVec
 
 	viewStaleness *prometheus.GaugeVec
 
@@ -317,6 +320,15 @@ func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfi
 				Help:      "active tasks",
 			},
 			[]string{"node_name", "doc_id", "continuous", "source", "target"}),
+
+		couchLog: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "server",
+				Name:      "couch_log",
+				Help:      "number of messages logged by log level",
+			},
+			[]string{"level", "node_name"}),
 
 		viewStaleness: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{

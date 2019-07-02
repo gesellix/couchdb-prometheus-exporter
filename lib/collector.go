@@ -25,6 +25,21 @@ var (
 		"info",
 		"notice",
 		"warning"}
+
+	exposedWorkerMetrics = []string{
+		"timeout"}
+
+	exposedOpenShardMetrics = []string{
+		"timeout"}
+
+	exposedReadRepairMetrics = []string{
+		"success",
+		"failure"}
+
+	exposedDocUpdateMetrics = []string{
+		"errors",
+		"mismatched_errors",
+		"write_quorum_errors"}
 )
 
 type CollectorConfig struct {
@@ -98,6 +113,11 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 
 	e.couchLog.Describe(ch)
 
+	e.fabricWorker.Describe(ch)
+	e.fabricOpenShard.Describe(ch)
+	e.fabricReadRepairs.Describe(ch)
+	e.fabricDocUpdate.Describe(ch)
+
 	e.nodeMemoryOther.Describe(ch)
 	e.nodeMemoryAtom.Describe(ch)
 	e.nodeMemoryAtomUsed.Describe(ch)
@@ -151,6 +171,11 @@ func (e *Exporter) resetAllMetrics() {
 		e.activeTasksReplicationLastUpdate,
 
 		e.couchLog,
+
+		e.fabricWorker,
+		e.fabricOpenShard,
+		e.fabricReadRepairs,
+		e.fabricDocUpdate,
 
 		e.nodeMemoryOther,
 		e.nodeMemoryAtom,
@@ -254,6 +279,11 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	e.activeTasksReplicationLastUpdate.Collect(ch)
 
 	e.couchLog.Collect(ch)
+
+	e.fabricWorker.Collect(ch)
+	e.fabricOpenShard.Collect(ch)
+	e.fabricReadRepairs.Collect(ch)
+	e.fabricDocUpdate.Collect(ch)
 
 	e.nodeMemoryOther.Collect(ch)
 	e.nodeMemoryAtom.Collect(ch)

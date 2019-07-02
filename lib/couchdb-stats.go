@@ -97,6 +97,13 @@ type LogLevel struct {
 	Level map[string]Counter `json:"level"`
 }
 
+type Fabric struct {
+	Worker      map[string]Counter `json:"worker"`
+	OpenShard   map[string]Counter `json:"open_shard"`
+	ReadRepairs map[string]Counter `json:"read_repairs"`
+	DocUpdate   map[string]Counter `json:"doc_update"`
+}
+
 type StatsResponse struct {
 	Couchdb  CouchdbStats `json:"couchdb"`
 	Up       float64      `json:"-"`
@@ -107,6 +114,7 @@ type StatsResponse struct {
 	HttpdStatusCodes    HttpdStatusCodes    `json:"httpd_status_codes"`
 	// v2.x api
 	CouchLog LogLevel `json:"couch_log"`
+	Fabric   Fabric   `json:"fabric"`
 }
 
 type View map[string]interface{}

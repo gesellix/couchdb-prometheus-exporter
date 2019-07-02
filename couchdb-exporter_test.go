@@ -170,7 +170,7 @@ func TestCouchdbStatsV1(t *testing.T) {
 }
 
 func TestCouchdbStatsV2(t *testing.T) {
-	performCouchdbStatsTest(t, "v2", 106, 4712, 58570, 15)
+	performCouchdbStatsTest(t, "v2", 228, 4712, 58570, 17)
 }
 
 func TestCouchdbStatsV1Integration(t *testing.T) {

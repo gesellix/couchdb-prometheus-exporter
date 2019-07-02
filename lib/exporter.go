@@ -55,6 +55,15 @@ type Exporter struct {
 
 	couchLog *prometheus.GaugeVec
 
+	nodeMemoryOther         *prometheus.GaugeVec
+	nodeMemoryAtom          *prometheus.GaugeVec
+	nodeMemoryAtomUsed      *prometheus.GaugeVec
+	nodeMemoryProcesses     *prometheus.GaugeVec
+	nodeMemoryProcessesUsed *prometheus.GaugeVec
+	nodeMemoryBinary        *prometheus.GaugeVec
+	nodeMemoryCode          *prometheus.GaugeVec
+	nodeMemoryEts           *prometheus.GaugeVec
+
 	viewStaleness *prometheus.GaugeVec
 
 	schedulerJobs *prometheus.GaugeVec
@@ -329,6 +338,78 @@ func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfi
 				Help:      "number of messages logged by log level",
 			},
 			[]string{"level", "node_name"}),
+
+		nodeMemoryOther: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "erlang",
+				Name:      "memory_other",
+				Help:      "erlang memory counters - other",
+			},
+			[]string{"node_name"}),
+
+		nodeMemoryAtom: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "erlang",
+				Name:      "memory_atom",
+				Help:      "erlang memory counters - atom",
+			},
+			[]string{"node_name"}),
+
+		nodeMemoryAtomUsed: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "erlang",
+				Name:      "memory_atom_used",
+				Help:      "erlang memory counters - atom_used",
+			},
+			[]string{"node_name"}),
+
+		nodeMemoryProcesses: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "erlang",
+				Name:      "memory_processes",
+				Help:      "erlang memory counters - processes",
+			},
+			[]string{"node_name"}),
+
+		nodeMemoryProcessesUsed: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "erlang",
+				Name:      "memory_processes_used",
+				Help:      "erlang memory counters - processes_used",
+			},
+			[]string{"node_name"}),
+
+		nodeMemoryBinary: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "erlang",
+				Name:      "memory_binary",
+				Help:      "erlang memory counters - binary",
+			},
+			[]string{"node_name"}),
+
+		nodeMemoryCode: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "erlang",
+				Name:      "memory_code",
+				Help:      "erlang memory counters - code",
+			},
+			[]string{"node_name"}),
+
+		nodeMemoryEts: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "erlang",
+				Name:      "memory_ets",
+				Help:      "erlang memory counters - ets",
+			},
+			[]string{"node_name"}),
 
 		viewStaleness: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{

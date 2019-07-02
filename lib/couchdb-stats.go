@@ -181,6 +181,22 @@ type SchedulerJobsResponse struct {
 	} `json:"jobs"`
 }
 
+type MemoryStats struct {
+	// v2.x api
+	Other         float64 `json:"other"`
+	Atom          float64 `json:"atom"`
+	AtomUsed      float64 `json:"atom_used"`
+	Processes     float64 `json:"processes"`
+	ProcessesUsed float64 `json:"processes_used"`
+	Binary        float64 `json:"binary"`
+	Code          float64 `json:"code"`
+	Ets           float64 `json:"ets"`
+}
+
+type SystemResponse struct {
+	MemoryStatsResponse MemoryStats `json:"memory"`
+}
+
 type Stats struct {
 	StatsByNodeName       map[string]StatsResponse
 	DatabasesTotal        int
@@ -188,5 +204,6 @@ type Stats struct {
 	ActiveTasksResponse   ActiveTasksResponse
 	// SchedulerJobsResponse: CouchDB 2.x+ only
 	SchedulerJobsResponse SchedulerJobsResponse
+	SystemByNodeName      map[string]SystemResponse
 	ApiVersion            string
 }

@@ -139,5 +139,16 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, colle
 		e.activeTasksReplication.WithLabelValues(nodeName).Set(tasks.Replication)
 	}
 
+	for nodeName, metric := range stats.SystemByNodeName {
+		e.nodeMemoryOther.WithLabelValues(nodeName).Set(metric.MemoryStatsResponse.Other)
+		e.nodeMemoryAtom.WithLabelValues(nodeName).Set(metric.MemoryStatsResponse.Atom)
+		e.nodeMemoryAtomUsed.WithLabelValues(nodeName).Set(metric.MemoryStatsResponse.AtomUsed)
+		e.nodeMemoryProcesses.WithLabelValues(nodeName).Set(metric.MemoryStatsResponse.Processes)
+		e.nodeMemoryProcessesUsed.WithLabelValues(nodeName).Set(metric.MemoryStatsResponse.ProcessesUsed)
+		e.nodeMemoryBinary.WithLabelValues(nodeName).Set(metric.MemoryStatsResponse.Binary)
+		e.nodeMemoryCode.WithLabelValues(nodeName).Set(metric.MemoryStatsResponse.Code)
+		e.nodeMemoryEts.WithLabelValues(nodeName).Set(metric.MemoryStatsResponse.Ets)
+	}
+
 	return nil
 }

@@ -44,6 +44,19 @@ type ActiveTaskTypes struct {
 
 type ActiveTaskTypesByNodeName map[string]ActiveTaskTypes
 
+type MemoryMetrics struct {
+	Other         float64
+	Atom          float64
+	AtomUsed      float64
+	Processes     float64
+	ProcessesUsed float64
+	Binary        float64
+	Code          float64
+	Ets           float64
+}
+
+type MemoryTypesByNodeName map[string]MemoryMetrics
+
 // Describe describes all the metrics ever exported by the couchdb exporter. It
 // implements prometheus.Collector.
 func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
@@ -84,6 +97,15 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	e.activeTasksReplicationLastUpdate.Describe(ch)
 
 	e.couchLog.Describe(ch)
+
+	e.nodeMemoryOther.Describe(ch)
+	e.nodeMemoryAtom.Describe(ch)
+	e.nodeMemoryAtomUsed.Describe(ch)
+	e.nodeMemoryProcesses.Describe(ch)
+	e.nodeMemoryProcessesUsed.Describe(ch)
+	e.nodeMemoryBinary.Describe(ch)
+	e.nodeMemoryCode.Describe(ch)
+	e.nodeMemoryEts.Describe(ch)
 
 	e.viewStaleness.Describe(ch)
 
@@ -129,6 +151,15 @@ func (e *Exporter) resetAllMetrics() {
 		e.activeTasksReplicationLastUpdate,
 
 		e.couchLog,
+
+		e.nodeMemoryOther,
+		e.nodeMemoryAtom,
+		e.nodeMemoryAtomUsed,
+		e.nodeMemoryProcesses,
+		e.nodeMemoryProcessesUsed,
+		e.nodeMemoryBinary,
+		e.nodeMemoryCode,
+		e.nodeMemoryEts,
 
 		e.viewStaleness,
 
@@ -223,6 +254,15 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	e.activeTasksReplicationLastUpdate.Collect(ch)
 
 	e.couchLog.Collect(ch)
+
+	e.nodeMemoryOther.Collect(ch)
+	e.nodeMemoryAtom.Collect(ch)
+	e.nodeMemoryAtomUsed.Collect(ch)
+	e.nodeMemoryProcesses.Collect(ch)
+	e.nodeMemoryProcessesUsed.Collect(ch)
+	e.nodeMemoryBinary.Collect(ch)
+	e.nodeMemoryCode.Collect(ch)
+	e.nodeMemoryEts.Collect(ch)
 
 	e.viewStaleness.Collect(ch)
 

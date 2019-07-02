@@ -34,7 +34,7 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, colle
 			e.fabricOpenShard.WithLabelValues(metric, name).Set(nodeStats.Fabric.OpenShard[metric].Value)
 		}
 
-		for _, metric := range exposedReadRepairMetrics {
+		for _, metric := range exposedExitState {
 			e.fabricReadRepairs.WithLabelValues(metric, name).Set(nodeStats.Fabric.ReadRepairs[metric].Value)
 		}
 
@@ -60,6 +60,35 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, colle
 		e.requests.WithLabelValues(name).Set(nodeStats.Couchdb.Httpd.Requests.Value)
 		e.temporaryViewReads.WithLabelValues(name).Set(nodeStats.Couchdb.Httpd.TemporaryViewReads.Value)
 		e.viewReads.WithLabelValues(name).Set(nodeStats.Couchdb.Httpd.ViewReads.Value)
+
+		e.couchReplicatorChangesReadFailures.WithLabelValues(name).Set(nodeStats.CouchReplicator.ChangesReadFailures.Value)
+		e.couchReplicatorChangesReaderDeaths.WithLabelValues(name).Set(nodeStats.CouchReplicator.ChangesReaderDeaths.Value)
+		e.couchReplicatorChangesManagerDeaths.WithLabelValues(name).Set(nodeStats.CouchReplicator.ChangesManagerDeaths.Value)
+		e.couchReplicatorChangesQueueDeaths.WithLabelValues(name).Set(nodeStats.CouchReplicator.ChangesQueueDeaths.Value)
+		for _, metric := range exposedExitState {
+			e.couchReplicatorCheckpoints.WithLabelValues(metric, name).Set(nodeStats.CouchReplicator.Checkpoints[metric].Value)
+		}
+		e.couchReplicatorFailedStarts.WithLabelValues(name).Set(nodeStats.CouchReplicator.FailedStarts.Value)
+		e.couchReplicatorRequests.WithLabelValues(name).Set(nodeStats.CouchReplicator.Requests.Value)
+		for _, metric := range exposedExitState {
+			e.couchReplicatorResponses.WithLabelValues(metric, name).Set(nodeStats.CouchReplicator.Responses[metric].Value)
+		}
+		for _, metric := range exposedExitState {
+			e.couchReplicatorStreamResponses.WithLabelValues(metric, name).Set(nodeStats.CouchReplicator.StreamResponses[metric].Value)
+		}
+		e.couchReplicatorWorkerDeaths.WithLabelValues(name).Set(nodeStats.CouchReplicator.WorkerDeaths.Value)
+		e.couchReplicatorWorkersStarted.WithLabelValues(name).Set(nodeStats.CouchReplicator.WorkersStarted.Value)
+		e.couchReplicatorClusterIsStable.WithLabelValues(name).Set(nodeStats.CouchReplicator.ClusterIsStable.Value)
+		e.couchReplicatorDbScans.WithLabelValues(name).Set(nodeStats.CouchReplicator.DbScans.Value)
+		for _, metric := range exposedReplicatorDocs {
+			e.couchReplicatorDocs.WithLabelValues(metric, name).Set(nodeStats.CouchReplicator.Docs[metric].Value)
+		}
+		for _, metric := range exposedReplicatorJobs {
+			e.couchReplicatorJobs.WithLabelValues(metric, name).Set(nodeStats.CouchReplicator.Jobs[metric].Value)
+		}
+		for _, metric := range exposedReplicatorConnection {
+			e.couchReplicatorConnection.WithLabelValues(metric, name).Set(nodeStats.CouchReplicator.Connection[metric].Value)
+		}
 	}
 
 	for _, dbName := range collectorConfig.ObservedDatabases {

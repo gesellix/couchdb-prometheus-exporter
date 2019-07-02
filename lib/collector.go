@@ -32,7 +32,7 @@ var (
 	exposedOpenShardMetrics = []string{
 		"timeout"}
 
-	exposedReadRepairMetrics = []string{
+	exposedExitState = []string{
 		"success",
 		"failure"}
 
@@ -40,6 +40,34 @@ var (
 		"errors",
 		"mismatched_errors",
 		"write_quorum_errors"}
+
+	exposedReplicatorDocs = []string{
+		"dbs_created",
+		"dbs_deleted",
+		"dbs_found",
+		"dbs_changes",
+		"failed_state_updates",
+		"completed_state_updates"}
+
+	exposedReplicatorJobs = []string{
+		"adds",
+		"duplicate_adds",
+		"removes",
+		"starts",
+		"stops",
+		"crashes",
+		"running",
+		"pending",
+		"crashed",
+		"total"}
+
+	exposedReplicatorConnection = []string{
+		"acquires",
+		"creates",
+		"releases",
+		"owner_crashes",
+		"worker_crashes",
+		"closes"}
 )
 
 type CollectorConfig struct {
@@ -118,6 +146,23 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	e.fabricReadRepairs.Describe(ch)
 	e.fabricDocUpdate.Describe(ch)
 
+	e.couchReplicatorChangesReadFailures.Describe(ch)
+	e.couchReplicatorChangesReaderDeaths.Describe(ch)
+	e.couchReplicatorChangesManagerDeaths.Describe(ch)
+	e.couchReplicatorChangesQueueDeaths.Describe(ch)
+	e.couchReplicatorCheckpoints.Describe(ch)
+	e.couchReplicatorFailedStarts.Describe(ch)
+	e.couchReplicatorRequests.Describe(ch)
+	e.couchReplicatorResponses.Describe(ch)
+	e.couchReplicatorStreamResponses.Describe(ch)
+	e.couchReplicatorWorkerDeaths.Describe(ch)
+	e.couchReplicatorWorkersStarted.Describe(ch)
+	e.couchReplicatorClusterIsStable.Describe(ch)
+	e.couchReplicatorDbScans.Describe(ch)
+	e.couchReplicatorDocs.Describe(ch)
+	e.couchReplicatorJobs.Describe(ch)
+	e.couchReplicatorConnection.Describe(ch)
+
 	e.nodeMemoryOther.Describe(ch)
 	e.nodeMemoryAtom.Describe(ch)
 	e.nodeMemoryAtomUsed.Describe(ch)
@@ -176,6 +221,23 @@ func (e *Exporter) resetAllMetrics() {
 		e.fabricOpenShard,
 		e.fabricReadRepairs,
 		e.fabricDocUpdate,
+
+		e.couchReplicatorChangesReadFailures,
+		e.couchReplicatorChangesReaderDeaths,
+		e.couchReplicatorChangesManagerDeaths,
+		e.couchReplicatorChangesQueueDeaths,
+		e.couchReplicatorCheckpoints,
+		e.couchReplicatorFailedStarts,
+		e.couchReplicatorRequests,
+		e.couchReplicatorResponses,
+		e.couchReplicatorStreamResponses,
+		e.couchReplicatorWorkerDeaths,
+		e.couchReplicatorWorkersStarted,
+		e.couchReplicatorClusterIsStable,
+		e.couchReplicatorDbScans,
+		e.couchReplicatorDocs,
+		e.couchReplicatorJobs,
+		e.couchReplicatorConnection,
 
 		e.nodeMemoryOther,
 		e.nodeMemoryAtom,
@@ -284,6 +346,23 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	e.fabricOpenShard.Collect(ch)
 	e.fabricReadRepairs.Collect(ch)
 	e.fabricDocUpdate.Collect(ch)
+
+	e.couchReplicatorChangesReadFailures.Collect(ch)
+	e.couchReplicatorChangesReaderDeaths.Collect(ch)
+	e.couchReplicatorChangesManagerDeaths.Collect(ch)
+	e.couchReplicatorChangesQueueDeaths.Collect(ch)
+	e.couchReplicatorCheckpoints.Collect(ch)
+	e.couchReplicatorFailedStarts.Collect(ch)
+	e.couchReplicatorRequests.Collect(ch)
+	e.couchReplicatorResponses.Collect(ch)
+	e.couchReplicatorStreamResponses.Collect(ch)
+	e.couchReplicatorWorkerDeaths.Collect(ch)
+	e.couchReplicatorWorkersStarted.Collect(ch)
+	e.couchReplicatorClusterIsStable.Collect(ch)
+	e.couchReplicatorDbScans.Collect(ch)
+	e.couchReplicatorDocs.Collect(ch)
+	e.couchReplicatorJobs.Collect(ch)
+	e.couchReplicatorConnection.Collect(ch)
 
 	e.nodeMemoryOther.Collect(ch)
 	e.nodeMemoryAtom.Collect(ch)

@@ -138,6 +138,37 @@ func (c *CouchdbClient) getStatsByNodeName(urisByNodeName map[string]string) (ma
 	return statsByNodeName, nil
 }
 
+func (c *CouchdbClient) getSystemByNodeName(urisByNodeName map[string]string) (map[string]SystemResponse, error) {
+	SystemByNodeName := make(map[string]SystemResponse)
+	for name, uri := range urisByNodeName {
+		var stats SystemResponse
+
+		data, err := c.Request("GET", fmt.Sprintf("%s/_system", uri), nil)
+		if err != nil {
+			err = fmt.Errorf("error reading couchdb system stats: %v", err)
+			if !strings.Contains(err.Error(), "\"error\":\"nodedown\"") {
+				return nil, err
+			}
+			glog.Error(fmt.Errorf("continuing despite error: %v", err))
+			continue
+		}
+
+		err = json.Unmarshal(data, &stats)
+		if err != nil {
+			return nil, fmt.Errorf("error unmarshalling stats: %v", err)
+		}
+
+		SystemByNodeName[name] = stats
+	}
+	fmt.Println("DEBUG: stats - ", SystemByNodeName)
+
+	if len(urisByNodeName) == 0 {
+		return nil, fmt.Errorf("all nodes down")
+	}
+
+	return SystemByNodeName, nil
+}
+
 func (c *CouchdbClient) getStats(config CollectorConfig) (Stats, error) {
 	isCouchDbV2, err := c.isCouchDbV2()
 	if err != nil {
@@ -174,12 +205,18 @@ func (c *CouchdbClient) getStats(config CollectorConfig) (Stats, error) {
 		if err != nil {
 			return Stats{}, err
 		}
+		systemStats, err := c.getSystemByNodeName(urisByNode)
+		if err != nil {
+			return Stats{}, err
+		}
+
 		return Stats{
 			StatsByNodeName:       nodeStats,
 			DatabasesTotal:        len(databasesList),
 			DatabaseStatsByDbName: databaseStats,
 			ActiveTasksResponse:   activeTasks,
 			SchedulerJobsResponse: schedulerJobs,
+			SystemByNodeName:      systemStats,
 			ApiVersion:            "2"}, nil
 	} else {
 		urisByNode := map[string]string{

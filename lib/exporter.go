@@ -55,6 +55,14 @@ type Exporter struct {
 
 	couchLog *prometheus.GaugeVec
 
+	fabricWorker            *prometheus.GaugeVec
+	fabricOpenShard         *prometheus.GaugeVec
+	fabricReadRepairs       *prometheus.GaugeVec
+	fabricFailure           *prometheus.GaugeVec
+	fabricDocUpdate         *prometheus.GaugeVec
+	fabricMismatchedErrors  *prometheus.GaugeVec
+	fabricWriteQuorumErrors *prometheus.GaugeVec
+
 	nodeMemoryOther         *prometheus.GaugeVec
 	nodeMemoryAtom          *prometheus.GaugeVec
 	nodeMemoryAtomUsed      *prometheus.GaugeVec
@@ -428,5 +436,41 @@ func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfi
 				Help:      "scheduler jobs",
 			},
 			[]string{"node_name", "job_id", "db_name", "doc_id", "source", "target"}),
+
+		fabricWorker: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "fabric",
+				Name:      "worker",
+				Help:      "worker metrics",
+			},
+			[]string{"metric", "node_name"}),
+
+		fabricOpenShard: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "fabric",
+				Name:      "open_shard",
+				Help:      "open_shard metrics",
+			},
+			[]string{"metric", "node_name"}),
+
+		fabricReadRepairs: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "fabric",
+				Name:      "read_repairs",
+				Help:      "read repair metrics",
+			},
+			[]string{"metric", "node_name"}),
+
+		fabricDocUpdate: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "fabric",
+				Name:      "doc_update",
+				Help:      "doc update metrics",
+			},
+			[]string{"metric", "node_name"}),
 	}
 }

@@ -160,7 +160,6 @@ func (c *CouchdbClient) getSystemByNodeName(urisByNodeName map[string]string) (m
 
 		SystemByNodeName[name] = stats
 	}
-	fmt.Println("DEBUG: stats - ", SystemByNodeName)
 
 	if len(urisByNodeName) == 0 {
 		return nil, fmt.Errorf("all nodes down")

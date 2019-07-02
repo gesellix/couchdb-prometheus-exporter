@@ -26,6 +26,22 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, colle
 			e.couchLog.WithLabelValues(level, name).Set(nodeStats.CouchLog.Level[level].Value)
 		}
 
+		for _, metric := range exposedWorkerMetrics {
+			e.fabricWorker.WithLabelValues(metric, name).Set(nodeStats.Fabric.Worker[metric].Value)
+		}
+
+		for _, metric := range exposedOpenShardMetrics {
+			e.fabricOpenShard.WithLabelValues(metric, name).Set(nodeStats.Fabric.OpenShard[metric].Value)
+		}
+
+		for _, metric := range exposedReadRepairMetrics {
+			e.fabricReadRepairs.WithLabelValues(metric, name).Set(nodeStats.Fabric.ReadRepairs[metric].Value)
+		}
+
+		for _, metric := range exposedDocUpdateMetrics {
+			e.fabricDocUpdate.WithLabelValues(metric, name).Set(nodeStats.Fabric.DocUpdate[metric].Value)
+		}
+
 		for _, code := range exposedHttpStatusCodes {
 			if _, ok := nodeStats.Couchdb.HttpdStatusCodes[code]; ok {
 				e.httpdStatusCodes.WithLabelValues(code, name).Set(nodeStats.Couchdb.HttpdStatusCodes[code].Value)

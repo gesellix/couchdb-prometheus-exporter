@@ -104,6 +104,25 @@ type Fabric struct {
 	DocUpdate   map[string]Counter `json:"doc_update"`
 }
 
+type CouchReplicator struct {
+	ChangesReadFailures  Counter            `json:"changes_read_failures"`
+	ChangesReaderDeaths  Counter            `json:"changes_reader_deaths"`
+	ChangesManagerDeaths Counter            `json:"changes_manager_deaths"`
+	ChangesQueueDeaths   Counter            `json:"changes_queue_deaths"`
+	Checkpoints          map[string]Counter `json:"checkpoints"`
+	FailedStarts         Counter            `json:"failed_starts"`
+	Requests             Counter            `json:"requests"`
+	Responses            map[string]Counter `json:"responses"`
+	StreamResponses      map[string]Counter `json:"stream_responses"`
+	WorkerDeaths         Counter            `json:"worker_deaths"`
+	WorkersStarted       Counter            `json:"workers_started"`
+	ClusterIsStable      Counter            `json:"cluster_is_stable"`
+	DbScans              Counter            `json:"db_scans"`
+	Docs                 map[string]Counter `json:"docs"`
+	Jobs                 map[string]Counter `json:"jobs"`
+	Connection           map[string]Counter `json:"connection"`
+}
+
 type StatsResponse struct {
 	Couchdb  CouchdbStats `json:"couchdb"`
 	Up       float64      `json:"-"`
@@ -113,8 +132,9 @@ type StatsResponse struct {
 	HttpdRequestMethods HttpdRequestMethods `json:"httpd_request_methods"`
 	HttpdStatusCodes    HttpdStatusCodes    `json:"httpd_status_codes"`
 	// v2.x api
-	CouchLog LogLevel `json:"couch_log"`
-	Fabric   Fabric   `json:"fabric"`
+	CouchLog        LogLevel        `json:"couch_log"`
+	Fabric          Fabric          `json:"fabric"`
+	CouchReplicator CouchReplicator `json:"couch_replicator"`
 }
 
 type View map[string]interface{}

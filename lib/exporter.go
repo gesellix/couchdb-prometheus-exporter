@@ -63,6 +63,23 @@ type Exporter struct {
 	fabricMismatchedErrors  *prometheus.GaugeVec
 	fabricWriteQuorumErrors *prometheus.GaugeVec
 
+	couchReplicatorChangesReadFailures  *prometheus.GaugeVec
+	couchReplicatorChangesReaderDeaths  *prometheus.GaugeVec
+	couchReplicatorChangesManagerDeaths *prometheus.GaugeVec
+	couchReplicatorChangesQueueDeaths   *prometheus.GaugeVec
+	couchReplicatorCheckpoints          *prometheus.GaugeVec
+	couchReplicatorFailedStarts         *prometheus.GaugeVec
+	couchReplicatorRequests             *prometheus.GaugeVec
+	couchReplicatorResponses            *prometheus.GaugeVec
+	couchReplicatorStreamResponses      *prometheus.GaugeVec
+	couchReplicatorWorkerDeaths         *prometheus.GaugeVec
+	couchReplicatorWorkersStarted       *prometheus.GaugeVec
+	couchReplicatorClusterIsStable      *prometheus.GaugeVec
+	couchReplicatorDbScans              *prometheus.GaugeVec
+	couchReplicatorDocs                 *prometheus.GaugeVec
+	couchReplicatorJobs                 *prometheus.GaugeVec
+	couchReplicatorConnection           *prometheus.GaugeVec
+
 	nodeMemoryOther         *prometheus.GaugeVec
 	nodeMemoryAtom          *prometheus.GaugeVec
 	nodeMemoryAtomUsed      *prometheus.GaugeVec
@@ -470,6 +487,150 @@ func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfi
 				Subsystem: "fabric",
 				Name:      "doc_update",
 				Help:      "doc update metrics",
+			},
+			[]string{"metric", "node_name"}),
+
+		couchReplicatorChangesReadFailures: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "replicator",
+				Name:      "changes_read_failures",
+				Help:      "number of failed replicator changes read failures",
+			},
+			[]string{"node_name"}),
+
+		couchReplicatorChangesReaderDeaths: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "replicator",
+				Name:      "changes_reader_deaths",
+				Help:      "number of failed replicator changes readers",
+			},
+			[]string{"node_name"}),
+
+		couchReplicatorChangesManagerDeaths: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "replicator",
+				Name:      "changes_manager_deaths",
+				Help:      "number of failed replicator changes managers",
+			},
+			[]string{"node_name"}),
+
+		couchReplicatorChangesQueueDeaths: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "replicator",
+				Name:      "changes_queue_deaths",
+				Help:      "number of failed replicator changes work queues",
+			},
+			[]string{"node_name"}),
+
+		couchReplicatorCheckpoints: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "replicator",
+				Name:      "checkpoints",
+				Help:      "replicator checkpoint counters",
+			},
+			[]string{"metric", "node_name"}),
+
+		couchReplicatorFailedStarts: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "replicator",
+				Name:      "failed_starts",
+				Help:      "number of replications that have failed to start",
+			},
+			[]string{"node_name"}),
+
+		couchReplicatorRequests: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "replicator",
+				Name:      "requests",
+				Help:      "number of HTTP requests made by the replicator",
+			},
+			[]string{"node_name"}),
+
+		couchReplicatorResponses: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "replicator",
+				Name:      "responses",
+				Help:      "number of HTTP responses by state",
+			},
+			[]string{"metric", "node_name"}),
+
+		couchReplicatorStreamResponses: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "replicator",
+				Name:      "stream_responses",
+				Help:      "number of streaming HTTP responses by state",
+			},
+			[]string{"metric", "node_name"}),
+
+		couchReplicatorWorkerDeaths: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "replicator",
+				Name:      "worker_deaths",
+				Help:      "number of failed replicator workers",
+			},
+			[]string{"node_name"}),
+
+		couchReplicatorWorkersStarted: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "replicator",
+				Name:      "workers_started",
+				Help:      "number of replicator workers started",
+			},
+			[]string{"node_name"}),
+
+		couchReplicatorClusterIsStable: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "replicator",
+				Name:      "cluster_is_stable",
+				Help:      "1 if cluster is stable, 0 if unstable",
+			},
+			[]string{"node_name"}),
+
+		couchReplicatorDbScans: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "replicator",
+				Name:      "db_scans",
+				Help:      "number of times replicator db scans have been started",
+			},
+			[]string{"node_name"}),
+
+		couchReplicatorDocs: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "replicator",
+				Name:      "docs",
+				Help:      "replicator metrics shown by type",
+			},
+			[]string{"metric", "node_name"}),
+
+		couchReplicatorJobs: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "replicator",
+				Name:      "jobs",
+				Help:      "replicator jobs shown by type",
+			},
+			[]string{"metric", "node_name"}),
+
+		couchReplicatorConnection: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "replicator",
+				Name:      "connections",
+				Help:      "replicator connection metrics shown by type",
 			},
 			[]string{"metric", "node_name"}),
 	}

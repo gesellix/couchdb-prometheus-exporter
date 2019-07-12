@@ -55,13 +55,10 @@ type Exporter struct {
 
 	couchLog *prometheus.GaugeVec
 
-	fabricWorker            *prometheus.GaugeVec
-	fabricOpenShard         *prometheus.GaugeVec
-	fabricReadRepairs       *prometheus.GaugeVec
-	fabricFailure           *prometheus.GaugeVec
-	fabricDocUpdate         *prometheus.GaugeVec
-	fabricMismatchedErrors  *prometheus.GaugeVec
-	fabricWriteQuorumErrors *prometheus.GaugeVec
+	fabricWorker      *prometheus.GaugeVec
+	fabricOpenShard   *prometheus.GaugeVec
+	fabricReadRepairs *prometheus.GaugeVec
+	fabricDocUpdate   *prometheus.GaugeVec
 
 	couchReplicatorChangesReadFailures  *prometheus.GaugeVec
 	couchReplicatorChangesReaderDeaths  *prometheus.GaugeVec
@@ -195,7 +192,7 @@ func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfi
 				Name:      "request_time",
 				Help:      "length of a request inside CouchDB without MochiWeb",
 			},
-			[]string{"node_name"}),
+			[]string{"node_name", "metric"}),
 
 		httpdStatusCodes: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{

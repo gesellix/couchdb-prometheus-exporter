@@ -20,7 +20,7 @@ func (e *Exporter) collectV1(stats Stats, exposedHttpStatusCodes []string, colle
 		e.databaseWrites.WithLabelValues(name).Set(nodeStats.Couchdb.DatabaseWrites.Current)
 		e.openDatabases.WithLabelValues(name).Set(nodeStats.Couchdb.OpenDatabases.Current)
 		e.openOsFiles.WithLabelValues(name).Set(nodeStats.Couchdb.OpenOsFiles.Current)
-		e.requestTime.WithLabelValues(name).Set(nodeStats.Couchdb.RequestTime.Current)
+		e.requestTime.WithLabelValues(name, "Current").Set(nodeStats.Couchdb.RequestTime.Current)
 
 		for _, code := range exposedHttpStatusCodes {
 			if _, ok := nodeStats.HttpdStatusCodes[code]; ok {

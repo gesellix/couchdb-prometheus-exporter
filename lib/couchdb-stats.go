@@ -15,19 +15,22 @@ type Counter struct {
 	Desc  string
 }
 
+type Percent map[int]float64
+
 // v2.x api
 type HistogramValue struct {
-	Min               float64 `json:"min"`
-	Max               float64 `json:"max"`
-	ArithmeticMean    float64 `json:"arithmetic_mean"`
-	GeometricMean     float64 `json:"geometric_mean"`
-	HarmonicMean      float64 `json:"harmonic_mean"`
-	Median            float64 `json:"median"`
-	Variance          float64 `json:"variance"`
-	StandardDeviation float64 `json:"standard_deviation"`
-	Skewness          float64 `json:"skewness"`
-	Kurtosis          float64 `json:"kurtosis"`
-	N                 float64 `json:"n"`
+	Min               float64     `json:"min"`
+	Max               float64     `json:"max"`
+	ArithmeticMean    float64     `json:"arithmetic_mean"`
+	GeometricMean     float64     `json:"geometric_mean"`
+	HarmonicMean      float64     `json:"harmonic_mean"`
+	Median            float64     `json:"median"`
+	Variance          float64     `json:"variance"`
+	StandardDeviation float64     `json:"standard_deviation"`
+	Skewness          float64     `json:"skewness"`
+	Kurtosis          float64     `json:"kurtosis"`
+	Percentile        [][]float64 `json:"percentile"`
+	N                 float64     `json:"n"`
 }
 
 type Histogram struct {

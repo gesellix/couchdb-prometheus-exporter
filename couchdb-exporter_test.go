@@ -3,11 +3,6 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/gesellix/couchdb-cluster-config/pkg"
-	"github.com/gesellix/couchdb-prometheus-exporter/lib"
-	"github.com/gesellix/couchdb-prometheus-exporter/testutil"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"log"
 	"net"
@@ -16,6 +11,12 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/gesellix/couchdb-cluster-config/pkg"
+	"github.com/gesellix/couchdb-prometheus-exporter/lib"
+	"github.com/gesellix/couchdb-prometheus-exporter/testutil"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/stretchr/testify/assert"
 )
 
 var clusterSetupDelay = 5 * time.Second
@@ -170,7 +171,7 @@ func TestCouchdbStatsV1(t *testing.T) {
 }
 
 func TestCouchdbStatsV2(t *testing.T) {
-	performCouchdbStatsTest(t, "v2", 228, 4712, 58570, 17)
+	performCouchdbStatsTest(t, "v2", 258, 4712, 58570, 17)
 }
 
 func TestCouchdbStatsV1Integration(t *testing.T) {

@@ -31,12 +31,10 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, colle
 		e.requestTime.WithLabelValues(name, "StandardDeviation").Set(nodeStats.Couchdb.RequestTime.Value.StandardDeviation)
 		e.requestTime.WithLabelValues(name, "Skewness").Set(nodeStats.Couchdb.RequestTime.Value.Skewness)
 		e.requestTime.WithLabelValues(name, "Kurtosis").Set(nodeStats.Couchdb.RequestTime.Value.Kurtosis)
-		e.requestTime.WithLabelValues(name, "p50").Set(nodeStats.Couchdb.RequestTime.Value.Percentile[0][1])
-		e.requestTime.WithLabelValues(name, "p75").Set(nodeStats.Couchdb.RequestTime.Value.Percentile[1][1])
-		e.requestTime.WithLabelValues(name, "p90").Set(nodeStats.Couchdb.RequestTime.Value.Percentile[2][1])
-		e.requestTime.WithLabelValues(name, "p95").Set(nodeStats.Couchdb.RequestTime.Value.Percentile[3][1])
-		e.requestTime.WithLabelValues(name, "p99").Set(nodeStats.Couchdb.RequestTime.Value.Percentile[4][1])
-		e.requestTime.WithLabelValues(name, "p999").Set(nodeStats.Couchdb.RequestTime.Value.Percentile[5][1])
+
+		for _, percentile := range nodeStats.Couchdb.RequestTime.Value.Percentile {
+			e.requestTime.WithLabelValues(name, fmt.Sprintf("%v", percentile[0])).Set(percentile[1])
+		}
 
 		for _, level := range exposedLogLevels {
 			e.couchLog.WithLabelValues(level, name).Set(nodeStats.CouchLog.Level[level].Value)

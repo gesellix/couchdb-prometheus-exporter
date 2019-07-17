@@ -68,24 +68,6 @@ var (
 		"owner_crashes",
 		"worker_crashes",
 		"closes"}
-
-	exposedRequestTimes = []string{
-		"Min",
-		"Max",
-		"ArithmeticMean",
-		"GeometricMean",
-		"HarmonicMean",
-		"Median",
-		"Variance",
-		"StandardDeviation",
-		"Skewness",
-		"Kurtosis"}
-
-	exposedPercentiles = []string{
-		"p50",
-		"p75",
-		"p99",
-		"p999"}
 )
 
 type CollectorConfig struct {

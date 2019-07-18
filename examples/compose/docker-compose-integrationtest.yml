@@ -11,7 +11,7 @@ services:
       - "4895:5984"
 
   couchdb1:
-    image: couchdb:2.3.0
+    image: couchdb:2.3.1
     command: -name couchdb@172.16.238.11 -setcookie thecookie
     restart: always
     networks:
@@ -21,7 +21,7 @@ services:
       - "15984:5984"
 
   couchdb2:
-    image: couchdb:2.3.0
+    image: couchdb:2.3.1
     command: -name couchdb@172.16.238.12 -setcookie thecookie
     restart: always
     networks:
@@ -31,7 +31,7 @@ services:
       - "25984:5984"
 
   couchdb3:
-    image: couchdb:2.3.0
+    image: couchdb:2.3.1
     command: -name couchdb@172.16.238.13 -setcookie thecookie
     restart: always
     networks:

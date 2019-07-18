@@ -139,7 +139,7 @@ func (c *CouchdbClient) getStatsByNodeName(urisByNodeName map[string]string) (ma
 }
 
 func (c *CouchdbClient) getSystemByNodeName(urisByNodeName map[string]string) (map[string]SystemResponse, error) {
-	SystemByNodeName := make(map[string]SystemResponse)
+	systemByNodeName := make(map[string]SystemResponse)
 	for name, uri := range urisByNodeName {
 		var stats SystemResponse
 
@@ -158,14 +158,14 @@ func (c *CouchdbClient) getSystemByNodeName(urisByNodeName map[string]string) (m
 			return nil, fmt.Errorf("error unmarshalling stats: %v", err)
 		}
 
-		SystemByNodeName[name] = stats
+		systemByNodeName[name] = stats
 	}
 
 	if len(urisByNodeName) == 0 {
 		return nil, fmt.Errorf("all nodes down")
 	}
 
-	return SystemByNodeName, nil
+	return systemByNodeName, nil
 }
 
 func (c *CouchdbClient) getStats(config CollectorConfig) (Stats, error) {

@@ -4,8 +4,8 @@ COUCHDB_ADDRESS="${1:-http://couchdb:5984}"
 CONFIG_PROPERTIES="${2:-config.properties}"
 
 # concept taken from https://stackoverflow.com/a/38096496
-function prop {
-    grep "${1}" ${CONFIG_PROPERTIES} | cut -d'=' -f2
+prop() {
+    grep "${1}" "${CONFIG_PROPERTIES}" | cut -d'=' -f2
 }
 
 curl -X POST "${COUCHDB_ADDRESS}/_cluster_setup" \

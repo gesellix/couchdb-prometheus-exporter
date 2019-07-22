@@ -3,11 +3,12 @@ package lib
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/okeuday/erlang_go/src/erlang"
 	"math/big"
 	"regexp"
 	"sort"
 	"strings"
+
+	"github.com/okeuday/erlang_go/src/erlang"
 )
 
 type UpdateSequence struct {
@@ -47,7 +48,7 @@ func convertSeq(t interface{}) int {
 	case int32:
 		return int(rType)
 	case erlang.OtpErlangTuple:
-		return int(erlang.OtpErlangTuple(rType)[0].(uint8))
+		return int(rType[0].(uint8))
 	default:
 		fmt.Printf("%v == %T\n", rType, rType)
 		// todo return err

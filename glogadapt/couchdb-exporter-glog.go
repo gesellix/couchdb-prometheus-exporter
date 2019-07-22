@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"sync/atomic"
+
 	"github.com/golang/glog"
 )
 
@@ -21,7 +22,7 @@ type severity int32 // sync/atomic int32
 // A message written to a high-severity log file is also written to each
 // lower-severity log file.
 const (
-	infoLog    severity = iota
+	infoLog severity = iota
 	warningLog
 	errorLog
 	fatalLog

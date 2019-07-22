@@ -2,11 +2,12 @@ package testutil
 
 import (
 	"fmt"
+	"log"
+	"regexp"
+
 	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
 	dto "github.com/prometheus/client_model/go"
-	"log"
-	"regexp"
 )
 
 func CollectMetrics(ch chan prometheus.Metric, debugMetrics bool) map[string]*dto.MetricFamily {

@@ -3,8 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gesellix/couchdb-prometheus-exporter/lib"
 	"os"
+
+	"github.com/gesellix/couchdb-prometheus-exporter/lib"
 )
 
 func main() {

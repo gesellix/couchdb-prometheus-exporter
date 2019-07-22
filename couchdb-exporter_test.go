@@ -13,10 +13,11 @@ import (
 	"time"
 
 	"github.com/gesellix/couchdb-cluster-config/pkg"
-	"github.com/gesellix/couchdb-prometheus-exporter/lib"
-	"github.com/gesellix/couchdb-prometheus-exporter/testutil"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/gesellix/couchdb-prometheus-exporter/lib"
+	"github.com/gesellix/couchdb-prometheus-exporter/testutil"
 )
 
 var clusterSetupDelay = 5 * time.Second
@@ -68,48 +69,52 @@ func readFile(t *testing.T, filename string) []byte {
 
 func couchdbResponse(t *testing.T, versionSuffix string) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
+		var err error
 		if r.URL.Path == "/" {
-			file := readFile(t, fmt.Sprintf("./testdata/couchdb-%s.json", versionSuffix))
-			w.Write([]byte(file))
+			response := readFile(t, fmt.Sprintf("./testdata/couchdb-%s.json", versionSuffix))
+			_, err = w.Write(response)
 		} else if r.URL.Path == "/_all_dbs" {
-			file := readFile(t, "./testdata/all-dbs.json")
-			w.Write([]byte(file))
+			response := readFile(t, "./testdata/all-dbs.json")
+			_, err = w.Write(response)
 		} else if r.URL.Path == "/_membership" {
-			file := readFile(t, fmt.Sprintf("./testdata/couchdb-membership-response-%s.json", versionSuffix))
-			w.Write([]byte(file))
+			response := readFile(t, fmt.Sprintf("./testdata/couchdb-membership-response-%s.json", versionSuffix))
+			_, err = w.Write(response)
 		} else if r.URL.Path == "/_active_tasks" {
-			file := readFile(t, fmt.Sprintf("./testdata/active-tasks-%s.json", versionSuffix))
-			w.Write([]byte(file))
+			response := readFile(t, fmt.Sprintf("./testdata/active-tasks-%s.json", versionSuffix))
+			_, err = w.Write(response)
 		} else if r.URL.Path == "/_scheduler/jobs" {
-			file := readFile(t, fmt.Sprintf("./testdata/scheduler-jobs-%s.json", versionSuffix))
-			w.Write([]byte(file))
+			response := readFile(t, fmt.Sprintf("./testdata/scheduler-jobs-%s.json", versionSuffix))
+			_, err = w.Write(response)
 		} else if r.URL.Path == "/example" {
-			file := readFile(t, fmt.Sprintf("./testdata/example-meta-%s.json", versionSuffix))
-			w.Write([]byte(file))
+			response := readFile(t, fmt.Sprintf("./testdata/example-meta-%s.json", versionSuffix))
+			_, err = w.Write(response)
 		} else if r.URL.Path == "/another-example" {
-			file := readFile(t, fmt.Sprintf("./testdata/example-meta-%s.json", versionSuffix))
-			w.Write([]byte(file))
+			response := readFile(t, fmt.Sprintf("./testdata/example-meta-%s.json", versionSuffix))
+			_, err = w.Write(response)
 		} else if r.URL.String() == "/example/_all_docs?startkey=\"_design/\"&endkey=\"_design0\"&include_docs=true" {
-			file := readFile(t, "./testdata/example-all-design-docs.json")
-			w.Write([]byte(file))
+			response := readFile(t, "./testdata/example-all-design-docs.json")
+			_, err = w.Write(response)
 		} else if r.URL.String() == "/another-example/_all_docs?startkey=\"_design/\"&endkey=\"_design0\"&include_docs=true" {
-			file := readFile(t, "./testdata/example-all-design-docs.json")
-			w.Write([]byte(file))
+			response := readFile(t, "./testdata/example-all-design-docs.json")
+			_, err = w.Write(response)
 		} else if r.URL.String() == "/example/_design/views/_view/by_id?stale=ok&update=false&stable=true&update_seq=true&include_docs=false&limit=0" {
-			file := readFile(t, fmt.Sprintf("./testdata/example-view-stale-%s.json", versionSuffix))
-			w.Write([]byte(file))
+			response := readFile(t, fmt.Sprintf("./testdata/example-view-stale-%s.json", versionSuffix))
+			_, err = w.Write(response)
 		} else if r.URL.String() == "/another-example/_design/views/_view/by_id?stale=ok&update=false&stable=true&update_seq=true&include_docs=false&limit=0" {
-			file := readFile(t, fmt.Sprintf("./testdata/example-view-stale-%s.json", versionSuffix))
-			w.Write([]byte(file))
+			response := readFile(t, fmt.Sprintf("./testdata/example-view-stale-%s.json", versionSuffix))
+			_, err = w.Write(response)
 		} else if r.URL.String() == "/example/_design/views/_view/by_id?stale=ok&update=false&stable=true&update_seq=true&include_docs=false&limit=0" {
-			file := readFile(t, fmt.Sprintf("./testdata/example-view-stale-%s.json", versionSuffix))
-			w.Write([]byte(file))
+			response := readFile(t, fmt.Sprintf("./testdata/example-view-stale-%s.json", versionSuffix))
+			_, err = w.Write(response)
 		} else if r.URL.String() == "/another-example/_design/views/_view/by_id?stale=ok&update=false&stable=true&update_seq=true&include_docs=false&limit=0" {
-			file := readFile(t, fmt.Sprintf("./testdata/example-view-stale-%s.json", versionSuffix))
-			w.Write([]byte(file))
+			response := readFile(t, fmt.Sprintf("./testdata/example-view-stale-%s.json", versionSuffix))
+			_, err = w.Write(response)
 		} else {
-			file := readFile(t, fmt.Sprintf("./testdata/couchdb-stats-response-%s.json", versionSuffix))
-			w.Write([]byte(file))
+			response := readFile(t, fmt.Sprintf("./testdata/couchdb-stats-response-%s.json", versionSuffix))
+			_, err = w.Write(response)
+		}
+		if err != nil {
+			t.Error(err)
 		}
 	}
 }

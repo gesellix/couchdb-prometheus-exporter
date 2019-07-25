@@ -260,7 +260,7 @@ func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string) (map[strin
 		dbStats DatabaseStats
 		err     error
 	}
-	r := make(chan result)
+	r := make(chan result, len(databases))
 	// scatter
 	for _, dbName := range databases {
 		dbName := dbName // rebind for closure to capture the value
@@ -303,10 +303,11 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 		dbStats DatabaseStats
 		err     error
 	}
-	r := make(chan result)
+	r := make(chan result, len(dbStatsByDbName))
 	// scatter
-	for dbName := range dbStatsByDbName {
+	for dbName, dbStats := range dbStatsByDbName {
 		dbName := dbName // rebind for closure to capture the value
+		dbStats := dbStats
 		go func() {
 			query := strings.Join([]string{
 				"startkey=\"_design/\"",
@@ -314,7 +315,6 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 				"include_docs=true",
 			}, "&")
 			designDocData, err := c.Request("GET", fmt.Sprintf("%s/%s/_all_docs?%s", c.BaseUri, dbName, query), nil)
-			dbStats := dbStatsByDbName[dbName]
 			if err != nil {
 				r <- result{err: fmt.Errorf("error reading database '%s' stats: %v", dbName, err)}
 				return
@@ -334,7 +334,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 					updateSeq string
 					err       error
 				}
-				v := make(chan viewresult)
+				v := make(chan viewresult, len(row.Doc.Views))
 				for viewName := range row.Doc.Views {
 					viewName := viewName
 					go func() {

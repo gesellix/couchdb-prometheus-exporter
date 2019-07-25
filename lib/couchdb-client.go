@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"sync"
 
 	"github.com/golang/glog"
 	"github.com/hashicorp/go-version"
@@ -254,69 +255,129 @@ func (c *CouchdbClient) getStats(config CollectorConfig) (Stats, error) {
 
 func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string) (map[string]DatabaseStats, error) {
 	dbStatsByDbName := make(map[string]DatabaseStats)
+	type result struct {
+		dbName  string
+		dbStats DatabaseStats
+		err     error
+	}
+	r := make(chan result)
+	// scatter
 	for _, dbName := range databases {
-		data, err := c.Request("GET", fmt.Sprintf("%s/%s", c.BaseUri, dbName), nil)
-		if err != nil {
-			return nil, fmt.Errorf("error reading database '%s' stats: %v", dbName, err)
-		}
+		dbName := dbName // rebind for closure to capture the value
+		go func() {
+			var dbStats DatabaseStats
+			data, err := c.Request("GET", fmt.Sprintf("%s/%s", c.BaseUri, dbName), nil)
+			if err != nil {
+				r <- result{err: fmt.Errorf("error reading database '%s' stats: %v", dbName, err)}
+				return
+			}
 
-		var dbStats DatabaseStats
-		err = json.Unmarshal(data, &dbStats)
-		if err != nil {
-			return nil, fmt.Errorf("error unmarshalling database '%s' stats: %v", dbName, err)
+			err = json.Unmarshal(data, &dbStats)
+			if err != nil {
+				r <- result{err: fmt.Errorf("error unmarshalling database '%s' stats: %v", dbName, err)}
+				return
+			}
+			dbStats.DiskSizeOverhead = dbStats.DiskSize - dbStats.DataSize
+			if dbStats.CompactRunningBool {
+				dbStats.CompactRunning = 1
+			} else {
+				dbStats.CompactRunning = 0
+			}
+			r <- result{dbName, dbStats, nil}
+		}()
+	}
+	// gather
+	for _ = range databases {
+		res := <-r
+		if res.err != nil {
+			return nil, res.err
 		}
-		dbStats.DiskSizeOverhead = dbStats.DiskSize - dbStats.DataSize
-		if dbStats.CompactRunningBool {
-			dbStats.CompactRunning = 1
-		} else {
-			dbStats.CompactRunning = 0
-		}
-		dbStatsByDbName[dbName] = dbStats
+		dbStatsByDbName[res.dbName] = res.dbStats
 	}
 	return dbStatsByDbName, nil
 }
 
 func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]DatabaseStats) error {
-	for dbName, dbStats := range dbStatsByDbName {
-		query := strings.Join([]string{
-			"startkey=\"_design/\"",
-			"endkey=\"_design0\"",
-			"include_docs=true",
-		}, "&")
-		designDocData, err := c.Request("GET", fmt.Sprintf("%s/%s/_all_docs?%s", c.BaseUri, dbName, query), nil)
-		if err != nil {
-			return fmt.Errorf("error reading database '%s' stats: %v", dbName, err)
-		}
-
-		var designDocs DocsResponse
-		err = json.Unmarshal(designDocData, &designDocs)
-		if err != nil {
-			return fmt.Errorf("error unmarshalling design docs for database '%s': %v", dbName, err)
-		}
-		views := make(ViewStatsByDesignDocName)
-		for _, row := range designDocs.Rows {
-			updateSeqByView := make(ViewStats)
-			for viewName := range row.Doc.Views {
-				// glog.Infof("/%s/%s/_view/%s\n", dbName, row.Doc.Id, viewName)
-				query = strings.Join([]string{
-					"stale=ok",
-					"update=false",
-					"stable=true",
-					"update_seq=true",
-					"include_docs=false",
-					"limit=0",
-				}, "&")
-				var viewDoc ViewResponse
-				viewDocData, err := c.Request("GET", fmt.Sprintf("%s/%s/%s/_view/%s?%s", c.BaseUri, dbName, row.Doc.Id, viewName, query), nil)
-				err = json.Unmarshal(viewDocData, &viewDoc)
-				if err != nil {
-					return fmt.Errorf("error unmarshalling view doc for view '%s/%s/_view/%s': %v", dbName, row.Doc.Id, viewName, err)
-				}
-				updateSeqByView[viewName] = viewDoc.UpdateSeq.String()
+	type result struct {
+		dbName  string
+		dbStats DatabaseStats
+		err     error
+	}
+	r := make(chan result)
+	// scatter
+	for dbName := range dbStatsByDbName {
+		dbName := dbName // rebind for closure to capture the value
+		go func() {
+			query := strings.Join([]string{
+				"startkey=\"_design/\"",
+				"endkey=\"_design0\"",
+				"include_docs=true",
+			}, "&")
+			designDocData, err := c.Request("GET", fmt.Sprintf("%s/%s/_all_docs?%s", c.BaseUri, dbName, query), nil)
+			dbStats := dbStatsByDbName[dbName]
+			if err != nil {
+				r <- result{err: fmt.Errorf("error reading database '%s' stats: %v", dbName, err)}
+				return
 			}
-			views[row.Doc.Id] = updateSeqByView
+
+			var designDocs DocsResponse
+			err = json.Unmarshal(designDocData, &designDocs)
+			if err != nil {
+				r <- result{err: fmt.Errorf("error unmarshalling design docs for database '%s': %v", dbName, err)}
+				return
+			}
+			views := make(ViewStatsByDesignDocName)
+			for _, row := range designDocs.Rows {
+				updateSeqByView := make(ViewStats)
+				type viewresult struct {
+					viewName  string
+					updateSeq string
+					err       error
+				}
+				v := make(chan viewresult)
+				for viewName := range row.Doc.Views {
+					viewName := viewName
+					go func() {
+						//glog.Infof("/%s/%s/_view/%s\n", dbName, row.Doc.Id, viewName)
+						query := strings.Join([]string{
+							"stale=ok",
+							"update=false",
+							"stable=true",
+							"update_seq=true",
+							"include_docs=false",
+							"limit=0",
+						}, "&")
+						var viewDoc ViewResponse
+						viewDocData, err := c.Request("GET", fmt.Sprintf("%s/%s/%s/_view/%s?%s", c.BaseUri, dbName, row.Doc.Id, viewName, query), nil)
+						err = json.Unmarshal(viewDocData, &viewDoc)
+						if err != nil {
+							v <- viewresult{err: fmt.Errorf("error unmarshalling view doc for view '%s/%s/_view/%s': %v", dbName, row.Doc.Id, viewName, err)}
+							return
+						}
+						v <- viewresult{viewName, viewDoc.UpdateSeq.String(), nil}
+					}()
+				}
+				for _ = range row.Doc.Views {
+					res := <-v
+					if res.err != nil {
+						r <- result{err: res.err}
+						return
+					}
+					updateSeqByView[res.viewName] = res.updateSeq
+				}
+				views[row.Doc.Id] = updateSeqByView
+			}
+			dbStats.Views = views
+			r <- result{dbName, dbStats, nil}
+		}()
+	}
+	// gather
+	for _ = range dbStatsByDbName {
+		resp := <-r
+		dbName, dbStats, err := resp.dbName, resp.dbStats, resp.err
+		if err != nil {
+			return err
 		}
-		dbStats.Views = views
 		dbStatsByDbName[dbName] = dbStats
 	}
 	return nil
@@ -418,10 +479,13 @@ func (c *CouchdbClient) Request(method string, uri string, body io.Reader) (resp
 type requestCountingRoundTripper struct {
 	RequestCount int
 	rt           http.RoundTripper
+	mutex        sync.Mutex
 }
 
 func (rt *requestCountingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	rt.mutex.Lock()
 	rt.RequestCount = rt.RequestCount + 1
+	rt.mutex.Unlock()
 	//glog.Infof("req[%d] %s", rt.RequestCount, req.URL.String())
 	return rt.rt.RoundTrip(req)
 }
@@ -432,6 +496,7 @@ func NewCouchdbClient(uri string, basicAuth BasicAuth, insecure bool) *CouchdbCl
 		&http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure},
 		},
+		sync.Mutex{},
 	}
 
 	httpClient := &http.Client{

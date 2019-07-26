@@ -10,7 +10,7 @@ func (e *Exporter) collectV1(stats Stats, exposedHttpStatusCodes []string, colle
 
 	for name, nodeStats := range stats.StatsByNodeName {
 		//fmt.Printf("%s -> %v\n", name, stats)
-		//glog.Info(fmt.Sprintf("name: %s -> stats: %v\n", name, stats))
+		//klog.Info(fmt.Sprintf("name: %s -> stats: %v\n", name, stats))
 		e.nodeUp.WithLabelValues(name).Set(nodeStats.Up)
 		e.nodeInfo.WithLabelValues(name, nodeStats.NodeInfo.Version, nodeStats.NodeInfo.Vendor.Name).Set(1)
 

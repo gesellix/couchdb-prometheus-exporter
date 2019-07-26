@@ -10,8 +10,8 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/golang/glog"
 	"github.com/hashicorp/go-version"
+	"k8s.io/klog"
 )
 
 type BasicAuth struct {
@@ -83,7 +83,7 @@ func (c *CouchdbClient) GetNodeNames() ([]string, error) {
 		return nil, err
 	}
 	// for i, name := range membership.ClusterNodes {
-	// 	glog.Infof("node[%d]: %s\n", i, name)
+	// 	klog.Infof("node[%d]: %s\n", i, name)
 	// }
 	return membership.ClusterNodes, nil
 }
@@ -112,7 +112,7 @@ func (c *CouchdbClient) getStatsByNodeName(urisByNodeName map[string]string) (ma
 			}
 
 			stats.Up = 0
-			glog.Error(fmt.Errorf("continuing despite error: %v", err))
+			klog.Error(fmt.Errorf("continuing despite error: %v", err))
 			continue
 		}
 
@@ -150,7 +150,7 @@ func (c *CouchdbClient) getSystemByNodeName(urisByNodeName map[string]string) (m
 			if !strings.Contains(err.Error(), "\"error\":\"nodedown\"") {
 				return nil, err
 			}
-			glog.Error(fmt.Errorf("continuing despite error: %v", err))
+			klog.Error(fmt.Errorf("continuing despite error: %v", err))
 			continue
 		}
 
@@ -338,7 +338,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 				for viewName := range row.Doc.Views {
 					viewName := viewName
 					go func() {
-						//glog.Infof("/%s/%s/_view/%s\n", dbName, row.Doc.Id, viewName)
+						//klog.Infof("/%s/%s/_view/%s\n", dbName, row.Doc.Id, viewName)
 						query := strings.Join([]string{
 							"stale=ok",
 							"update=false",
@@ -483,7 +483,7 @@ type requestCountingRoundTripper struct {
 
 func (rt *requestCountingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	atomic.AddInt64(&rt.RequestCount, 1)
-	//glog.Infof("req[%d] %s", atomic.LoadInt64(&rt.RequestCount), req.URL.String())
+	//klog.Infof("req[%d] %s", atomic.LoadInt64(&rt.RequestCount), req.URL.String())
 	return rt.rt.RoundTrip(req)
 }
 

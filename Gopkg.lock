@@ -137,7 +137,6 @@
   analyzer-version = 1
   input-imports = [
     "github.com/gesellix/couchdb-cluster-config/pkg",
-    "github.com/golang/glog",
     "github.com/golang/protobuf/proto",
     "github.com/hashicorp/go-version",
     "github.com/namsral/flag",

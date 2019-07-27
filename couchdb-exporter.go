@@ -38,7 +38,7 @@ type loggingConfigType struct {
 
 var exporterConfig exporterConfigType
 
-// custom exposed logging config flags
+// custom exposed (but hidden) logging config flags
 var loggingConfig loggingConfigType
 
 var appFlags []cli.Flag
@@ -207,7 +207,7 @@ func main() {
 	app.Description = "CouchDB stats exporter for Prometheus"
 	//app.Version = ""
 	app.Flags = appFlags
-	app.Before = adoptKlogFlags
+	app.Before = initKlogFlags
 	app.Action = appAction
 
 	defer klog.Flush()
@@ -218,13 +218,9 @@ func main() {
 	}
 }
 
-func adoptKlogFlags(_ *cli.Context) error {
-	//fmt.Printf("c.args: %v\n", c.Args())
-	//fmt.Printf("os.args: %v\n", os.Args[1:])
-
+func initKlogFlags(_ *cli.Context) error {
 	klogFlags := flag.NewFlagSet("klog", flag.ContinueOnError)
 	klog.InitFlags(klogFlags)
-	//err := klogFlags.Parse(os.Args[1:])
 
 	flags := map[string]string{
 		"logtostderr":     strconv.FormatBool(loggingConfig.toStderr),
@@ -234,9 +230,7 @@ func adoptKlogFlags(_ *cli.Context) error {
 		"log_dir":         loggingConfig.logDir,
 	}
 	for k, v := range flags {
-		err := klogFlags.Set(k, v)
-		if err != nil {
-			//fmt.Printf("err %v", err)
+		if err := klogFlags.Set(k, v); err != nil {
 			return err
 		}
 	}

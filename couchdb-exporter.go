@@ -1,9 +1,11 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -124,48 +126,43 @@ func init() {
 			Destination: &exporterConfig.schedulerJobs,
 		},
 
-		cli.BoolFlag{
+		cli.BoolTFlag{
 			Name:        "logtostderr",
 			Usage:       "log to standard error instead of files",
-			Hidden:      false,
+			Hidden:      true,
 			Destination: &loggingConfig.toStderr,
 		},
 		cli.BoolFlag{
 			Name:        "alsologtostderr",
 			Usage:       "log to standard error as well as files",
-			Hidden:      false,
+			Hidden:      true,
 			Destination: &loggingConfig.alsoToStderr,
 		},
 		// TODO `v` clashed with urfave/cli's `--version` shortcut `-v`.
-		// TODO should be of type `Level` or at least match int32
 		cli.IntFlag{
 			Name:        "verbosity",
 			Usage:       "log level for V logs",
-			Hidden:      false,
+			Value:       0,
+			Hidden:      true,
 			Destination: &loggingConfig.verbosity,
 		},
-		// TODO should be of type `severity` or at least match int32
 		cli.IntFlag{
 			Name:        "stderrthreshold",
 			Usage:       "logs at or above this threshold go to stderr",
-			Hidden:      false,
+			Value:       2,
+			Hidden:      true,
 			Destination: &loggingConfig.stderrThreshold,
 		},
 		cli.StringFlag{
 			Name:        "log_dir",
 			Usage:       "If non-empty, write log files in this directory",
-			Hidden:      false,
+			Hidden:      true,
 			Destination: &loggingConfig.logDir,
 		},
 	}
-
-	//klogFlags := flag.NewFlagSet("klog", flag.ContinueOnError)
-	klog.InitFlags(nil)
 }
 
 func main() {
-	defer klog.Flush()
-
 	var appAction = func(c *cli.Context) error {
 		var databases []string
 		if *&exporterConfig.databases != "" {
@@ -206,14 +203,44 @@ func main() {
 
 	app := cli.NewApp()
 	app.Name = "CouchDB Prometheus Exporter"
-	app.Usage = ""
+	//app.Usage = ""
 	app.Description = "CouchDB stats exporter for Prometheus"
-	app.Version = ""
+	//app.Version = ""
 	app.Flags = appFlags
+	app.Before = adoptKlogFlags
 	app.Action = appAction
+
+	defer klog.Flush()
 
 	err := app.Run(os.Args)
 	if err != nil {
 		klog.Fatal(err)
 	}
+}
+
+func adoptKlogFlags(_ *cli.Context) error {
+	//fmt.Printf("c.args: %v\n", c.Args())
+	//fmt.Printf("os.args: %v\n", os.Args[1:])
+
+	klogFlags := flag.NewFlagSet("klog", flag.ContinueOnError)
+	klog.InitFlags(klogFlags)
+	//err := klogFlags.Parse(os.Args[1:])
+
+	flags := map[string]string{
+		"logtostderr":     strconv.FormatBool(loggingConfig.toStderr),
+		"alsologtostderr": strconv.FormatBool(loggingConfig.alsoToStderr),
+		"stderrthreshold": strconv.Itoa(loggingConfig.stderrThreshold),
+		"v":               strconv.Itoa(loggingConfig.verbosity),
+		"log_dir":         loggingConfig.logDir,
+	}
+	for k, v := range flags {
+		err := klogFlags.Set(k, v)
+		if err != nil {
+			//fmt.Printf("err %v", err)
+			return err
+		}
+	}
+
+	klog.Infof("adopted logging config: %+v\n", loggingConfig)
+	return nil
 }

@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
-	"github.com/namsral/flag"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/urfave/cli"
 	"k8s.io/klog"
 
 	"github.com/gesellix/couchdb-prometheus-exporter/lib"
@@ -25,69 +26,194 @@ type exporterConfigType struct {
 	schedulerJobs   bool
 }
 
+type loggingConfigType struct {
+	toStderr        bool   // The -logtostderr flag.
+	alsoToStderr    bool   // The -alsologtostderr flag.
+	verbosity       int    // V logging level, the value of the -v flag/
+	stderrThreshold int    // The -stderrthreshold flag.
+	logDir          string // The -log_dir flag.
+}
+
 var exporterConfig exporterConfigType
+
+// custom exposed logging config flags
+var loggingConfig loggingConfigType
+
+var appFlags []cli.Flag
 
 // TODO graceful migration to new parameter names
 // 1) Warn, that these parameters are deprecated and will be removed/renamed
 // 2) Fail at startup, when deprecated parameters are used. Maybe allow override by explicit "i-know-what-i-am-doing"-parameter
 // 3) Remove (ignore) deprecated parameters
 func init() {
-	flag.String(flag.DefaultConfigFlagname, "", "path to config file")
+	// TODO replace mechanism with urfave/cli
+	//flag.String(flag.DefaultConfigFlagname, "", "path to config file")
 
-	flag.StringVar(&exporterConfig.listenAddress, "telemetry.address", "localhost:9984", "Address on which to expose metrics.")
-	flag.StringVar(&exporterConfig.metricsEndpoint, "telemetry.endpoint", "/metrics", "Path under which to expose metrics.")
-	flag.StringVar(&exporterConfig.couchdbURI, "couchdb.uri", "http://localhost:5984", "URI to the CouchDB instance")
-	flag.StringVar(&exporterConfig.couchdbUsername, "couchdb.username", "", "Basic auth username for the CouchDB instance")
-	flag.StringVar(&exporterConfig.couchdbPassword, "couchdb.password", "", "Basic auth password for the CouchDB instance")
-	flag.BoolVar(&exporterConfig.couchdbInsecure, "couchdb.insecure", true, "Ignore server certificate if using https")
-	flag.StringVar(&exporterConfig.databases, "databases", "", fmt.Sprintf("Comma separated list of database names, or '%s'", lib.AllDbs))
-	flag.BoolVar(&exporterConfig.databaseViews, "databases.views", true, "Collect view details of every observed database")
-	flag.BoolVar(&exporterConfig.schedulerJobs, "scheduler.jobs", false, "Collect active replication jobs (CouchDB 2.x+ only)")
+	appFlags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "telemetry.address",
+			Usage: "Address on which to expose metrics",
+			//EnvVar:      "TELEMETRY_ADDRESS",
+			Hidden:      false,
+			Value:       "localhost:9984",
+			Destination: &exporterConfig.listenAddress,
+		},
+		cli.StringFlag{
+			Name:  "telemetry.endpoint",
+			Usage: "Path under which to expose metrics",
+			//EnvVar:      "TELEMETRY_ENDPOINT",
+			Hidden:      false,
+			Value:       "/metrics",
+			Destination: &exporterConfig.metricsEndpoint,
+		},
+		cli.StringFlag{
+			Name:  "couchdb.uri",
+			Usage: "URI to the CouchDB instance",
+			//EnvVar:      "COUCHDB_URI",
+			Hidden:      false,
+			Value:       "http://localhost:5984",
+			Destination: &exporterConfig.couchdbURI,
+		},
+		cli.StringFlag{
+			Name:  "couchdb.username",
+			Usage: "Basic auth username for the CouchDB instance",
+			//EnvVar:      "COUCHDB_USERNAME",
+			Hidden:      false,
+			Value:       "",
+			Destination: &exporterConfig.couchdbUsername,
+		},
+		cli.StringFlag{
+			Name:  "couchdb.password",
+			Usage: "Basic auth password for the CouchDB instance",
+			//EnvVar:      "COUCHDB_PASSWORD",
+			Hidden:      false,
+			Value:       "",
+			Destination: &exporterConfig.couchdbPassword,
+		},
+		// TODO doesn't print the default when showing the command help
+		cli.BoolTFlag{
+			Name:  "couchdb.insecure",
+			Usage: "Ignore server certificate if using https",
+			//EnvVar:      "COUCHDB_INSECURE",
+			Hidden:      false,
+			Destination: &exporterConfig.couchdbInsecure,
+		},
+		// TODO use cli.StringSliceFlag?
+		cli.StringFlag{
+			Name:  "databases",
+			Usage: fmt.Sprintf("Comma separated list of database names, or '%s'", lib.AllDbs),
+			//EnvVar:      "DATABASES",
+			Hidden:      false,
+			Value:       "",
+			Destination: &exporterConfig.databases,
+		},
+		// TODO doesn't print the default when showing the command help
+		cli.BoolTFlag{
+			Name:  "databases.views",
+			Usage: "Collect view details of every observed database",
+			//EnvVar:      "DATABASES_VIEWS",
+			Hidden:      false,
+			Destination: &exporterConfig.databaseViews,
+		},
+		// TODO doesn't print the default when showing the command help
+		cli.BoolFlag{
+			Name:  "scheduler.jobs",
+			Usage: "Collect active replication jobs (CouchDB 2.x+ only)",
+			//EnvVar:      "SCHEDULER_JOBS",
+			Hidden:      false,
+			Destination: &exporterConfig.schedulerJobs,
+		},
 
-	// previously manually exposed logging config flags:
-	//flag.BoolVar(&glogadapt.Logging.ToStderr, "logtostderr", false, "log to standard error instead of files")
-	//flag.BoolVar(&glogadapt.Logging.AlsoToStderr, "alsologtostderr", false, "log to standard error as well as files")
-	//flag.Var(&glogadapt.Logging.Verbosity, "v", "log level for V logs")
-	//flag.Var(&glogadapt.Logging.StderrThreshold, "stderrthreshold", "logs at or above this threshold go to stderr")
-	//flag.StringVar(&glogadapt.Logging.LogDir, "log_dir", "", "If non-empty, write log files in this directory")
+		cli.BoolFlag{
+			Name:        "logtostderr",
+			Usage:       "log to standard error instead of files",
+			Hidden:      false,
+			Destination: &loggingConfig.toStderr,
+		},
+		cli.BoolFlag{
+			Name:        "alsologtostderr",
+			Usage:       "log to standard error as well as files",
+			Hidden:      false,
+			Destination: &loggingConfig.alsoToStderr,
+		},
+		// TODO clashes with urfave/cli `--version` shortcut `-v`.
+		// TODO should be of type `Level` or at least match int32
+		//cli.IntFlag{
+		//	Name:        "v",
+		//	Usage:       "log level for V logs",
+		//	Hidden:      false,
+		//	Destination: &loggingConfig.verbosity,
+		//},
+		// TODO should be of type `severity` or at least match int32
+		cli.IntFlag{
+			Name:        "stderrthreshold",
+			Usage:       "logs at or above this threshold go to stderr",
+			Hidden:      false,
+			Destination: &loggingConfig.stderrThreshold,
+		},
+		cli.StringFlag{
+			Name:        "log_dir",
+			Usage:       "If non-empty, write log files in this directory",
+			Hidden:      false,
+			Destination: &loggingConfig.logDir,
+		},
+	}
+
+	//klogFlags := flag.NewFlagSet("klog", flag.ContinueOnError)
+	klog.InitFlags(nil)
 }
 
 func main() {
-	klog.InitFlags(nil)
-	// TODO > Programs should call Flush before exiting to guarantee all log output is written.
-	//defer klog.Flush()
+	// > Programs should call Flush before exiting to guarantee all log output is written.
+	defer klog.Flush()
 
-	var databases []string
-	if *&exporterConfig.databases != "" {
-		databases = strings.Split(*&exporterConfig.databases, ",")
+	var appAction = func(c *cli.Context) error {
+		var databases []string
+		if *&exporterConfig.databases != "" {
+			databases = strings.Split(*&exporterConfig.databases, ",")
+		}
+
+		exporter := lib.NewExporter(
+			*&exporterConfig.couchdbURI,
+			lib.BasicAuth{
+				Username: *&exporterConfig.couchdbUsername,
+				Password: *&exporterConfig.couchdbPassword},
+			lib.CollectorConfig{
+				Databases:            databases,
+				CollectViews:         *&exporterConfig.databaseViews,
+				CollectSchedulerJobs: *&exporterConfig.schedulerJobs,
+			},
+			*&exporterConfig.couchdbInsecure)
+		prometheus.MustRegister(exporter)
+
+		http.Handle(*&exporterConfig.metricsEndpoint, promhttp.Handler())
+		http.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
+			_, err := fmt.Fprint(w, "OK")
+			if err != nil {
+				klog.Error(err)
+			}
+		})
+		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, fmt.Sprintf("Please GET %s", *&exporterConfig.metricsEndpoint), http.StatusNotFound)
+		})
+
+		klog.Infof("Starting exporter at '%s' to read from CouchDB at '%s'", *&exporterConfig.listenAddress, *&exporterConfig.couchdbURI)
+		err := http.ListenAndServe(*&exporterConfig.listenAddress, nil)
+		if err != nil {
+			klog.Fatal(err)
+		}
+		return err
 	}
 
-	exporter := lib.NewExporter(
-		*&exporterConfig.couchdbURI,
-		lib.BasicAuth{
-			Username: *&exporterConfig.couchdbUsername,
-			Password: *&exporterConfig.couchdbPassword},
-		lib.CollectorConfig{
-			Databases:            databases,
-			CollectViews:         *&exporterConfig.databaseViews,
-			CollectSchedulerJobs: *&exporterConfig.schedulerJobs,
-		},
-		*&exporterConfig.couchdbInsecure)
-	prometheus.MustRegister(exporter)
+	app := cli.NewApp()
+	app.Name = "CouchDB Prometheus Exporter"
+	app.Usage = ""
+	app.Description = "CouchDB stats exporter for Prometheus"
+	app.Version = ""
+	app.Flags = appFlags
+	app.Action = appAction
 
-	http.Handle(*&exporterConfig.metricsEndpoint, promhttp.Handler())
-	http.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
-		_, err := fmt.Fprint(w, "OK")
-		if err != nil {
-			klog.Error(err)
-		}
-	})
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, fmt.Sprintf("Please GET %s", *&exporterConfig.metricsEndpoint), http.StatusNotFound)
-	})
-
-	klog.Infof("Starting exporter at '%s' to read from CouchDB at '%s'", *&exporterConfig.listenAddress, *&exporterConfig.couchdbURI)
-	err := http.ListenAndServe(*&exporterConfig.listenAddress, nil)
+	err := app.Run(os.Args)
 	if err != nil {
 		klog.Fatal(err)
 	}

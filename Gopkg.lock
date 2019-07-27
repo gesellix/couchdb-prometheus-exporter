@@ -50,14 +50,6 @@
   version = "v1.0.1"
 
 [[projects]]
-  digest = "1:0828677c3ebed3fc9c4f11e17e7997a733e62a3f20b38d00d70e756b681b46ab"
-  name = "github.com/namsral/flag"
-  packages = ["."]
-  pruneopts = ""
-  revision = "71ceffbeb0ba60fccc853971bb3ed4d7d90bfd04"
-  version = "v1.7.4-pre"
-
-[[projects]]
   digest = "1:27a944cff478bdbbfa4d10417bfae2abe6ad34429c12716376c96a6f7036cc3f"
   name = "github.com/okeuday/erlang_go"
   packages = ["src/erlang"]
@@ -125,6 +117,14 @@
   version = "v1.3.0"
 
 [[projects]]
+  digest = "1:e85837cb04b78f61688c6eba93ea9d14f60d611e2aaf8319999b1a60d2dafbfa"
+  name = "github.com/urfave/cli"
+  packages = ["."]
+  pruneopts = ""
+  revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
+  version = "v1.20.0"
+
+[[projects]]
   digest = "1:9eaf86f4f6fb4a8f177220d488ef1e3255d06a691cca95f14ef085d4cd1cef3c"
   name = "k8s.io/klog"
   packages = ["."]
@@ -139,12 +139,12 @@
     "github.com/gesellix/couchdb-cluster-config/pkg",
     "github.com/golang/protobuf/proto",
     "github.com/hashicorp/go-version",
-    "github.com/namsral/flag",
     "github.com/okeuday/erlang_go/src/erlang",
     "github.com/prometheus/client_golang/prometheus",
     "github.com/prometheus/client_golang/prometheus/promhttp",
     "github.com/prometheus/client_model/go",
     "github.com/stretchr/testify/assert",
+    "github.com/urfave/cli",
     "k8s.io/klog",
   ]
   solver-name = "gps-cdcl"

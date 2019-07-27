@@ -136,14 +136,14 @@ func init() {
 			Hidden:      false,
 			Destination: &loggingConfig.alsoToStderr,
 		},
-		// TODO clashes with urfave/cli `--version` shortcut `-v`.
+		// TODO `v` clashed with urfave/cli's `--version` shortcut `-v`.
 		// TODO should be of type `Level` or at least match int32
-		//cli.IntFlag{
-		//	Name:        "v",
-		//	Usage:       "log level for V logs",
-		//	Hidden:      false,
-		//	Destination: &loggingConfig.verbosity,
-		//},
+		cli.IntFlag{
+			Name:        "verbosity",
+			Usage:       "log level for V logs",
+			Hidden:      false,
+			Destination: &loggingConfig.verbosity,
+		},
 		// TODO should be of type `severity` or at least match int32
 		cli.IntFlag{
 			Name:        "stderrthreshold",
@@ -164,7 +164,6 @@ func init() {
 }
 
 func main() {
-	// > Programs should call Flush before exiting to guarantee all log output is written.
 	defer klog.Flush()
 
 	var appAction = func(c *cli.Context) error {

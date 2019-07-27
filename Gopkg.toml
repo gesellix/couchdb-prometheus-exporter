@@ -33,8 +33,8 @@
   name = "github.com/hashicorp/go-version"
 
 [[constraint]]
-  name = "github.com/namsral/flag"
-  version = "1.7.4-pre"
+  name = "github.com/urfave/cli"
+  version = "1.20.0"
 
 [[constraint]]
   name = "github.com/prometheus/client_golang"

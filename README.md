@@ -15,7 +15,7 @@ environment variables, and config file.
 
 The couchdb-exporter uses the [glog](https://godoc.org/github.com/golang/glog) library for logging.
 With the default parameters everything will be logged to `/tmp/`.
-Use `-logtostderr` to enable logging to stderr and `--help` to see all options.
+Use `--logtostderr` to enable logging to stderr and `--help` to see all options.
 
 For CouchDB 2.x, you should configure the exporter to fetch the stats from one node, to get
 a complete cluster overview. In contrast to CouchDB 1.x you'll need to configure the admin

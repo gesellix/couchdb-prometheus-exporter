@@ -1,4 +1,4 @@
-FROM alpine:3.9 AS builder
+FROM alpine:3.10 AS builder
 LABEL builder=true
 
 ENV CGO_ENABLED=0
@@ -20,9 +20,12 @@ RUN cd $APPPATH && go get -d \
 FROM scratch
 LABEL maintainer="Tobias Gesellchen <tobias@gesellix.de> (@gesellix)"
 
+ENV TELEMETRY.ADDRESS="0.0.0.0:9984"
+ENV LOGTOSTDERR="true"
+
 EXPOSE 9984
-ENTRYPOINT [ "/couchdb-prometheus-exporter", "-telemetry.address=0.0.0.0:9984" ]
-CMD [ "-logtostderr" ]
+ENTRYPOINT [ "/couchdb-prometheus-exporter" ]
+CMD [ ]
 
 COPY --from=builder /etc/passwd /etc/passwd
 USER user

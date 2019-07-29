@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
-	"sync"
+	"sync/atomic"
 
 	"github.com/golang/glog"
 	"github.com/hashicorp/go-version"
@@ -287,7 +287,7 @@ func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string) (map[strin
 		}()
 	}
 	// gather
-	for _ = range databases {
+	for range databases {
 		res := <-r
 		if res.err != nil {
 			return nil, res.err
@@ -357,7 +357,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 						v <- viewresult{viewName, viewDoc.UpdateSeq.String(), nil}
 					}()
 				}
-				for _ = range row.Doc.Views {
+				for range row.Doc.Views {
 					res := <-v
 					if res.err != nil {
 						r <- result{err: res.err}
@@ -372,7 +372,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 		}()
 	}
 	// gather
-	for _ = range dbStatsByDbName {
+	for range dbStatsByDbName {
 		resp := <-r
 		dbName, dbStats, err := resp.dbName, resp.dbStats, resp.err
 		if err != nil {
@@ -477,16 +477,13 @@ func (c *CouchdbClient) Request(method string, uri string, body io.Reader) (resp
 }
 
 type requestCountingRoundTripper struct {
-	RequestCount int
+	RequestCount int64
 	rt           http.RoundTripper
-	mutex        sync.Mutex
 }
 
 func (rt *requestCountingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
-	rt.mutex.Lock()
-	rt.RequestCount = rt.RequestCount + 1
-	rt.mutex.Unlock()
-	//glog.Infof("req[%d] %s", rt.RequestCount, req.URL.String())
+	atomic.AddInt64(&rt.RequestCount, 1)
+	//glog.Infof("req[%d] %s", atomic.LoadInt64(&rt.RequestCount), req.URL.String())
 	return rt.rt.RoundTrip(req)
 }
 
@@ -496,7 +493,6 @@ func NewCouchdbClient(uri string, basicAuth BasicAuth, insecure bool) *CouchdbCl
 		&http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure},
 		},
-		sync.Mutex{},
 	}
 
 	httpClient := &http.Client{
@@ -508,10 +504,10 @@ func NewCouchdbClient(uri string, basicAuth BasicAuth, insecure bool) *CouchdbCl
 		basicAuth: basicAuth,
 		client:    httpClient,
 		ResetRequestCount: func() {
-			countingRoundTripper.RequestCount = 0
+			atomic.StoreInt64(&countingRoundTripper.RequestCount, 0)
 		},
 		GetRequestCount: func() int {
-			return countingRoundTripper.RequestCount
+			return int(atomic.LoadInt64(&countingRoundTripper.RequestCount))
 		},
 	}
 }

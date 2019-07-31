@@ -33,7 +33,7 @@
   name = "github.com/hashicorp/go-version"
 
 [[constraint]]
-  name = "github.com/urfave/cli"
+  name = "gopkg.in/urfave/cli.v1"
   version = "1.20.0"
 
 [[constraint]]

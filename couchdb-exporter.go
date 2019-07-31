@@ -10,9 +10,11 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/urfave/cli"
+	"gopkg.in/urfave/cli.v1"
+	"gopkg.in/urfave/cli.v1/altsrc"
 	"k8s.io/klog"
 
+	"github.com/gesellix/couchdb-prometheus-exporter/fileutil"
 	"github.com/gesellix/couchdb-prometheus-exporter/lib"
 )
 
@@ -38,127 +40,132 @@ type loggingConfigType struct {
 
 var exporterConfig exporterConfigType
 
+var configFileFlagname = "config"
+
 // custom exposed (but hidden) logging config flags
 var loggingConfig loggingConfigType
 
 var appFlags []cli.Flag
 
 // TODO graceful migration to new parameter names
-// 1) Warn, that these parameters are deprecated and will be removed/renamed
+// 1) Warn, for deprecated parameters to be removed/renamed
 // 2) Fail at startup, when deprecated parameters are used. Maybe allow override by explicit "i-know-what-i-am-doing"-parameter
 // 3) Remove (ignore) deprecated parameters
 func init() {
-	// TODO replace mechanism with urfave/cli
-	//flag.String(flag.DefaultConfigFlagname, "", "path to config file")
-
 	appFlags = []cli.Flag{
 		cli.StringFlag{
+			Name:   configFileFlagname,
+			Usage:  "Path to config file",
+			EnvVar: "CONFIG",
+			Hidden: false,
+		},
+		altsrc.NewStringFlag(cli.StringFlag{
 			Name:        "telemetry.address",
 			Usage:       "Address on which to expose metrics",
 			EnvVar:      "TELEMETRY.ADDRESS",
 			Hidden:      false,
 			Value:       "localhost:9984",
 			Destination: &exporterConfig.listenAddress,
-		},
-		cli.StringFlag{
+		}),
+		altsrc.NewStringFlag(cli.StringFlag{
 			Name:        "telemetry.endpoint",
 			Usage:       "Path under which to expose metrics",
 			EnvVar:      "TELEMETRY.ENDPOINT",
 			Hidden:      false,
 			Value:       "/metrics",
 			Destination: &exporterConfig.metricsEndpoint,
-		},
-		cli.StringFlag{
+		}),
+		altsrc.NewStringFlag(cli.StringFlag{
 			Name:        "couchdb.uri",
 			Usage:       "URI to the CouchDB instance",
 			EnvVar:      "COUCHDB.URI",
 			Hidden:      false,
 			Value:       "http://localhost:5984",
 			Destination: &exporterConfig.couchdbURI,
-		},
-		cli.StringFlag{
+		}),
+		altsrc.NewStringFlag(cli.StringFlag{
 			Name:        "couchdb.username",
 			Usage:       "Basic auth username for the CouchDB instance",
 			EnvVar:      "COUCHDB.USERNAME",
 			Hidden:      false,
 			Value:       "",
 			Destination: &exporterConfig.couchdbUsername,
-		},
-		cli.StringFlag{
+		}),
+		altsrc.NewStringFlag(cli.StringFlag{
 			Name:        "couchdb.password",
 			Usage:       "Basic auth password for the CouchDB instance",
 			EnvVar:      "COUCHDB.PASSWORD",
 			Hidden:      false,
 			Value:       "",
 			Destination: &exporterConfig.couchdbPassword,
-		},
+		}),
 		// TODO doesn't print the default when showing the command help
-		cli.BoolTFlag{
+		altsrc.NewBoolTFlag(cli.BoolTFlag{
 			Name:        "couchdb.insecure",
 			Usage:       "Ignore server certificate if using https",
 			EnvVar:      "COUCHDB.INSECURE",
 			Hidden:      false,
 			Destination: &exporterConfig.couchdbInsecure,
-		},
+		}),
 		// TODO use cli.StringSliceFlag?
-		cli.StringFlag{
+		altsrc.NewStringFlag(cli.StringFlag{
 			Name:        "databases",
 			Usage:       fmt.Sprintf("Comma separated list of database names, or '%s'", lib.AllDbs),
 			EnvVar:      "DATABASES",
 			Hidden:      false,
 			Value:       "",
 			Destination: &exporterConfig.databases,
-		},
+		}),
 		// TODO doesn't print the default when showing the command help
-		cli.BoolTFlag{
+		altsrc.NewBoolTFlag(cli.BoolTFlag{
 			Name:        "databases.views",
 			Usage:       "Collect view details of every observed database",
 			EnvVar:      "DATABASES.VIEWS",
 			Hidden:      false,
 			Destination: &exporterConfig.databaseViews,
-		},
+		}),
 		// TODO doesn't print the default when showing the command help
-		cli.BoolFlag{
+		altsrc.NewBoolFlag(cli.BoolFlag{
 			Name:        "scheduler.jobs",
 			Usage:       "Collect active replication jobs (CouchDB 2.x+ only)",
 			EnvVar:      "SCHEDULER.JOBS",
 			Hidden:      false,
 			Destination: &exporterConfig.schedulerJobs,
-		},
+		}),
 
-		cli.BoolTFlag{
+		altsrc.NewBoolTFlag(cli.BoolTFlag{
 			Name:        "logtostderr",
 			Usage:       "log to standard error instead of files",
 			Hidden:      true,
 			Destination: &loggingConfig.toStderr,
-		},
-		cli.BoolFlag{
+		}),
+		altsrc.NewBoolFlag(cli.BoolFlag{
 			Name:        "alsologtostderr",
 			Usage:       "log to standard error as well as files",
 			Hidden:      true,
 			Destination: &loggingConfig.alsoToStderr,
-		},
+		}),
 		// TODO `v` clashed with urfave/cli's "version" shortcut `-v`.
-		cli.IntFlag{
+		altsrc.NewIntFlag(cli.IntFlag{
 			Name:        "verbosity",
 			Usage:       "log level for V logs",
 			Value:       0,
 			Hidden:      true,
 			Destination: &loggingConfig.verbosity,
-		},
-		cli.IntFlag{
+		}),
+		altsrc.NewIntFlag(cli.IntFlag{
 			Name:        "stderrthreshold",
 			Usage:       "logs at or above this threshold go to stderr",
 			Value:       2,
 			Hidden:      true,
 			Destination: &loggingConfig.stderrThreshold,
-		},
-		cli.StringFlag{
+		}),
+		altsrc.NewStringFlag(cli.StringFlag{
 			Name:        "log_dir",
 			Usage:       "If non-empty, write log files in this directory",
 			Hidden:      true,
 			Destination: &loggingConfig.logDir,
-		},
+		}),
 	}
 }
 
@@ -207,7 +214,7 @@ func main() {
 	app.Description = "CouchDB stats exporter for Prometheus"
 	//app.Version = ""
 	app.Flags = appFlags
-	app.Before = initKlogFlags
+	app.Before = beforeApp(appFlags)
 	app.Action = appAction
 
 	defer klog.Flush()
@@ -215,6 +222,19 @@ func main() {
 	err := app.Run(os.Args)
 	if err != nil {
 		klog.Fatal(err)
+	}
+}
+
+func beforeApp(appFlags []cli.Flag) cli.BeforeFunc {
+	return func(context *cli.Context) error {
+		// TODO decide on a preferred config file format, maybe support different ones.
+		inputSource := fileutil.NewPropertiesSourceFromFlagFunc(configFileFlagname)
+		//inputSource := altsrc.NewYamlSourceFromFlagFunc(configFileFlagname)
+		//inputSource := altsrc.NewTomlSourceFromFlagFunc(configFileFlagname)
+		if err := altsrc.InitInputSourceWithContext(appFlags, inputSource)(context); err != nil {
+			return err
+		}
+		return initKlogFlags(context)
 	}
 }
 

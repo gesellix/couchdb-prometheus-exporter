@@ -19,7 +19,7 @@ services:
         max_attempts: 3
 
   couchdbstats:
-    image: gesellix/couchdb-prometheus-exporter
+    image: gesellix/couchdb-prometheus-exporter:latest
     command: --couchdb.uri=http://couchdb:5984 --config=/run/secrets/config.properties --logtostderr
     networks:
       - couchdb

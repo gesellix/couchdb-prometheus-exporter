@@ -16,7 +16,7 @@ services:
         max_attempts: 3
 
   couchdb-config:
-    image: gesellix/wait-for
+    image: gesellix/wait-for:latest
     command: couchdb:5984 --timeout=10 -- /cluster-config.sh couchdb:5984 /run/secrets/config.properties
     networks:
       - couchdb
@@ -33,7 +33,7 @@ services:
         max_attempts: 2
 
   couchdbstats:
-    image: gesellix/couchdb-prometheus-exporter
+    image: gesellix/couchdb-prometheus-exporter:latest
     command: --couchdb.uri=http://couchdb:5984 --config=/run/secrets/config.properties --logtostderr
     networks:
       - couchdb

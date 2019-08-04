@@ -183,12 +183,12 @@ func (c *CouchdbClient) getStats(config CollectorConfig) (Stats, error) {
 		if err != nil {
 			return Stats{}, err
 		}
-		databaseStats, err := c.getDatabasesStatsByDbName(config.ObservedDatabases)
+		databaseStats, err := c.getDatabasesStatsByDbName(config.ObservedDatabases, config.Concurrency)
 		if err != nil {
 			return Stats{}, err
 		}
 		if config.CollectViews {
-			err := c.enhanceWithViewUpdateSeq(databaseStats)
+			err := c.enhanceWithViewUpdateSeq(databaseStats, config.Concurrency)
 			if err != nil {
 				return Stats{}, err
 			}
@@ -226,12 +226,12 @@ func (c *CouchdbClient) getStats(config CollectorConfig) (Stats, error) {
 		if err != nil {
 			return Stats{}, err
 		}
-		databaseStats, err := c.getDatabasesStatsByDbName(config.ObservedDatabases)
+		databaseStats, err := c.getDatabasesStatsByDbName(config.ObservedDatabases, config.Concurrency)
 		if err != nil {
 			return Stats{}, err
 		}
 		if config.CollectViews {
-			err := c.enhanceWithViewUpdateSeq(databaseStats)
+			err := c.enhanceWithViewUpdateSeq(databaseStats, config.Concurrency)
 			if err != nil {
 				return Stats{}, err
 			}
@@ -253,18 +253,36 @@ func (c *CouchdbClient) getStats(config CollectorConfig) (Stats, error) {
 	}
 }
 
-func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string) (map[string]DatabaseStats, error) {
+func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string, concurrency uint) (map[string]DatabaseStats, error) {
 	dbStatsByDbName := make(map[string]DatabaseStats)
 	type result struct {
 		dbName  string
 		dbStats DatabaseStats
 		err     error
 	}
+	// Setup for concurrent scatter/gather scrapes, with concurrency limit
 	r := make(chan result, len(databases))
+	semaphore := make(chan struct{}, concurrency) // semaphore to limit concurrency
+	abort := make(chan struct{})                  // signal to abort for goroutines waiting on a semaphore
+	if concurrency == 0 {
+		close(semaphore) // concurrency effectively unlimited
+	}
+	if concurrency > 0 {
+		// fill semaphore
+		for i := 0; i < int(concurrency); i++ {
+			semaphore <- struct{}{}
+		}
+	}
 	// scatter
 	for _, dbName := range databases {
 		dbName := dbName // rebind for closure to capture the value
 		go func() {
+			select {
+			case <-abort:
+				return
+			case <-semaphore:
+				// continue
+			}
 			var dbStats DatabaseStats
 			data, err := c.Request("GET", fmt.Sprintf("%s/%s", c.BaseUri, dbName), nil)
 			if err != nil {
@@ -283,6 +301,9 @@ func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string) (map[strin
 			} else {
 				dbStats.CompactRunning = 0
 			}
+			if concurrency > 0 {
+				semaphore <- struct{}{}
+			}
 			r <- result{dbName, dbStats, nil}
 		}()
 	}
@@ -290,6 +311,7 @@ func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string) (map[strin
 	for range databases {
 		res := <-r
 		if res.err != nil {
+			close(abort)
 			return nil, res.err
 		}
 		dbStatsByDbName[res.dbName] = res.dbStats
@@ -297,18 +319,35 @@ func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string) (map[strin
 	return dbStatsByDbName, nil
 }
 
-func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]DatabaseStats) error {
+func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]DatabaseStats, concurrency uint) error {
 	type result struct {
 		dbName  string
 		dbStats DatabaseStats
 		err     error
 	}
+	// Setup for concurrent scatter/gather scrapes, with concurrency limit
 	r := make(chan result, len(dbStatsByDbName))
+	semaphore := make(chan struct{}, concurrency) // semaphore to limit concurrency
+	abort := make(chan struct{})                  // signal to abort for goroutines waiting on a semaphore
+	if concurrency == 0 {
+		close(semaphore) // concurrency effectively unlimited
+	}
+	if concurrency > 0 {
+		// fill semaphore
+		for i := 0; i < int(concurrency); i++ {
+			semaphore <- struct{}{}
+		}
+	}
 	// scatter
 	for dbName, dbStats := range dbStatsByDbName {
 		dbName := dbName // rebind for closure to capture the value
 		dbStats := dbStats
 		go func() {
+			select {
+			case <-abort:
+				return
+			case <-semaphore:
+			}
 			query := strings.Join([]string{
 				"startkey=\"_design/\"",
 				"endkey=\"_design0\"",
@@ -327,6 +366,10 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 				return
 			}
 			views := make(ViewStatsByDesignDocName)
+			// return concurrency token here, so view scrapes may proceed
+			if concurrency > 0 {
+				semaphore <- struct{}{}
+			}
 			for _, row := range designDocs.Rows {
 				updateSeqByView := make(ViewStats)
 				type viewresult struct {
@@ -339,6 +382,11 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 					viewName := viewName
 					go func() {
 						//klog.Infof("/%s/%s/_view/%s\n", dbName, row.Doc.Id, viewName)
+						select {
+						case <-abort:
+							return
+						case <-semaphore:
+						}
 						query := strings.Join([]string{
 							"stale=ok",
 							"update=false",
@@ -353,6 +401,9 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 						if err != nil {
 							v <- viewresult{err: fmt.Errorf("error unmarshalling view doc for view '%s/%s/_view/%s': %v", dbName, row.Doc.Id, viewName, err)}
 							return
+						}
+						if concurrency > 0 {
+							semaphore <- struct{}{}
 						}
 						v <- viewresult{viewName, viewDoc.UpdateSeq.String(), nil}
 					}()
@@ -376,6 +427,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 		resp := <-r
 		dbName, dbStats, err := resp.dbName, resp.dbStats, resp.err
 		if err != nil {
+			close(abort) // let any goroutines waiting on semaphores terminate
 			return err
 		}
 		dbStatsByDbName[dbName] = dbStats

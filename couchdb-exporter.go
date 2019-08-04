@@ -27,6 +27,7 @@ type exporterConfigType struct {
 	couchdbInsecure bool
 	databases       string
 	databaseViews   bool
+	concurrency     uint
 	schedulerJobs   bool
 }
 
@@ -124,6 +125,13 @@ func init() {
 			Hidden:      false,
 			Destination: &exporterConfig.databaseViews,
 		}),
+		altsrc.NewUintFlag(cli.UintFlag{
+			Name:        "concurrency",
+			Usage:       "maximum concurrent calls to couchDB, or 0 for unlimited",
+			Value:       0,
+			Hidden:      false,
+			Destination: &exporterConfig.concurrency,
+		}),
 		// TODO doesn't print the default when showing the command help
 		altsrc.NewBoolFlag(cli.BoolFlag{
 			Name:        "scheduler.jobs",
@@ -185,6 +193,7 @@ func main() {
 				Databases:            databases,
 				CollectViews:         *&exporterConfig.databaseViews,
 				CollectSchedulerJobs: *&exporterConfig.schedulerJobs,
+				Concurrency:          *&exporterConfig.concurrency,
 			},
 			*&exporterConfig.couchdbInsecure)
 		prometheus.MustRegister(exporter)

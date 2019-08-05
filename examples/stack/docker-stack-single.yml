@@ -17,7 +17,7 @@ services:
 
   couchdb-config:
     image: gesellix/wait-for:latest
-    command: couchdb:5984 --timeout=10 -- /cluster-config.sh couchdb:5984 /run/secrets/config.properties
+    command: couchdb:5984 --timeout=30 -- /cluster-config.sh couchdb:5984 /run/secrets/config.properties
     networks:
       - couchdb
     configs:

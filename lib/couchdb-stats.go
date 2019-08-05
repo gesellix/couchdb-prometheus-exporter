@@ -126,6 +126,12 @@ type CouchReplicator struct {
 	Connection           map[string]Counter `json:"connection"`
 }
 
+type HealthResponse struct {
+	Status string `json:"status"`
+	// see https://github.com/apache/couchdb/pull/1658
+	//Seeds map[string]SeedStat `json:"seeds"`
+}
+
 type StatsResponse struct {
 	Couchdb  CouchdbStats `json:"couchdb"`
 	Up       float64      `json:"-"`
@@ -229,6 +235,7 @@ type SystemResponse struct {
 }
 
 type Stats struct {
+	//HealthByNodeName      map[string]HealthResponse
 	StatsByNodeName       map[string]StatsResponse
 	DatabasesTotal        int
 	DatabaseStatsByDbName DatabaseStatsByDbName

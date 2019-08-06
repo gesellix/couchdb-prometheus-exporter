@@ -384,6 +384,8 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 						//klog.Infof("/%s/%s/_view/%s\n", dbName, row.Doc.Id, viewName)
 						select {
 						case <-abort:
+							// send something to parent coroutine so it doesn't block forever on receive
+							v <- viewresult{err: fmt.Errorf("Aborted view stats for /%s/%s/_view/%s", dbName, row.Doc.Id, viewName)}
 							return
 						case <-semaphore:
 						}

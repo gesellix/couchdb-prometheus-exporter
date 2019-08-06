@@ -262,26 +262,15 @@ func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string, concurrenc
 	}
 	// Setup for concurrent scatter/gather scrapes, with concurrency limit
 	r := make(chan result, len(databases))
-	semaphore := make(chan struct{}, concurrency) // semaphore to limit concurrency
-	abort := make(chan struct{})                  // signal to abort for goroutines waiting on a semaphore
-	if concurrency == 0 {
-		close(semaphore) // concurrency effectively unlimited
-	}
-	if concurrency > 0 {
-		// fill semaphore
-		for i := 0; i < int(concurrency); i++ {
-			semaphore <- struct{}{}
-		}
-	}
+	semaphore := NewSemaphore(concurrency) // semaphore to limit concurrency
+
 	// scatter
 	for _, dbName := range databases {
 		dbName := dbName // rebind for closure to capture the value
 		go func() {
-			select {
-			case <-abort:
+			err := semaphore.Acquire()
+			if err != nil {
 				return
-			case <-semaphore:
-				// continue
 			}
 			var dbStats DatabaseStats
 			data, err := c.Request("GET", fmt.Sprintf("%s/%s", c.BaseUri, dbName), nil)
@@ -301,9 +290,7 @@ func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string, concurrenc
 			} else {
 				dbStats.CompactRunning = 0
 			}
-			if concurrency > 0 {
-				semaphore <- struct{}{}
-			}
+			semaphore.Release()
 			r <- result{dbName, dbStats, nil}
 		}()
 	}
@@ -311,7 +298,7 @@ func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string, concurrenc
 	for range databases {
 		res := <-r
 		if res.err != nil {
-			close(abort)
+			semaphore.Abort()
 			return nil, res.err
 		}
 		dbStatsByDbName[res.dbName] = res.dbStats
@@ -327,26 +314,16 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 	}
 	// Setup for concurrent scatter/gather scrapes, with concurrency limit
 	r := make(chan result, len(dbStatsByDbName))
-	semaphore := make(chan struct{}, concurrency) // semaphore to limit concurrency
-	abort := make(chan struct{})                  // signal to abort for goroutines waiting on a semaphore
-	if concurrency == 0 {
-		close(semaphore) // concurrency effectively unlimited
-	}
-	if concurrency > 0 {
-		// fill semaphore
-		for i := 0; i < int(concurrency); i++ {
-			semaphore <- struct{}{}
-		}
-	}
+	semaphore := NewSemaphore(concurrency) // semaphore to limit concurrency
+
 	// scatter
 	for dbName, dbStats := range dbStatsByDbName {
 		dbName := dbName // rebind for closure to capture the value
 		dbStats := dbStats
 		go func() {
-			select {
-			case <-abort:
+			err := semaphore.Acquire()
+			if err != nil {
 				return
-			case <-semaphore:
 			}
 			query := strings.Join([]string{
 				"startkey=\"_design/\"",
@@ -366,10 +343,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 				return
 			}
 			views := make(ViewStatsByDesignDocName)
-			// return concurrency token here, so view scrapes may proceed
-			if concurrency > 0 {
-				semaphore <- struct{}{}
-			}
+			semaphore.Release() // return concurrency token here, so view scrapes may proceed
 			for _, row := range designDocs.Rows {
 				updateSeqByView := make(ViewStats)
 				type viewresult struct {
@@ -382,12 +356,11 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 					viewName := viewName
 					go func() {
 						//klog.Infof("/%s/%s/_view/%s\n", dbName, row.Doc.Id, viewName)
-						select {
-						case <-abort:
+						err := semaphore.Acquire()
+						if err != nil {
 							// send something to parent coroutine so it doesn't block forever on receive
 							v <- viewresult{err: fmt.Errorf("Aborted view stats for /%s/%s/_view/%s", dbName, row.Doc.Id, viewName)}
 							return
-						case <-semaphore:
 						}
 						query := strings.Join([]string{
 							"stale=ok",
@@ -404,9 +377,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 							v <- viewresult{err: fmt.Errorf("error unmarshalling view doc for view '%s/%s/_view/%s': %v", dbName, row.Doc.Id, viewName, err)}
 							return
 						}
-						if concurrency > 0 {
-							semaphore <- struct{}{}
-						}
+						semaphore.Release()
 						v <- viewresult{viewName, viewDoc.UpdateSeq.String(), nil}
 					}()
 				}
@@ -429,7 +400,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 		resp := <-r
 		dbName, dbStats, err := resp.dbName, resp.dbStats, resp.err
 		if err != nil {
-			close(abort) // let any goroutines waiting on semaphores terminate
+			semaphore.Abort() // let any goroutines waiting on semaphores terminate
 			return err
 		}
 		dbStatsByDbName[dbName] = dbStats
@@ -563,5 +534,60 @@ func NewCouchdbClient(uri string, basicAuth BasicAuth, insecure bool) *CouchdbCl
 		GetRequestCount: func() int {
 			return int(atomic.LoadInt64(&countingRoundTripper.RequestCount))
 		},
+	}
+}
+
+type Semaphore struct {
+	abort       chan struct{}
+	sem         chan struct{}
+	concurrency uint
+}
+
+// NewSemaphore for concurrency, concurrency == 0 means unlimited
+func NewSemaphore(concurrency uint) Semaphore {
+	s := Semaphore{
+		sem:         make(chan struct{}, concurrency),
+		abort:       make(chan struct{}), // signal to abort for goroutines waiting on a semaphore
+		concurrency: concurrency,
+	}
+	if concurrency == 0 {
+		close(s.sem) // concurrency effectively unlimited
+		return s
+	}
+	// fill semaphore
+	for i := 0; i < int(s.concurrency); i++ {
+		s.sem <- struct{}{}
+	}
+	return s
+}
+
+// Acquire the semaphore; blocks until ready, or returns error to indicate the goroutine should abort
+func (s Semaphore) Acquire() error {
+	select {
+	case <-s.abort:
+		return fmt.Errorf("Could not acquire semaphore")
+	case <-s.sem:
+		return nil
+	}
+}
+
+func (s Semaphore) Release() {
+	if s.concurrency > 0 {
+		select {
+		case s.sem <- struct{}{}:
+		default: // should not happen unless someone double released
+		}
+	}
+}
+
+// Signal abort for anyone waiting on the Semaphor
+func (s Semaphore) Abort() {
+	select {
+	case <-s.abort:
+		// a check if we've already closed the abort channel
+		return
+	default:
+		// abort channel now never blocks for receivers
+		close(s.abort)
 	}
 }

@@ -183,12 +183,12 @@ func (c *CouchdbClient) getStats(config CollectorConfig) (Stats, error) {
 		if err != nil {
 			return Stats{}, err
 		}
-		databaseStats, err := c.getDatabasesStatsByDbName(config.ObservedDatabases, config.Concurrency)
+		databaseStats, err := c.getDatabasesStatsByDbName(config.ObservedDatabases, config.ConcurrentRequests)
 		if err != nil {
 			return Stats{}, err
 		}
 		if config.CollectViews {
-			err := c.enhanceWithViewUpdateSeq(databaseStats, config.Concurrency)
+			err := c.enhanceWithViewUpdateSeq(databaseStats, config.ConcurrentRequests)
 			if err != nil {
 				return Stats{}, err
 			}
@@ -226,12 +226,12 @@ func (c *CouchdbClient) getStats(config CollectorConfig) (Stats, error) {
 		if err != nil {
 			return Stats{}, err
 		}
-		databaseStats, err := c.getDatabasesStatsByDbName(config.ObservedDatabases, config.Concurrency)
+		databaseStats, err := c.getDatabasesStatsByDbName(config.ObservedDatabases, config.ConcurrentRequests)
 		if err != nil {
 			return Stats{}, err
 		}
 		if config.CollectViews {
-			err := c.enhanceWithViewUpdateSeq(databaseStats, config.Concurrency)
+			err := c.enhanceWithViewUpdateSeq(databaseStats, config.ConcurrentRequests)
 			if err != nil {
 				return Stats{}, err
 			}

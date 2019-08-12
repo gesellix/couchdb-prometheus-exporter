@@ -75,7 +75,7 @@ type CollectorConfig struct {
 	ObservedDatabases    []string
 	CollectViews         bool
 	CollectSchedulerJobs bool
-	Concurrency          uint
+	ConcurrentRequests   uint
 }
 
 type ActiveTaskTypes struct {

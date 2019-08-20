@@ -275,6 +275,7 @@ func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string, concurrenc
 			}
 			var dbStats DatabaseStats
 			data, err := c.Request("GET", fmt.Sprintf("%s/%s", c.BaseUri, dbName), nil)
+			semaphore.Release()
 			if err != nil {
 				r <- result{err: fmt.Errorf("error reading database '%s' stats: %v", dbName, err)}
 				return
@@ -291,7 +292,6 @@ func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string, concurrenc
 			} else {
 				dbStats.CompactRunning = 0
 			}
-			semaphore.Release()
 			r <- result{dbName, dbStats, nil}
 		}()
 	}
@@ -332,6 +332,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 				"include_docs=true",
 			}, "&")
 			designDocData, err := c.Request("GET", fmt.Sprintf("%s/%s/_all_docs?%s", c.BaseUri, dbName, query), nil)
+			semaphore.Release()
 			if err != nil {
 				r <- result{err: fmt.Errorf("error reading database '%s' stats: %v", dbName, err)}
 				return
@@ -344,9 +345,9 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 				return
 			}
 			views := make(ViewStatsByDesignDocName)
+
 			viewmutex := &sync.Mutex{}
 			done := make(chan struct{}, len(designDocs.Rows))
-			semaphore.Release() // return concurrency token here, so view scrapes may proceed
 			for _, row := range designDocs.Rows {
 				row := row
 				go func() {
@@ -378,12 +379,12 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 							}, "&")
 							var viewDoc ViewResponse
 							viewDocData, err := c.Request("GET", fmt.Sprintf("%s/%s/%s/_view/%s?%s", c.BaseUri, dbName, row.Doc.Id, viewName, query), nil)
+							semaphore.Release()
 							err = json.Unmarshal(viewDocData, &viewDoc)
 							if err != nil {
 								v <- viewresult{err: fmt.Errorf("error unmarshalling view doc for view '%s/%s/_view/%s': %v", dbName, row.Doc.Id, viewName, err)}
 								return
 							}
-							semaphore.Release()
 							v <- viewresult{viewName, viewDoc.UpdateSeq.String(), nil}
 						}()
 					}

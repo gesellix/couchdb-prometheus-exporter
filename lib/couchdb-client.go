@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"sync"
 	"sync/atomic"
 
 	"github.com/hashicorp/go-version"
@@ -343,53 +344,65 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 				return
 			}
 			views := make(ViewStatsByDesignDocName)
+			viewmutex := &sync.Mutex{}
+			done := make(chan struct{}, len(designDocs.Rows))
 			semaphore.Release() // return concurrency token here, so view scrapes may proceed
 			for _, row := range designDocs.Rows {
-				updateSeqByView := make(ViewStats)
-				type viewresult struct {
-					viewName  string
-					updateSeq string
-					err       error
-				}
-				v := make(chan viewresult, len(row.Doc.Views))
-				for viewName := range row.Doc.Views {
-					viewName := viewName
-					go func() {
-						//klog.Infof("/%s/%s/_view/%s\n", dbName, row.Doc.Id, viewName)
-						err := semaphore.Acquire()
-						if err != nil {
-							// send something to parent coroutine so it doesn't block forever on receive
-							v <- viewresult{err: fmt.Errorf("Aborted view stats for /%s/%s/_view/%s", dbName, row.Doc.Id, viewName)}
-							return
-						}
-						query := strings.Join([]string{
-							"stale=ok",
-							"update=false",
-							"stable=true",
-							"update_seq=true",
-							"include_docs=false",
-							"limit=0",
-						}, "&")
-						var viewDoc ViewResponse
-						viewDocData, err := c.Request("GET", fmt.Sprintf("%s/%s/%s/_view/%s?%s", c.BaseUri, dbName, row.Doc.Id, viewName, query), nil)
-						err = json.Unmarshal(viewDocData, &viewDoc)
-						if err != nil {
-							v <- viewresult{err: fmt.Errorf("error unmarshalling view doc for view '%s/%s/_view/%s': %v", dbName, row.Doc.Id, viewName, err)}
-							return
-						}
-						semaphore.Release()
-						v <- viewresult{viewName, viewDoc.UpdateSeq.String(), nil}
-					}()
-				}
-				for range row.Doc.Views {
-					res := <-v
-					if res.err != nil {
-						r <- result{err: res.err}
-						return
+				row := row
+				go func() {
+					defer func() { done <- struct{}{} }()
+					updateSeqByView := make(ViewStats)
+					type viewresult struct {
+						viewName  string
+						updateSeq string
+						err       error
 					}
-					updateSeqByView[res.viewName] = res.updateSeq
-				}
-				views[row.Doc.Id] = updateSeqByView
+					v := make(chan viewresult, len(row.Doc.Views))
+					for viewName := range row.Doc.Views {
+						viewName := viewName
+						go func() {
+							//klog.Infof("/%s/%s/_view/%s\n", dbName, row.Doc.Id, viewName)
+							err := semaphore.Acquire()
+							if err != nil {
+								// send something to parent coroutine so it doesn't block forever on receive
+								v <- viewresult{err: fmt.Errorf("Aborted view stats for /%s/%s/_view/%s", dbName, row.Doc.Id, viewName)}
+								return
+							}
+							query := strings.Join([]string{
+								"stale=ok",
+								"update=false",
+								"stable=true",
+								"update_seq=true",
+								"include_docs=false",
+								"limit=0",
+							}, "&")
+							var viewDoc ViewResponse
+							viewDocData, err := c.Request("GET", fmt.Sprintf("%s/%s/%s/_view/%s?%s", c.BaseUri, dbName, row.Doc.Id, viewName, query), nil)
+							err = json.Unmarshal(viewDocData, &viewDoc)
+							if err != nil {
+								v <- viewresult{err: fmt.Errorf("error unmarshalling view doc for view '%s/%s/_view/%s': %v", dbName, row.Doc.Id, viewName, err)}
+								return
+							}
+							semaphore.Release()
+							v <- viewresult{viewName, viewDoc.UpdateSeq.String(), nil}
+						}()
+					}
+					for range row.Doc.Views {
+						res := <-v
+						if res.err != nil {
+							r <- result{err: res.err}
+							return
+						}
+						updateSeqByView[res.viewName] = res.updateSeq
+					}
+					viewmutex.Lock()
+					views[row.Doc.Id] = updateSeqByView
+					viewmutex.Unlock()
+
+				}()
+			}
+			for range designDocs.Rows {
+				<-done
 			}
 			dbStats.Views = views
 			r <- result{dbName, dbStats, nil}

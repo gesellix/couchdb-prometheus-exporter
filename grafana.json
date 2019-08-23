@@ -16,98 +16,16 @@
   "gnetId": 10049,
   "graphTooltip": 0,
   "id": 21,
-  "iteration": 1566554043782,
+  "iteration": 1566563508724,
   "links": [],
   "panels": [
-    {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": false,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
-      "datasource": "prometheus",
-      "description": "Number of CouchDB Nodes Available",
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 6,
-        "x": 17,
-        "y": 0
-      },
-      "id": 10,
-      "interval": null,
-      "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "options": {},
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": false
-      },
-      "tableColumn": "",
-      "targets": [
-        {
-          "expr": "couchdb_httpd_node_up{instance=\"$InstanceName\"}",
-          "format": "time_series",
-          "intervalFactor": 1,
-          "refId": "A"
-        }
-      ],
-      "thresholds": "",
-      "title": "Number of CouchDB Nodes Available",
-      "type": "singlestat",
-      "valueFontSize": "80%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        }
-      ],
-      "valueName": "avg"
-    },
     {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 3
+        "y": 0
       },
       "id": 20,
       "panels": [],
@@ -143,7 +61,7 @@
         "h": 3,
         "w": 5,
         "x": 0,
-        "y": 4
+        "y": 1
       },
       "id": 63,
       "interval": null,
@@ -239,7 +157,7 @@
         "h": 3,
         "w": 6,
         "x": 5,
-        "y": 4
+        "y": 1
       },
       "id": 16,
       "interval": null,
@@ -326,7 +244,7 @@
         "h": 3,
         "w": 6,
         "x": 11,
-        "y": 4
+        "y": 1
       },
       "id": 30,
       "interval": null,
@@ -395,6 +313,95 @@
       "valueName": "current"
     },
     {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "prometheus",
+      "description": "Number of CouchDB Nodes Available",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 17,
+        "y": 1
+      },
+      "id": 10,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "options": {},
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "scopedVars": {
+        "InstanceName": {
+          "selected": false,
+          "text": "flxcdb-d01-stb",
+          "value": "flxcdb-d01-stb"
+        }
+      },
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "expr": "couchdb_httpd_node_up{instance=\"$InstanceName\"}",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "refId": "A"
+        }
+      ],
+      "thresholds": "",
+      "title": "Number of CouchDB Nodes Available",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "current"
+    },
+    {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -405,7 +412,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 7
+        "y": 4
       },
       "id": 76,
       "legend": {
@@ -498,7 +505,7 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 17
+        "y": 14
       },
       "id": 40,
       "legend": {
@@ -618,7 +625,7 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 29
+        "y": 26
       },
       "id": 51,
       "legend": {
@@ -712,7 +719,7 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 41
+        "y": 38
       },
       "id": 4,
       "legend": {
@@ -752,6 +759,7 @@
           "expr": "deriv(couchdb_httpd_requests{instance=\"$InstanceName\"}[5m])",
           "format": "time_series",
           "intervalFactor": 1,
+          "legendFormat": "Requests",
           "refId": "A"
         }
       ],
@@ -808,7 +816,7 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 48
+        "y": 45
       },
       "id": 8,
       "legend": {
@@ -848,6 +856,7 @@
           "expr": "deriv(couchdb_httpd_request_methods{instance=\"$InstanceName\"}[5m])",
           "format": "time_series",
           "intervalFactor": 1,
+          "legendFormat": "{{method}}",
           "refId": "A"
         }
       ],
@@ -906,7 +915,7 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 55
+        "y": 52
       },
       "id": 14,
       "legend": {
@@ -948,6 +957,7 @@
           "expr": "couchdb_httpd_clients_requesting_changes{instance=\"$InstanceName\"}",
           "format": "time_series",
           "intervalFactor": 1,
+          "legendFormat": "Clients changes",
           "refId": "A"
         }
       ],
@@ -1005,7 +1015,7 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 62
+        "y": 59
       },
       "id": 12,
       "legend": {
@@ -1045,6 +1055,7 @@
           "expr": "couchdb_httpd_open_os_files{instance=\"$InstanceName\"}",
           "format": "time_series",
           "intervalFactor": 1,
+          "legendFormat": "Open Files",
           "refId": "A"
         }
       ],
@@ -1095,12 +1106,12 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 69
+        "y": 66
       },
       "id": 77,
       "panels": [],
       "repeat": null,
-      "repeatIteration": 1566554043782,
+      "repeatIteration": 1566563508724,
       "repeatPanelId": 20,
       "scopedVars": {
         "InstanceName": {
@@ -1133,7 +1144,7 @@
         "h": 3,
         "w": 5,
         "x": 0,
-        "y": 70
+        "y": 67
       },
       "id": 78,
       "interval": null,
@@ -1165,7 +1176,7 @@
           "to": "null"
         }
       ],
-      "repeatIteration": 1566554043782,
+      "repeatIteration": 1566563508724,
       "repeatPanelId": 63,
       "repeatedByRow": true,
       "scopedVars": {
@@ -1232,7 +1243,7 @@
         "h": 3,
         "w": 6,
         "x": 5,
-        "y": 70
+        "y": 67
       },
       "id": 79,
       "interval": null,
@@ -1263,7 +1274,7 @@
           "to": "null"
         }
       ],
-      "repeatIteration": 1566554043782,
+      "repeatIteration": 1566563508724,
       "repeatPanelId": 16,
       "repeatedByRow": true,
       "scopedVars": {
@@ -1322,7 +1333,7 @@
         "h": 3,
         "w": 6,
         "x": 11,
-        "y": 70
+        "y": 67
       },
       "id": 80,
       "interval": null,
@@ -1353,7 +1364,7 @@
           "to": "null"
         }
       ],
-      "repeatIteration": 1566554043782,
+      "repeatIteration": 1566563508724,
       "repeatPanelId": 30,
       "repeatedByRow": true,
       "scopedVars": {
@@ -1394,6 +1405,98 @@
       "valueName": "current"
     },
     {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "prometheus",
+      "description": "Number of CouchDB Nodes Available",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 17,
+        "y": 67
+      },
+      "id": 81,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "options": {},
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "repeatIteration": 1566563508724,
+      "repeatPanelId": 10,
+      "repeatedByRow": true,
+      "scopedVars": {
+        "InstanceName": {
+          "selected": false,
+          "text": "flxcdb-d01-tst",
+          "value": "flxcdb-d01-tst"
+        }
+      },
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "expr": "couchdb_httpd_node_up{instance=\"$InstanceName\"}",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "refId": "A"
+        }
+      ],
+      "thresholds": "",
+      "title": "Number of CouchDB Nodes Available",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "current"
+    },
+    {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -1404,9 +1507,9 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 73
+        "y": 70
       },
-      "id": 81,
+      "id": 82,
       "legend": {
         "alignAsTable": true,
         "avg": true,
@@ -1427,7 +1530,7 @@
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
-      "repeatIteration": 1566554043782,
+      "repeatIteration": 1566563508724,
       "repeatPanelId": 76,
       "repeatedByRow": true,
       "scopedVars": {
@@ -1500,9 +1603,9 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 83
+        "y": 80
       },
-      "id": 82,
+      "id": 83,
       "legend": {
         "alignAsTable": true,
         "avg": true,
@@ -1525,7 +1628,7 @@
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
-      "repeatIteration": 1566554043782,
+      "repeatIteration": 1566563508724,
       "repeatPanelId": 40,
       "repeatedByRow": true,
       "scopedVars": {
@@ -1623,9 +1726,9 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 95
+        "y": 92
       },
-      "id": 83,
+      "id": 84,
       "legend": {
         "alignAsTable": true,
         "avg": true,
@@ -1646,7 +1749,7 @@
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
-      "repeatIteration": 1566554043782,
+      "repeatIteration": 1566563508724,
       "repeatPanelId": 51,
       "repeatedByRow": true,
       "scopedVars": {
@@ -1720,9 +1823,9 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 107
+        "y": 104
       },
-      "id": 84,
+      "id": 85,
       "legend": {
         "alignAsTable": true,
         "avg": true,
@@ -1744,7 +1847,7 @@
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
-      "repeatIteration": 1566554043782,
+      "repeatIteration": 1566563508724,
       "repeatPanelId": 4,
       "repeatedByRow": true,
       "scopedVars": {
@@ -1763,6 +1866,7 @@
           "expr": "deriv(couchdb_httpd_requests{instance=\"$InstanceName\"}[5m])",
           "format": "time_series",
           "intervalFactor": 1,
+          "legendFormat": "Requests",
           "refId": "A"
         }
       ],
@@ -1819,9 +1923,9 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 114
+        "y": 111
       },
-      "id": 85,
+      "id": 86,
       "legend": {
         "alignAsTable": true,
         "avg": true,
@@ -1843,7 +1947,7 @@
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
-      "repeatIteration": 1566554043782,
+      "repeatIteration": 1566563508724,
       "repeatPanelId": 8,
       "repeatedByRow": true,
       "scopedVars": {
@@ -1862,6 +1966,7 @@
           "expr": "deriv(couchdb_httpd_request_methods{instance=\"$InstanceName\"}[5m])",
           "format": "time_series",
           "intervalFactor": 1,
+          "legendFormat": "{{method}}",
           "refId": "A"
         }
       ],
@@ -1920,9 +2025,9 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 121
+        "y": 118
       },
-      "id": 86,
+      "id": 87,
       "legend": {
         "alignAsTable": true,
         "avg": true,
@@ -1946,7 +2051,7 @@
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
-      "repeatIteration": 1566554043782,
+      "repeatIteration": 1566563508724,
       "repeatPanelId": 14,
       "repeatedByRow": true,
       "scopedVars": {
@@ -1965,6 +2070,7 @@
           "expr": "couchdb_httpd_clients_requesting_changes{instance=\"$InstanceName\"}",
           "format": "time_series",
           "intervalFactor": 1,
+          "legendFormat": "Clients changes",
           "refId": "A"
         }
       ],
@@ -2022,9 +2128,9 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 128
+        "y": 125
       },
-      "id": 87,
+      "id": 88,
       "legend": {
         "alignAsTable": true,
         "avg": true,
@@ -2046,7 +2152,7 @@
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
-      "repeatIteration": 1566554043782,
+      "repeatIteration": 1566563508724,
       "repeatPanelId": 12,
       "repeatedByRow": true,
       "scopedVars": {
@@ -2065,6 +2171,1123 @@
           "expr": "couchdb_httpd_open_os_files{instance=\"$InstanceName\"}",
           "format": "time_series",
           "intervalFactor": 1,
+          "legendFormat": "Open Files",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "CouchDB Open OS Files",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 132
+      },
+      "id": 89,
+      "panels": [],
+      "repeat": null,
+      "repeatIteration": 1566563508724,
+      "repeatPanelId": 20,
+      "scopedVars": {
+        "InstanceName": {
+          "selected": false,
+          "text": "vpnssl-d01-cdb",
+          "value": "vpnssl-d01-cdb"
+        }
+      },
+      "title": "$InstanceName",
+      "type": "row"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 5,
+        "x": 0,
+        "y": 133
+      },
+      "id": 90,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "options": {},
+      "pluginVersion": "6.3.3",
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "repeatIteration": 1566563508724,
+      "repeatPanelId": 63,
+      "repeatedByRow": true,
+      "scopedVars": {
+        "InstanceName": {
+          "selected": false,
+          "text": "vpnssl-d01-cdb",
+          "value": "vpnssl-d01-cdb"
+        }
+      },
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false,
+        "ymax": null,
+        "ymin": null
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "expr": "couchdb_server_node_info{instance=\"$InstanceName\"}",
+          "format": "time_series",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{version}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": "",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Version",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "name"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "prometheus",
+      "description": "Total number of databases in the cluster",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 5,
+        "y": 133
+      },
+      "id": 91,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "options": {},
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "repeatIteration": 1566563508724,
+      "repeatPanelId": 16,
+      "repeatedByRow": true,
+      "scopedVars": {
+        "InstanceName": {
+          "selected": false,
+          "text": "vpnssl-d01-cdb",
+          "value": "vpnssl-d01-cdb"
+        }
+      },
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "expr": "couchdb_httpd_databases_total{instance=\"$InstanceName\"}",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "refId": "A"
+        }
+      ],
+      "thresholds": "",
+      "title": "Total number of databases in the cluster",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "current"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "format": "decbits",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 11,
+        "y": 133
+      },
+      "id": 92,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "options": {},
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "repeatIteration": 1566563508724,
+      "repeatPanelId": 30,
+      "repeatedByRow": true,
+      "scopedVars": {
+        "InstanceName": {
+          "selected": false,
+          "text": "vpnssl-d01-cdb",
+          "value": "vpnssl-d01-cdb"
+        }
+      },
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false,
+        "ymax": null,
+        "ymin": null
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "expr": "sum(couchdb_database_disk_size{instance=\"$InstanceName\"})",
+          "refId": "A"
+        }
+      ],
+      "thresholds": "",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Total Disk Size",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "current"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "prometheus",
+      "description": "Number of CouchDB Nodes Available",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 17,
+        "y": 133
+      },
+      "id": 93,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "options": {},
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "repeatIteration": 1566563508724,
+      "repeatPanelId": 10,
+      "repeatedByRow": true,
+      "scopedVars": {
+        "InstanceName": {
+          "selected": false,
+          "text": "vpnssl-d01-cdb",
+          "value": "vpnssl-d01-cdb"
+        }
+      },
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "expr": "couchdb_httpd_node_up{instance=\"$InstanceName\"}",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "refId": "A"
+        }
+      ],
+      "thresholds": "",
+      "title": "Number of CouchDB Nodes Available",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "current"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 136
+      },
+      "id": 94,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "max": true,
+        "min": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "repeatIteration": 1566563508724,
+      "repeatPanelId": 76,
+      "repeatedByRow": true,
+      "scopedVars": {
+        "InstanceName": {
+          "selected": false,
+          "text": "vpnssl-d01-cdb",
+          "value": "vpnssl-d01-cdb"
+        }
+      },
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "node_cpu_seconds_total{instance=~\"$InstanceName.+\"}",
+          "legendFormat": "{{mode}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "CPU Seconds",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 146
+      },
+      "id": 95,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "show": true,
+        "total": true,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null as zero",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "repeatIteration": 1566563508724,
+      "repeatPanelId": 40,
+      "repeatedByRow": true,
+      "scopedVars": {
+        "InstanceName": {
+          "selected": false,
+          "text": "vpnssl-d01-cdb",
+          "value": "vpnssl-d01-cdb"
+        }
+      },
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "couchdb_erlang_memory_binary{instance=\"$InstanceName\"}",
+          "legendFormat": "Binary",
+          "refId": "A"
+        },
+        {
+          "expr": "couchdb_erlang_memory_atomd{instance=\"$InstanceName\"}",
+          "legendFormat": "Atomd",
+          "refId": "B"
+        },
+        {
+          "expr": "couchdb_erlang_memory_processes{instance=\"$InstanceName\"}",
+          "legendFormat": "Processes",
+          "refId": "C"
+        },
+        {
+          "expr": "couchdb_erlang_memory_code{instance=\"$InstanceName\"}",
+          "legendFormat": "Code",
+          "refId": "D"
+        },
+        {
+          "expr": "couchdb_erlang_memory_ets{instance=\"$InstanceName\"}",
+          "legendFormat": "ETS",
+          "refId": "E"
+        },
+        {
+          "expr": "couchdb_erlang_memory_other{instance=\"$InstanceName\"}",
+          "legendFormat": "Other",
+          "refId": "F"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Memory",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "decbits",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 158
+      },
+      "id": 96,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": false,
+        "max": false,
+        "min": true,
+        "show": true,
+        "total": true,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "repeatIteration": 1566563508724,
+      "repeatPanelId": 51,
+      "repeatedByRow": true,
+      "scopedVars": {
+        "InstanceName": {
+          "selected": false,
+          "text": "vpnssl-d01-cdb",
+          "value": "vpnssl-d01-cdb"
+        }
+      },
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "topk(5, couchdb_database_doc_count{instance=\"$InstanceName\"})",
+          "legendFormat": "{{db_name}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Document Count",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "prometheus",
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 170
+      },
+      "id": 97,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "max": true,
+        "min": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "repeatIteration": 1566563508724,
+      "repeatPanelId": 4,
+      "repeatedByRow": true,
+      "scopedVars": {
+        "InstanceName": {
+          "selected": false,
+          "text": "vpnssl-d01-cdb",
+          "value": "vpnssl-d01-cdb"
+        }
+      },
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "deriv(couchdb_httpd_requests{instance=\"$InstanceName\"}[5m])",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Requests",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "CouchDB HTTPD Requests",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "locale",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "prometheus",
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 177
+      },
+      "id": 98,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "max": true,
+        "min": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "repeatIteration": 1566563508724,
+      "repeatPanelId": 8,
+      "repeatedByRow": true,
+      "scopedVars": {
+        "InstanceName": {
+          "selected": false,
+          "text": "vpnssl-d01-cdb",
+          "value": "vpnssl-d01-cdb"
+        }
+      },
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "deriv(couchdb_httpd_request_methods{instance=\"$InstanceName\"}[5m])",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "{{method}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "CouchDB HTTP Request per Method",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "prometheus",
+      "decimals": null,
+      "description": "number of clients for continuous _changes",
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 184
+      },
+      "id": 99,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": true,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "repeatIteration": 1566563508724,
+      "repeatPanelId": 14,
+      "repeatedByRow": true,
+      "scopedVars": {
+        "InstanceName": {
+          "selected": false,
+          "text": "vpnssl-d01-cdb",
+          "value": "vpnssl-d01-cdb"
+        }
+      },
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "couchdb_httpd_clients_requesting_changes{instance=\"$InstanceName\"}",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Clients changes",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "CouchDB number of clients for continuous changes",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "locale",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "prometheus",
+      "description": "number of file descriptors CouchDB has open",
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 191
+      },
+      "id": 100,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "max": true,
+        "min": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "repeatIteration": 1566563508724,
+      "repeatPanelId": 12,
+      "repeatedByRow": true,
+      "scopedVars": {
+        "InstanceName": {
+          "selected": false,
+          "text": "vpnssl-d01-cdb",
+          "value": "vpnssl-d01-cdb"
+        }
+      },
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "couchdb_httpd_open_os_files{instance=\"$InstanceName\"}",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Open Files",
           "refId": "A"
         }
       ],
@@ -2231,5 +3454,5 @@
   "timezone": "",
   "title": "CouchDB Dashboard",
   "uid": "S8rTdLRZz",
-  "version": 50
+  "version": 54
 }

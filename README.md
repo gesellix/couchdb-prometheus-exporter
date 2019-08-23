@@ -38,6 +38,24 @@ Or, if you want to get stats for every database, please use `_all_dbs` as databa
 
 For a step-by-step guide, see [Monitoring CouchDB with Prometheus, Grafana and Docker](https://medium.com/@redgeoff/monitoring-couchdb-with-prometheus-grafana-and-docker-4693bc8408f0)
 
+### Prometheus Configuration
+```
+- job_name: couchdb
+  static_configs:
+  - labels:
+      instance: cdb-d01-tst.local
+    targets:
+    - tlsdck-p01-www.local:9985
+  - labels:
+      instance: cdb-d01-stb.local
+    targets:
+    - tlsdck-p01-www.local:9984
+
+```
+
+### Grafana
+Import grafana.json
+
 ## Examples
 
 The `examples` directory in this repository contains ready-to-run examples for

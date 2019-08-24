@@ -180,25 +180,25 @@ func init() {
 func main() {
 	var appAction = func(c *cli.Context) error {
 		var databases []string
-		if *&exporterConfig.databases != "" {
-			databases = strings.Split(*&exporterConfig.databases, ",")
+		if exporterConfig.databases != "" {
+			databases = strings.Split(exporterConfig.databases, ",")
 		}
 
 		exporter := lib.NewExporter(
-			*&exporterConfig.couchdbURI,
+			exporterConfig.couchdbURI,
 			lib.BasicAuth{
-				Username: *&exporterConfig.couchdbUsername,
-				Password: *&exporterConfig.couchdbPassword},
+				Username: exporterConfig.couchdbUsername,
+				Password: exporterConfig.couchdbPassword},
 			lib.CollectorConfig{
 				Databases:            databases,
-				CollectViews:         *&exporterConfig.databaseViews,
-				CollectSchedulerJobs: *&exporterConfig.schedulerJobs,
-				ConcurrentRequests:   *&exporterConfig.databaseConcurrentRequests,
+				CollectViews:         exporterConfig.databaseViews,
+				CollectSchedulerJobs: exporterConfig.schedulerJobs,
+				ConcurrentRequests:   exporterConfig.databaseConcurrentRequests,
 			},
-			*&exporterConfig.couchdbInsecure)
+			exporterConfig.couchdbInsecure)
 		prometheus.MustRegister(exporter)
 
-		http.Handle(*&exporterConfig.metricsEndpoint, promhttp.Handler())
+		http.Handle(exporterConfig.metricsEndpoint, promhttp.Handler())
 		http.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
 			_, err := fmt.Fprint(w, "OK")
 			if err != nil {
@@ -206,11 +206,11 @@ func main() {
 			}
 		})
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			http.Error(w, fmt.Sprintf("Please GET %s", *&exporterConfig.metricsEndpoint), http.StatusNotFound)
+			http.Error(w, fmt.Sprintf("Please GET %s", exporterConfig.metricsEndpoint), http.StatusNotFound)
 		})
 
-		klog.Infof("Starting exporter at '%s' to read from CouchDB at '%s'", *&exporterConfig.listenAddress, *&exporterConfig.couchdbURI)
-		err := http.ListenAndServe(*&exporterConfig.listenAddress, nil)
+		klog.Infof("Starting exporter at '%s' to read from CouchDB at '%s'", exporterConfig.listenAddress, exporterConfig.couchdbURI)
+		err := http.ListenAndServe(exporterConfig.listenAddress, nil)
 		if err != nil {
 			klog.Fatal(err)
 		}

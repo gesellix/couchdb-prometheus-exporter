@@ -55,7 +55,7 @@ func TestSerialSemaphore(t *testing.T) {
 	}
 	sem.Release()
 	time.Sleep(20 * time.Millisecond)
-	if len(results) > 20 { // should never complete this many in the alotted time
+	if len(results) > 20 { // should never complete this many in the allotted time
 		t.Error("Workers completed job too fast", len(results))
 	}
 }

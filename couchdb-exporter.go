@@ -127,7 +127,7 @@ func init() {
 		}),
 		altsrc.NewUintFlag(cli.UintFlag{
 			Name:        "database.concurrent.requests",
-			Usage:       "maximum concurrent calls to couchDB, or 0 for unlimited",
+			Usage:       "maximum concurrent calls to CouchDB, or 0 for unlimited",
 			Value:       0,
 			Hidden:      false,
 			Destination: &exporterConfig.databaseConcurrentRequests,

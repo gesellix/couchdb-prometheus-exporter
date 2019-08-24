@@ -351,7 +351,9 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 			for _, row := range designDocs.Rows {
 				row := row
 				go func() {
-					defer func() { done <- struct{}{} }()
+					defer func() {
+						done <- struct{}{}
+					}()
 					updateSeqByView := make(ViewStats)
 					type viewresult struct {
 						viewName  string
@@ -366,7 +368,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 							err := semaphore.Acquire()
 							if err != nil {
 								// send something to parent coroutine so it doesn't block forever on receive
-								v <- viewresult{err: fmt.Errorf("Aborted view stats for /%s/%s/_view/%s", dbName, row.Doc.Id, viewName)}
+								v <- viewresult{err: fmt.Errorf("aborted view stats for /%s/%s/_view/%s", dbName, row.Doc.Id, viewName)}
 								return
 							}
 							query := strings.Join([]string{
@@ -579,7 +581,7 @@ func NewSemaphore(concurrency uint) Semaphore {
 func (s Semaphore) Acquire() error {
 	select {
 	case <-s.abort:
-		return fmt.Errorf("Could not acquire semaphore")
+		return fmt.Errorf("could not acquire semaphore")
 	case <-s.sem:
 		return nil
 	}
@@ -594,7 +596,7 @@ func (s Semaphore) Release() {
 	}
 }
 
-// Signal abort for anyone waiting on the Semaphor
+// Signal abort for anyone waiting on the Semaphore
 func (s Semaphore) Abort() {
 	select {
 	case <-s.abort:

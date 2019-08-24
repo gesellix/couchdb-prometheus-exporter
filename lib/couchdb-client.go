@@ -254,15 +254,16 @@ func (c *CouchdbClient) getStats(config CollectorConfig) (Stats, error) {
 	}
 }
 
+type dbStatsResult struct {
+	dbName  string
+	dbStats DatabaseStats
+	err     error
+}
+
 func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string, concurrency uint) (map[string]DatabaseStats, error) {
 	dbStatsByDbName := make(map[string]DatabaseStats)
-	type result struct {
-		dbName  string
-		dbStats DatabaseStats
-		err     error
-	}
 	// Setup for concurrent scatter/gather scrapes, with concurrency limit
-	r := make(chan result, len(databases))
+	r := make(chan dbStatsResult, len(databases))
 	semaphore := NewSemaphore(concurrency) // semaphore to limit concurrency
 
 	// scatter
@@ -277,13 +278,13 @@ func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string, concurrenc
 			data, err := c.Request("GET", fmt.Sprintf("%s/%s", c.BaseUri, dbName), nil)
 			semaphore.Release()
 			if err != nil {
-				r <- result{err: fmt.Errorf("error reading database '%s' stats: %v", dbName, err)}
+				r <- dbStatsResult{err: fmt.Errorf("error reading database '%s' stats: %v", dbName, err)}
 				return
 			}
 
 			err = json.Unmarshal(data, &dbStats)
 			if err != nil {
-				r <- result{err: fmt.Errorf("error unmarshalling database '%s' stats: %v", dbName, err)}
+				r <- dbStatsResult{err: fmt.Errorf("error unmarshalling database '%s' stats: %v", dbName, err)}
 				return
 			}
 			dbStats.DiskSizeOverhead = dbStats.DiskSize - dbStats.DataSize
@@ -292,7 +293,7 @@ func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string, concurrenc
 			} else {
 				dbStats.CompactRunning = 0
 			}
-			r <- result{dbName, dbStats, nil}
+			r <- dbStatsResult{dbName, dbStats, nil}
 		}()
 	}
 	// gather
@@ -308,13 +309,8 @@ func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string, concurrenc
 }
 
 func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]DatabaseStats, concurrency uint) error {
-	type result struct {
-		dbName  string
-		dbStats DatabaseStats
-		err     error
-	}
 	// Setup for concurrent scatter/gather scrapes, with concurrency limit
-	r := make(chan result, len(dbStatsByDbName))
+	r := make(chan dbStatsResult, len(dbStatsByDbName))
 	semaphore := NewSemaphore(concurrency) // semaphore to limit concurrency
 
 	// scatter
@@ -334,14 +330,14 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 			designDocData, err := c.Request("GET", fmt.Sprintf("%s/%s/_all_docs?%s", c.BaseUri, dbName, query), nil)
 			semaphore.Release()
 			if err != nil {
-				r <- result{err: fmt.Errorf("error reading database '%s' stats: %v", dbName, err)}
+				r <- dbStatsResult{err: fmt.Errorf("error reading database '%s' stats: %v", dbName, err)}
 				return
 			}
 
 			var designDocs DocsResponse
 			err = json.Unmarshal(designDocData, &designDocs)
 			if err != nil {
-				r <- result{err: fmt.Errorf("error unmarshalling design docs for database '%s': %v", dbName, err)}
+				r <- dbStatsResult{err: fmt.Errorf("error unmarshalling design docs for database '%s': %v", dbName, err)}
 				return
 			}
 			views := make(ViewStatsByDesignDocName)
@@ -393,7 +389,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 					for range row.Doc.Views {
 						res := <-v
 						if res.err != nil {
-							r <- result{err: res.err}
+							r <- dbStatsResult{err: res.err}
 							return
 						}
 						updateSeqByView[res.viewName] = res.updateSeq
@@ -408,7 +404,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 				<-done
 			}
 			dbStats.Views = views
-			r <- result{dbName, dbStats, nil}
+			r <- dbStatsResult{dbName, dbStats, nil}
 		}()
 	}
 	// gather

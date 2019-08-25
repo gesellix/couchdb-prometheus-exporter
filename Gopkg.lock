@@ -127,7 +127,10 @@
 [[projects]]
   digest = "1:3cc2a7c40ee2188ca47722a56bbc28f96366837c11919f56aa0a159712a048e0"
   name = "github.com/urfave/cli"
-  packages = ["."]
+  packages = [
+    ".",
+    "altsrc",
+  ]
   pruneopts = ""
   revision = "e6cf83ec39f6e1158ced1927d4ed14578fda8edb"
   version = "v1.21.0"
@@ -179,8 +182,8 @@
     "github.com/prometheus/client_golang/prometheus/promhttp",
     "github.com/prometheus/client_model/go",
     "github.com/stretchr/testify/assert",
-    "gopkg.in/urfave/cli.v1",
-    "gopkg.in/urfave/cli.v1/altsrc",
+    "github.com/urfave/cli",
+    "github.com/urfave/cli/altsrc",
     "k8s.io/klog",
   ]
   solver-name = "gps-cdcl"

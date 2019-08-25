@@ -14,8 +14,8 @@ import (
 	"runtime"
 	"strings"
 
-	"gopkg.in/urfave/cli.v1"
-	"gopkg.in/urfave/cli.v1/altsrc"
+	"github.com/urfave/cli"
+	"github.com/urfave/cli/altsrc"
 )
 
 func readPropertiesFile(filename string) (map[interface{}]interface{}, error) {

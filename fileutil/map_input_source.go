@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"gopkg.in/urfave/cli.v1"
+	"github.com/urfave/cli"
 )
 
 // MapInputSource implements InputSourceContext to return

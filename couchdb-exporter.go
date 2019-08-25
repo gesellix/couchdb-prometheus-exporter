@@ -10,8 +10,8 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"gopkg.in/urfave/cli.v1"
-	"gopkg.in/urfave/cli.v1/altsrc"
+	"github.com/urfave/cli"
+	"github.com/urfave/cli/altsrc"
 	"k8s.io/klog"
 
 	"github.com/gesellix/couchdb-prometheus-exporter/fileutil"

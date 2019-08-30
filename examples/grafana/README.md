@@ -1,3 +1,7 @@
+From: https://github.com/vegasbrianc/prometheus
+
+----
+
 [![Build Status](https://travis-ci.org/vegasbrianc/prometheus.svg?branch=version-2)](https://travis-ci.org/vegasbrianc/prometheus)
 
 # Contents
@@ -8,14 +12,14 @@
   - [Installation & Configuration](#installation--configuration)
     - [Add Datasources & Dashboards](#add-datasources-and-dashboards)
     - [Install Dashboards the Old Way](#install-dashboards-the-old-way)
-  	- [Alerting](#alerting)
-  	- [Test Alerts](#test-alerts)
+    - [Alerting](#alerting)
+    - [Test Alerts](#test-alerts)
     - [Add additional Datasources](#add-additional-datasources)
   - [Deploy Prometheus stack with Traefik](#deploy-prometheus-stack-with-traefik)
   - [Security Considerations](#security-considerations)
-  	- [Production Security](#production-security)
+    - [Production Security](#production-security)
   - [Troubleshooting](#troubleshooting)
-  	- [Mac Users](#mac-users)
+    - [Mac Users](#mac-users)
   - [Interesting Projects that use this Repo](#interesting-projects-that-use-this-repo)
 
 # A Prometheus & Grafana docker-compose stack
@@ -41,8 +45,8 @@ That's it the `docker stack deploy' command deploys the entire Grafana and Prome
 
 The Grafana Dashboard is now accessible via: `http://<Host IP Address>:3000` for example http://192.168.10.1:3000
 
-	username - admin
-	password - foobar (Password is stored in the `/grafana/config.monitoring` env file)
+    username - admin
+    password - foobar (Password is stored in the `/grafana/config.monitoring` env file)
 
 In order to check the status of the newly created stack:
 

@@ -1,8 +1,8 @@
 version: '3.7'
 
 volumes:
-    prometheus_data: {}
-    grafana_data: {}
+  prometheus_data: {}
+  grafana_data: {}
 
 networks:
   monitor-net:
@@ -11,6 +11,9 @@ networks:
   traefik:
     driver: overlay
     name: traefik
+  couchdb-cluster:
+    driver: overlay
+    name: couchdbs
 
 services:
   traefik:
@@ -27,6 +30,7 @@ services:
     networks:
       - traefik
       - monitor-net
+      - couchdb-cluster
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
@@ -51,6 +55,120 @@ services:
       restart_policy:
         condition: on-failure
 
+  couchdb0:
+    image: couchdb:1.7.2
+    environment:
+      - "COUCHDB_USER=${COUCHDB_USER:-root}"
+      - "COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
+    ports:
+      - "4895:5984"
+    deploy:
+      mode: global
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  couchdb1:
+    image: couchdb:2.3.1
+    command: -name couchdb@couchdb1 -setcookie thecookie
+    networks:
+      couchdb-cluster:
+      monitor-net:
+    ports:
+      - "15984:5984"
+    deploy:
+      mode: global
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  couchdb2:
+    image: couchdb:2.3.1
+    command: -name couchdb@couchdb2 -setcookie thecookie
+    networks:
+      couchdb-cluster:
+      monitor-net:
+    ports:
+      - "25984:5984"
+    deploy:
+      mode: global
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  couchdb3:
+    image: couchdb:2.3.1
+    command: -name couchdb@couchdb3 -setcookie thecookie
+    networks:
+      couchdb-cluster:
+      monitor-net:
+    ports:
+      - "35984:5984"
+    deploy:
+      mode: global
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  couchdbstats1:
+    image: "gesellix/couchdb-prometheus-exporter:${COUCHDB_EXPORTER_VERSION:-latest}"
+    command: --couchdb.uri=http://couchdb1:5984 --logtostderr --databases=_all_dbs
+    environment:
+      - "COUCHDB.USERNAME=${COUCHDB_USER:-root}"
+      - "COUCHDB.PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
+    networks:
+      couchdb-cluster:
+      monitor-net:
+    ports:
+      - "9984:9984"
+    deploy:
+      mode: global
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  couchdbstats2:
+    image: "gesellix/couchdb-prometheus-exporter:${COUCHDB_EXPORTER_VERSION:-latest}"
+    command: --couchdb.uri=http://couchdb2:5984 --logtostderr --databases=_all_dbs
+    environment:
+      - "COUCHDB.USERNAME=${COUCHDB_USER:-root}"
+      - "COUCHDB.PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
+    networks:
+      couchdb-cluster:
+      monitor-net:
+    ports:
+      - "9985:9984"
+    deploy:
+      mode: global
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  cluster-setup:
+    image: gesellix/couchdb-cluster-config:11
+    command: setup --delay 10s --timeout 30s --username ${COUCHDB_USER:-root} --password ${COUCHDB_PASSWORD:-a-secret} -nodes couchdb1 -nodes couchdb2 -nodes couchdb3
+    networks:
+      couchdb-cluster:
+    deploy:
+      mode: global
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
   prometheus:
     image: prom/prometheus
     volumes:
@@ -62,16 +180,16 @@ services:
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
     networks:
-      - monitor-net     
+      - monitor-net
     deploy:
       placement:
         constraints:
           - node.role==manager
       labels:
-          - "traefik.frontend.rule=Host:prometheus.localhost"
-          - "traefik.backend=prometheus"
-          - "traefik.port=9090"
-          - "traefik.docker.network=traefik"
+        - "traefik.frontend.rule=Host:prometheus.localhost"
+        - "traefik.backend=prometheus"
+        - "traefik.port=9090"
+        - "traefik.docker.network=traefik"
       restart_policy:
         condition: on-failure
 
@@ -81,8 +199,8 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
-    command: 
-      - '--path.procfs=/host/proc' 
+    command:
+      - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
       - --collector.filesystem.ignored-mount-points
       - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
@@ -109,9 +227,9 @@ services:
     deploy:
       placement:
         constraints:
-           - node.role==manager
+          - node.role==manager
       restart_policy:
-        condition: on-failure    
+        condition: on-failure
 
   cadvisor:
     image: google/cadvisor
@@ -137,7 +255,7 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/:/etc/grafana/provisioning/
     env_file:
-      - ./grafana/config.monitoring
+      - grafana/config.monitoring
     networks:
       - monitor-net
     user: "104"
@@ -146,7 +264,7 @@ services:
         constraints:
           - node.role==manager
       labels:
-        -  "traefik.frontend.rule=Host:grafana.localhost"
+        - "traefik.frontend.rule=Host:grafana.localhost"
         - "traefik.backend=grafana"
         - "traefik.port=3000"
         - "traefik.docker.network=traefik"

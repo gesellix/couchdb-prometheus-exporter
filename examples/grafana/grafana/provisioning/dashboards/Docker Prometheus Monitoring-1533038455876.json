@@ -1435,7 +1435,7 @@
   "style": "dark",
   "tags": [
     "docker",
-    "prometheus, ",
+    "prometheus",
     "node-exporter",
     "cadvisor"
   ],

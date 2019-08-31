@@ -38,6 +38,13 @@ Or, if you want to get stats for every database, please use `_all_dbs` as databa
 
 For a step-by-step guide, see [Monitoring CouchDB with Prometheus, Grafana and Docker](https://medium.com/@redgeoff/monitoring-couchdb-with-prometheus-grafana-and-docker-4693bc8408f0)
 
+A complete example stack including multiple CouchDB instances, exporters, Prometheus, Grafana, etc. is available at `examples/grafana/`, and can be deployed locally:
+
+````bash
+cd examples/grafana
+docker stack deploy --compose-file docker-traefik-stack.yml example
+````
+
 ## Examples
 
 The `examples` directory in this repository contains ready-to-run examples for

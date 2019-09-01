@@ -42,6 +42,7 @@ A complete example stack including multiple CouchDB instances, exporters, Promet
 
 ````bash
 cd examples/grafana
+docker swarm init
 docker stack deploy --compose-file docker-traefik-stack.yml example
 ````
 

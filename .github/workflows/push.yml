@@ -24,8 +24,8 @@ jobs:
       # see https://github.com/actions/setup-go/issues/14
       run: |
         echo "##[set-env name=GOPATH;]$(dirname $GITHUB_WORKSPACE)/go"
-        echo "##[add-path]$(dirname $GITHUB_WORKSPACE)/bin"
-        mkdir -p
+        echo "##[add-path]$(dirname $GITHUB_WORKSPACE)/go/bin"
+        mkdir -p "$(dirname $GITHUB_WORKSPACE)/go/bin"
       shell: bash
 
     - name: Get dependencies

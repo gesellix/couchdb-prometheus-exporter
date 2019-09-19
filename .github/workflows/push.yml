@@ -15,14 +15,18 @@ jobs:
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+        path: go/src/github.com/gesellix/couchdb-prometheus-exporter
 
-    - name: Set GOPATH
-      # temporary fix
-      # see https://github.com/actions/setup-go/issues/14
-      run: |
-        echo "##[set-env name=GOPATH;]$(dirname $GITHUB_WORKSPACE)"
-        echo "##[add-path]$(dirname $GITHUB_WORKSPACE)/bin"
-      shell: bash
+#    - name: Set GOPATH
+#      # temporary fix
+#      # see https://github.com/actions/setup-go/issues/14
+#      run: |
+#        echo "##[set-env name=GOPATH;]$(dirname $GITHUB_WORKSPACE)"
+#        echo "##[add-path]$(dirname $GITHUB_WORKSPACE)/bin"
+#        mkdir -p
+#      shell: bash
 
     - name: Get dependencies
       run: |
@@ -31,6 +35,10 @@ jobs:
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
         fi
+      env:
+        GOPATH: /home/runner/work/couchdb-prometheus-exporter/go
 
     - name: Build
       run: go build -v .
+      env:
+        GOPATH: /home/runner/work/couchdb-prometheus-exporter/go

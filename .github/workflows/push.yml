@@ -18,6 +18,8 @@ jobs:
       with:
         fetch-depth: 1
         path: go/src/github.com/gesellix/couchdb-prometheus-exporter
+      env:
+        GOPATH: /home/runner/work/couchdb-prometheus-exporter/go
 
 #    - name: Set GOPATH
 #      # temporary fix

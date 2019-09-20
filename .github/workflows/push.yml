@@ -32,7 +32,11 @@ jobs:
         GOPATH: /home/runner/work/couchdb-prometheus-exporter/go
 
     - name: Check
-      run: go test -v ./...
+      run: |
+        cd go/src/github.com/gesellix/couchdb-prometheus-exporter
+        ./integrationtest-setup.sh
+        go test -v ./...
+        ./integrationtest-teardown.sh
       env:
         GOPATH: /home/runner/work/couchdb-prometheus-exporter/go
 

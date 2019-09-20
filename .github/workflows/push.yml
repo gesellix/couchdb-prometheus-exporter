@@ -31,7 +31,12 @@ jobs:
       env:
         GOPATH: /home/runner/work/couchdb-prometheus-exporter/go
 
+    - name: Check
+      run: go test -v ./...
+      env:
+        GOPATH: /home/runner/work/couchdb-prometheus-exporter/go
+
     - name: Build
-      run: go build -v .
+      run: go build -v ./...
       env:
         GOPATH: /home/runner/work/couchdb-prometheus-exporter/go

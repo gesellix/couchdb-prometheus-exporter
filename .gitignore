@@ -25,6 +25,7 @@ _testmain.go
 *.prof
 couchdb-exporter
 couchdb-prometheus-exporter
+dist/
 
 .idea
 *.iml

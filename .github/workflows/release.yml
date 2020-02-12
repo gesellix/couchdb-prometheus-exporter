@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Unshallow
-        run: git fetch --prune --unshallow --tags
+        run: git fetch --prune --unshallow
       - name: Release binaries
         uses: goreleaser/goreleaser-action@v1
         with:

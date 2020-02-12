@@ -36,6 +36,7 @@ jobs:
         with:
           version: latest
           args: release --rm-dist
+        working-directory: /home/runner/work/couchdb-prometheus-exporter/go/src/github.com/gesellix/couchdb-prometheus-exporter
         env:
           GOPATH: /home/runner/work/couchdb-prometheus-exporter/go
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

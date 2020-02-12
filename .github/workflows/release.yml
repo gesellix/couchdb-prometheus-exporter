@@ -30,6 +30,7 @@ jobs:
           GOPATH: /home/runner/work/couchdb-prometheus-exporter/go
       - name: Unshallow
         run: git fetch --prune --unshallow
+        working-directory: /home/runner/work/couchdb-prometheus-exporter/go/src/github.com/gesellix/couchdb-prometheus-exporter
       - name: Release binaries
         uses: goreleaser/goreleaser-action@v1
         with:

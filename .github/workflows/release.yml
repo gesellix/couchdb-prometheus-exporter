@@ -12,22 +12,9 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v1
         with:
-          go-version: 1.12.x
+          go-version: 1.13.x
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          path: go/src/github.com/gesellix/couchdb-prometheus-exporter
-      - name: Get dependencies
-        run: |
-          mkdir -p $GOPATH/bin
-          export PATH=$PATH:$GOPATH/bin
-          go get -v -t -d ./...
-          if [ -f Gopkg.toml ]; then
-              curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-              dep ensure
-          fi
-        env:
-          GOPATH: /home/runner/work/couchdb-prometheus-exporter/go
 #      - name: Unshallow
 #        run: git fetch --prune --unshallow
 #        working-directory: /home/runner/work/couchdb-prometheus-exporter/go/src/github.com/gesellix/couchdb-prometheus-exporter
@@ -36,8 +23,6 @@ jobs:
         with:
           version: latest
           args: release --rm-dist
-        working-directory: /home/runner/work/couchdb-prometheus-exporter/go/src/github.com/gesellix/couchdb-prometheus-exporter
         env:
-          GOPATH: /home/runner/work/couchdb-prometheus-exporter/go
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ...

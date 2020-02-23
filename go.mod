@@ -11,7 +11,6 @@ require (
 	github.com/prometheus/client_golang v1.4.1
 	github.com/prometheus/client_model v0.2.0
 	github.com/prometheus/procfs v0.0.10 // indirect
-	github.com/russross/blackfriday v2.0.0+incompatible // indirect
 	github.com/stretchr/testify v1.4.0
 	github.com/urfave/cli v1.22.2
 	golang.org/x/sys v0.0.0-20200219091948-cb0a6d8edb6c // indirect

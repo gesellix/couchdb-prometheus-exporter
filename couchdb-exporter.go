@@ -18,6 +18,12 @@ import (
 	"github.com/gesellix/couchdb-prometheus-exporter/lib"
 )
 
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 type exporterConfigType struct {
 	listenAddress              string
 	metricsEndpoint            string
@@ -221,7 +227,7 @@ func main() {
 	app.Name = "CouchDB Prometheus Exporter"
 	//app.Usage = ""
 	app.Description = "CouchDB stats exporter for Prometheus"
-	//app.Version = ""
+	app.Version = fmt.Sprintf("%s (%s, %s)", version, commit, date)
 	app.Flags = appFlags
 	app.Before = beforeApp(appFlags)
 	app.Action = appAction

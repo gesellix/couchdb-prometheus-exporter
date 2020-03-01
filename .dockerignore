@@ -25,9 +25,13 @@ _testmain.go
 *.prof
 couchdb-exporter
 couchdb-prometheus-exporter
+dist/
 
 .idea
 *.iml
+
+*.sublime-project
+*.sublime-workspace
 
 couchdb-cookies.txt
 .couchdb-env

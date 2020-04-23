@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -193,9 +194,9 @@ func TestCouchdbStatsV1Integration(t *testing.T) {
 	basicAuth := lib.BasicAuth{Username: "root", Password: "a-secret"}
 
 	client := lib.NewCouchdbClient(dbUrl, basicAuth, true)
-	databases := []string{"v1_testdb1", "v1_testdb2"}
+	databases := []string{"v1_testdb1", "v1_test/db2"}
 	for _, db := range databases {
-		_, err = client.Request("PUT", fmt.Sprintf("%s/%s", client.BaseUri, db), nil)
+		_, err = client.Request("PUT", fmt.Sprintf("%s/%s", client.BaseUri, url.PathEscape(db)), nil)
 		if err != nil {
 			t.Error(err)
 		}
@@ -252,7 +253,7 @@ func TestCouchdbStatsV1Integration(t *testing.T) {
 	})
 
 	for _, db := range databases {
-		_, err = client.Request("DELETE", fmt.Sprintf("%s/%s", client.BaseUri, db), nil)
+		_, err = client.Request("DELETE", fmt.Sprintf("%s/%s", client.BaseUri, url.PathEscape(db)), nil)
 		if err != nil {
 			t.Error(err)
 		}
@@ -303,9 +304,9 @@ func TestCouchdbStatsV2Integration(t *testing.T) {
 	}
 
 	client := lib.NewCouchdbClient(dbUrl, basicAuth, true)
-	databases := []string{"v2_testdb1", "v2_testdb2"}
+	databases := []string{"v2_testdb1", "v2_test/db2"}
 	for _, db := range databases {
-		_, err = client.Request("PUT", fmt.Sprintf("%s/%s", client.BaseUri, db), nil)
+		_, err = client.Request("PUT", fmt.Sprintf("%s/%s", client.BaseUri, url.PathEscape(db)), nil)
 		if err != nil {
 			t.Error(err)
 		}
@@ -362,7 +363,7 @@ func TestCouchdbStatsV2Integration(t *testing.T) {
 	})
 
 	for _, db := range databases {
-		_, err = client.Request("DELETE", fmt.Sprintf("%s/%s", client.BaseUri, db), nil)
+		_, err = client.Request("DELETE", fmt.Sprintf("%s/%s", client.BaseUri, url.PathEscape(db)), nil)
 		if err != nil {
 			t.Error(err)
 		}

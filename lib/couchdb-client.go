@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -269,13 +270,14 @@ func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string, concurrenc
 	// scatter
 	for _, dbName := range databases {
 		dbName := dbName // rebind for closure to capture the value
+		escapedDbName := url.PathEscape(dbName)
 		go func() {
 			err := semaphore.Acquire()
 			if err != nil {
 				return
 			}
 			var dbStats DatabaseStats
-			data, err := c.Request("GET", fmt.Sprintf("%s/%s", c.BaseUri, dbName), nil)
+			data, err := c.Request("GET", fmt.Sprintf("%s/%s", c.BaseUri, escapedDbName), nil)
 			semaphore.Release()
 			if err != nil {
 				r <- dbStatsResult{err: fmt.Errorf("error reading database '%s' stats: %v", dbName, err)}
@@ -316,6 +318,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 	// scatter
 	for dbName, dbStats := range dbStatsByDbName {
 		dbName := dbName // rebind for closure to capture the value
+		escapedDbName := url.PathEscape(dbName)
 		dbStats := dbStats
 		go func() {
 			err := semaphore.Acquire()
@@ -327,7 +330,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 				"endkey=\"_design0\"",
 				"include_docs=true",
 			}, "&")
-			designDocData, err := c.Request("GET", fmt.Sprintf("%s/%s/_all_docs?%s", c.BaseUri, dbName, query), nil)
+			designDocData, err := c.Request("GET", fmt.Sprintf("%s/%s/_all_docs?%s", c.BaseUri, escapedDbName, query), nil)
 			semaphore.Release()
 			if err != nil {
 				r <- dbStatsResult{err: fmt.Errorf("error reading database '%s' stats: %v", dbName, err)}
@@ -376,7 +379,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 								"limit=0",
 							}, "&")
 							var viewDoc ViewResponse
-							viewDocData, err := c.Request("GET", fmt.Sprintf("%s/%s/%s/_view/%s?%s", c.BaseUri, dbName, row.Doc.Id, viewName, query), nil)
+							viewDocData, err := c.Request("GET", fmt.Sprintf("%s/%s/%s/_view/%s?%s", c.BaseUri, escapedDbName, row.Doc.Id, viewName, query), nil)
 							semaphore.Release()
 							err = json.Unmarshal(viewDocData, &viewDoc)
 							if err != nil {

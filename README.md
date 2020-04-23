@@ -9,6 +9,27 @@ exposes them for Prometheus consumption. You can optionally monitor detailed dat
 disk and data size to monitor the storage overhead. The exporter can be configured via program parameters,
 environment variables, and config file.
 
+## Build the binary
+
+You can find pre-build releases for different platforms at or [GitHub Releases page](https://github.com/gesellix/couchdb-prometheus-exporter/releases).
+
+If you prefer to build your own binary or in case you'd like to build from the current `master`,
+you'll have to get and install [a recent version of Golang](https://golang.org/dl/) for your platform, first.
+Then, you have to perform the following commands in the cloned repository:
+
+````shell script
+export GO111MODULE=on  # in a Windows shell, please replace `export` with `set`
+go get github.com/gesellix/couchdb-prometheus-exporter
+````
+
+Those commands will install the binary in your local `GOBIN` directory, usually something like
+`$HOME/go/bin`. Please ensure that the directory is in your system's `PATH`. Then the following
+should work:
+
+````shell script
+couchdb-prometheus-exporter --help
+````
+
 ## Run it as container
 
     docker run -p 9984:9984 gesellix/couchdb-prometheus-exporter --couchdb.uri=http://couchdb:5984 --logtostderr

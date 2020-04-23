@@ -11,7 +11,7 @@ environment variables, and config file.
 
 ## Build the binary
 
-You can find pre-build releases for different platforms at or [GitHub Releases page](https://github.com/gesellix/couchdb-prometheus-exporter/releases).
+You can find pre-build releases for different platforms at [our GitHub Releases](https://github.com/gesellix/couchdb-prometheus-exporter/releases).
 
 If you prefer to build your own binary or in case you'd like to build from the current `master`,
 you'll have to get and install [a recent version of Golang](https://golang.org/dl/) for your platform, first.

@@ -1,7 +1,7 @@
 version: "2.3"
 
 services:
-  couchdb0:
+  couchdb_1_7:
     image: couchdb:1.7.2
     environment:
       - "COUCHDB_USER=${COUCHDB_USER:-root}"
@@ -10,9 +10,12 @@ services:
     ports:
       - "4895:5984"
 
-  couchdb1:
+  couchdb_2_3_1__1:
     image: couchdb:2.3.1
     command: -name couchdb@172.16.238.11 -setcookie thecookie
+    environment:
+      - "COUCHDB_USER=${COUCHDB_USER:-root}"
+      - "COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
     restart: always
     networks:
       couchdb-cluster:
@@ -20,9 +23,12 @@ services:
     ports:
       - "15984:5984"
 
-  couchdb2:
+  couchdb_2_3_1__2:
     image: couchdb:2.3.1
     command: -name couchdb@172.16.238.12 -setcookie thecookie
+    environment:
+      - "COUCHDB_USER=${COUCHDB_USER:-root}"
+      - "COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
     restart: always
     networks:
       couchdb-cluster:
@@ -30,9 +36,12 @@ services:
     ports:
       - "25984:5984"
 
-  couchdb3:
+  couchdb_2_3_1__3:
     image: couchdb:2.3.1
     command: -name couchdb@172.16.238.13 -setcookie thecookie
+    environment:
+      - "COUCHDB_USER=${COUCHDB_USER:-root}"
+      - "COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
     restart: always
     networks:
       couchdb-cluster:
@@ -40,9 +49,9 @@ services:
     ports:
       - "35984:5984"
 
-  couchdbstats:
+  couchdbstats1:
     image: "gesellix/couchdb-prometheus-exporter:${COUCHDB_EXPORTER_VERSION:-latest}"
-    command: --couchdb.uri=http://couchdb1:5984 --logtostderr
+    command: --couchdb.uri=http://couchdb_2_3_1__1:5984 --logtostderr
     environment:
       - "COUCHDB.USERNAME=${COUCHDB_USER:-root}"
       - "COUCHDB.PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
@@ -54,7 +63,7 @@ services:
 
   couchdbstats2:
     image: "gesellix/couchdb-prometheus-exporter:${COUCHDB_EXPORTER_VERSION:-latest}"
-    command: --couchdb.uri=http://couchdb2:5984 --logtostderr
+    command: --couchdb.uri=http://couchdb_2_3_1__2:5984 --logtostderr
     environment:
       - "COUCHDB.USERNAME=${COUCHDB_USER:-root}"
       - "COUCHDB.PASSWORD=${COUCHDB_PASSWORD:-a-secret}"

@@ -69,7 +69,7 @@ func init() {
 		altsrc.NewStringFlag(cli.StringFlag{
 			Name:        "telemetry.address",
 			Usage:       "Address on which to expose metrics",
-			EnvVar:      "TELEMETRY.ADDRESS",
+			EnvVar:      "TELEMETRY.ADDRESS,TELEMETRY_ADDRESS",
 			Hidden:      false,
 			Value:       "localhost:9984",
 			Destination: &exporterConfig.listenAddress,
@@ -77,7 +77,7 @@ func init() {
 		altsrc.NewStringFlag(cli.StringFlag{
 			Name:        "telemetry.endpoint",
 			Usage:       "Path under which to expose metrics",
-			EnvVar:      "TELEMETRY.ENDPOINT",
+			EnvVar:      "TELEMETRY.ENDPOINT,TELEMETRY_ENDPOINT",
 			Hidden:      false,
 			Value:       "/metrics",
 			Destination: &exporterConfig.metricsEndpoint,
@@ -85,7 +85,7 @@ func init() {
 		altsrc.NewStringFlag(cli.StringFlag{
 			Name:        "couchdb.uri",
 			Usage:       "URI to the CouchDB instance",
-			EnvVar:      "COUCHDB.URI",
+			EnvVar:      "COUCHDB.URI,COUCHDB_URI",
 			Hidden:      false,
 			Value:       "http://localhost:5984",
 			Destination: &exporterConfig.couchdbURI,
@@ -93,7 +93,7 @@ func init() {
 		altsrc.NewStringFlag(cli.StringFlag{
 			Name:        "couchdb.username",
 			Usage:       "Basic auth username for the CouchDB instance",
-			EnvVar:      "COUCHDB.USERNAME",
+			EnvVar:      "COUCHDB.USERNAME,COUCHD_USERNAME",
 			Hidden:      false,
 			Value:       "",
 			Destination: &exporterConfig.couchdbUsername,
@@ -101,7 +101,7 @@ func init() {
 		altsrc.NewStringFlag(cli.StringFlag{
 			Name:        "couchdb.password",
 			Usage:       "Basic auth password for the CouchDB instance",
-			EnvVar:      "COUCHDB.PASSWORD",
+			EnvVar:      "COUCHDB.PASSWORD,COUCHDB_PASSWORD",
 			Hidden:      false,
 			Value:       "",
 			Destination: &exporterConfig.couchdbPassword,
@@ -110,7 +110,7 @@ func init() {
 		altsrc.NewBoolTFlag(cli.BoolTFlag{
 			Name:        "couchdb.insecure",
 			Usage:       "Ignore server certificate if using https",
-			EnvVar:      "COUCHDB.INSECURE",
+			EnvVar:      "COUCHDB.INSECURE,COUCHDB_INSECURE",
 			Hidden:      false,
 			Destination: &exporterConfig.couchdbInsecure,
 		}),
@@ -127,7 +127,7 @@ func init() {
 		altsrc.NewBoolTFlag(cli.BoolTFlag{
 			Name:        "databases.views",
 			Usage:       "Collect view details of every observed database",
-			EnvVar:      "DATABASES.VIEWS",
+			EnvVar:      "DATABASES.VIEWS,DATABASES_VIEWS",
 			Hidden:      false,
 			Destination: &exporterConfig.databaseViews,
 		}),
@@ -142,7 +142,7 @@ func init() {
 		altsrc.NewBoolFlag(cli.BoolFlag{
 			Name:        "scheduler.jobs",
 			Usage:       "Collect active replication jobs (CouchDB 2.x+ only)",
-			EnvVar:      "SCHEDULER.JOBS",
+			EnvVar:      "SCHEDULER.JOBS,SCHEDULER_JOBS",
 			Hidden:      false,
 			Destination: &exporterConfig.schedulerJobs,
 		}),

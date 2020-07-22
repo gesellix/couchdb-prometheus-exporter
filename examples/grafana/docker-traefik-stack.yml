@@ -123,8 +123,8 @@ services:
     image: "gesellix/couchdb-prometheus-exporter:${COUCHDB_EXPORTER_VERSION:-latest}"
     command: --couchdb.uri=http://couchdb1:5984 --logtostderr --databases=_all_dbs
     environment:
-      - "COUCHDB.USERNAME=${COUCHDB_USER:-root}"
-      - "COUCHDB.PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
+      - "COUCHDB_USERNAME=${COUCHDB_USER:-root}"
+      - "COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
     networks:
       couchdb-cluster:
       monitor-net:
@@ -142,8 +142,8 @@ services:
     image: "gesellix/couchdb-prometheus-exporter:${COUCHDB_EXPORTER_VERSION:-latest}"
     command: --couchdb.uri=http://couchdb2:5984 --logtostderr --databases=_all_dbs
     environment:
-      - "COUCHDB.USERNAME=${COUCHDB_USER:-root}"
-      - "COUCHDB.PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
+      - "COUCHDB_USERNAME=${COUCHDB_USER:-root}"
+      - "COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
     networks:
       couchdb-cluster:
       monitor-net:

@@ -53,8 +53,8 @@ services:
     image: "gesellix/couchdb-prometheus-exporter:${COUCHDB_EXPORTER_VERSION:-latest}"
     command: --couchdb.uri=http://couchdb_2_3_1__1:5984 --logtostderr
     environment:
-      - "COUCHDB.USERNAME=${COUCHDB_USER:-root}"
-      - "COUCHDB.PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
+      - "COUCHDB_USERNAME=${COUCHDB_USER:-root}"
+      - "COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
     networks:
       couchdb-cluster:
         ipv4_address: 172.16.238.10
@@ -65,8 +65,8 @@ services:
     image: "gesellix/couchdb-prometheus-exporter:${COUCHDB_EXPORTER_VERSION:-latest}"
     command: --couchdb.uri=http://couchdb_2_3_1__2:5984 --logtostderr
     environment:
-      - "COUCHDB.USERNAME=${COUCHDB_USER:-root}"
-      - "COUCHDB.PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
+      - "COUCHDB_USERNAME=${COUCHDB_USER:-root}"
+      - "COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
     networks:
       couchdb-cluster:
         ipv4_address: 172.16.238.20

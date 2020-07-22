@@ -14,8 +14,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/urfave/cli"
-	"github.com/urfave/cli/altsrc"
+	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v2/altsrc"
 )
 
 func readPropertiesFile(filename string) (map[interface{}]interface{}, error) {

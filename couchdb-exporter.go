@@ -10,8 +10,8 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/urfave/cli"
-	"github.com/urfave/cli/altsrc"
+	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v2/altsrc"
 	"k8s.io/klog"
 
 	"github.com/gesellix/couchdb-prometheus-exporter/fileutil"
@@ -60,121 +60,121 @@ var appFlags []cli.Flag
 // 3) Remove (ignore) deprecated parameters
 func init() {
 	appFlags = []cli.Flag{
-		cli.StringFlag{
-			Name:   configFileFlagname,
-			Usage:  "Path to config file",
-			EnvVar: "CONFIG",
-			Hidden: false,
+		&cli.StringFlag{
+			Name:    configFileFlagname,
+			Usage:   "Path to config file",
+			EnvVars: []string{"CONFIG"},
+			Hidden:  false,
 		},
-		altsrc.NewStringFlag(cli.StringFlag{
+		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:        "telemetry.address",
 			Usage:       "Address on which to expose metrics",
-			EnvVar:      "TELEMETRY.ADDRESS,TELEMETRY_ADDRESS",
+			EnvVars:     []string{"TELEMETRY.ADDRESS", "TELEMETRY_ADDRESS"},
 			Hidden:      false,
 			Value:       "localhost:9984",
 			Destination: &exporterConfig.listenAddress,
 		}),
-		altsrc.NewStringFlag(cli.StringFlag{
+		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:        "telemetry.endpoint",
 			Usage:       "Path under which to expose metrics",
-			EnvVar:      "TELEMETRY.ENDPOINT,TELEMETRY_ENDPOINT",
+			EnvVars:     []string{"TELEMETRY.ENDPOINT", "TELEMETRY_ENDPOINT"},
 			Hidden:      false,
 			Value:       "/metrics",
 			Destination: &exporterConfig.metricsEndpoint,
 		}),
-		altsrc.NewStringFlag(cli.StringFlag{
+		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:        "couchdb.uri",
 			Usage:       "URI to the CouchDB instance",
-			EnvVar:      "COUCHDB.URI,COUCHDB_URI",
+			EnvVars:     []string{"COUCHDB.URI", "COUCHDB_URI"},
 			Hidden:      false,
 			Value:       "http://localhost:5984",
 			Destination: &exporterConfig.couchdbURI,
 		}),
-		altsrc.NewStringFlag(cli.StringFlag{
+		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:        "couchdb.username",
 			Usage:       "Basic auth username for the CouchDB instance",
-			EnvVar:      "COUCHDB.USERNAME,COUCHD_USERNAME",
+			EnvVars:     []string{"COUCHDB.USERNAME", "COUCHD_USERNAME"},
 			Hidden:      false,
 			Value:       "",
 			Destination: &exporterConfig.couchdbUsername,
 		}),
-		altsrc.NewStringFlag(cli.StringFlag{
+		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:        "couchdb.password",
 			Usage:       "Basic auth password for the CouchDB instance",
-			EnvVar:      "COUCHDB.PASSWORD,COUCHDB_PASSWORD",
+			EnvVars:     []string{"COUCHDB.PASSWORD", "COUCHDB_PASSWORD"},
 			Hidden:      false,
 			Value:       "",
 			Destination: &exporterConfig.couchdbPassword,
 		}),
-		// TODO doesn't print the default when showing the command help
-		altsrc.NewBoolTFlag(cli.BoolTFlag{
+		altsrc.NewBoolFlag(&cli.BoolFlag{
 			Name:        "couchdb.insecure",
 			Usage:       "Ignore server certificate if using https",
-			EnvVar:      "COUCHDB.INSECURE,COUCHDB_INSECURE",
+			EnvVars:     []string{"COUCHDB.INSECURE", "COUCHDB_INSECURE"},
 			Hidden:      false,
+			Value:       true,
 			Destination: &exporterConfig.couchdbInsecure,
 		}),
 		// TODO use cli.StringSliceFlag?
-		altsrc.NewStringFlag(cli.StringFlag{
+		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:        "databases",
 			Usage:       fmt.Sprintf("Comma separated list of database names, or '%s'", lib.AllDbs),
-			EnvVar:      "DATABASES",
+			EnvVars:     []string{"DATABASES"},
 			Hidden:      false,
 			Value:       "",
 			Destination: &exporterConfig.databases,
 		}),
-		// TODO doesn't print the default when showing the command help
-		altsrc.NewBoolTFlag(cli.BoolTFlag{
+		altsrc.NewBoolFlag(&cli.BoolFlag{
 			Name:        "databases.views",
 			Usage:       "Collect view details of every observed database",
-			EnvVar:      "DATABASES.VIEWS,DATABASES_VIEWS",
+			EnvVars:     []string{"DATABASES.VIEWS", "DATABASES_VIEWS"},
 			Hidden:      false,
+			Value:       true,
 			Destination: &exporterConfig.databaseViews,
 		}),
-		altsrc.NewUintFlag(cli.UintFlag{
+		altsrc.NewUintFlag(&cli.UintFlag{
 			Name:        "database.concurrent.requests",
 			Usage:       "maximum concurrent calls to CouchDB, or 0 for unlimited",
 			Value:       0,
 			Hidden:      false,
 			Destination: &exporterConfig.databaseConcurrentRequests,
 		}),
-		// TODO doesn't print the default when showing the command help
-		altsrc.NewBoolFlag(cli.BoolFlag{
+		altsrc.NewBoolFlag(&cli.BoolFlag{
 			Name:        "scheduler.jobs",
 			Usage:       "Collect active replication jobs (CouchDB 2.x+ only)",
-			EnvVar:      "SCHEDULER.JOBS,SCHEDULER_JOBS",
+			EnvVars:     []string{"SCHEDULER.JOBS", "SCHEDULER_JOBS"},
 			Hidden:      false,
 			Destination: &exporterConfig.schedulerJobs,
 		}),
 
-		altsrc.NewBoolTFlag(cli.BoolTFlag{
+		altsrc.NewBoolFlag(&cli.BoolFlag{
 			Name:        "logtostderr",
 			Usage:       "log to standard error instead of files",
 			Hidden:      true,
+			Value:       true,
 			Destination: &loggingConfig.toStderr,
 		}),
-		altsrc.NewBoolFlag(cli.BoolFlag{
+		altsrc.NewBoolFlag(&cli.BoolFlag{
 			Name:        "alsologtostderr",
 			Usage:       "log to standard error as well as files",
 			Hidden:      true,
 			Destination: &loggingConfig.alsoToStderr,
 		}),
 		// TODO `v` clashed with urfave/cli's "version" shortcut `-v`.
-		altsrc.NewIntFlag(cli.IntFlag{
+		altsrc.NewIntFlag(&cli.IntFlag{
 			Name:        "verbosity",
 			Usage:       "log level for V logs",
 			Value:       0,
 			Hidden:      true,
 			Destination: &loggingConfig.verbosity,
 		}),
-		altsrc.NewIntFlag(cli.IntFlag{
+		altsrc.NewIntFlag(&cli.IntFlag{
 			Name:        "stderrthreshold",
 			Usage:       "logs at or above this threshold go to stderr",
 			Value:       2,
 			Hidden:      true,
 			Destination: &loggingConfig.stderrThreshold,
 		}),
-		altsrc.NewStringFlag(cli.StringFlag{
+		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:        "log_dir",
 			Usage:       "If non-empty, write log files in this directory",
 			Hidden:      true,

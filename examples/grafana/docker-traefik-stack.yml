@@ -17,7 +17,7 @@ networks:
 
 services:
   traefik:
-    image: traefik:v2.0.0
+    image: traefik:v2.1.6
     command:
       - "--log.level=DEBUG"
       - "--api=true"
@@ -158,7 +158,7 @@ services:
         condition: on-failure
 
   cluster-setup:
-    image: gesellix/couchdb-cluster-config:11
+    image: gesellix/couchdb-cluster-config:v16.1.0
     command: setup --delay 10s --timeout 30s --username ${COUCHDB_USER:-root} --password ${COUCHDB_PASSWORD:-a-secret} -nodes couchdb1 -nodes couchdb2 -nodes couchdb3
     networks:
       couchdb-cluster:
@@ -171,7 +171,7 @@ services:
         condition: on-failure
 
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v2.13.1
     volumes:
       - ./prometheus/:/etc/prometheus/
       - prometheus_data:/prometheus

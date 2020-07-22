@@ -74,7 +74,7 @@ services:
       - "9985:9984"
 
   cluster-setup:
-    image: gesellix/couchdb-cluster-config:11
+    image: gesellix/couchdb-cluster-config:v16.1.0
     command: setup --delay 10s --timeout 30s --username ${COUCHDB_USER:-root} --password ${COUCHDB_PASSWORD:-a-secret} -nodes 172.16.238.11 -nodes 172.16.238.12 -nodes 172.16.238.13
     networks:
       couchdb-cluster:

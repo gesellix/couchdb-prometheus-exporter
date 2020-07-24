@@ -3,8 +3,7 @@ module github.com/gesellix/couchdb-prometheus-exporter
 go 1.13
 
 require (
-	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
-	github.com/gesellix/couchdb-cluster-config v0.0.0-20200218123558-43a3249a3c3c
+	github.com/gesellix/couchdb-cluster-config v0.0.0-20200724214638-fa110e7b59bb
 	github.com/golang/protobuf v1.4.2
 	github.com/hashicorp/go-version v1.2.1
 	github.com/okeuday/erlang_go v2.0.0+incompatible
@@ -17,5 +16,3 @@ require (
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	k8s.io/klog v1.0.0
 )
-
-replace gopkg.in/russross/blackfriday.v2 => github.com/russross/blackfriday/v2 v2.0.1

@@ -17,8 +17,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/gesellix/couchdb-prometheus-exporter/lib"
-	"github.com/gesellix/couchdb-prometheus-exporter/testutil"
+	"github.com/gesellix/couchdb-prometheus-exporter/v28/lib"
+	"github.com/gesellix/couchdb-prometheus-exporter/v28/testutil"
 )
 
 var clusterSetupDelay = 5 * time.Second

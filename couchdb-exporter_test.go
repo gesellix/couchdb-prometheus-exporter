@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gesellix/couchdb-cluster-config/pkg"
+	"github.com/gesellix/couchdb-cluster-config/v17/pkg"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 

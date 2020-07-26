@@ -14,8 +14,8 @@ import (
 	"github.com/urfave/cli/v2/altsrc"
 	"k8s.io/klog"
 
-	"github.com/gesellix/couchdb-prometheus-exporter/fileutil"
-	"github.com/gesellix/couchdb-prometheus-exporter/lib"
+	"github.com/gesellix/couchdb-prometheus-exporter/v28/fileutil"
+	"github.com/gesellix/couchdb-prometheus-exporter/v28/lib"
 )
 
 var (

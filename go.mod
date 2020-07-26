@@ -1,4 +1,4 @@
-module github.com/gesellix/couchdb-prometheus-exporter
+module github.com/gesellix/couchdb-prometheus-exporter/v28
 
 go 1.13
 

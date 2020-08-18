@@ -175,6 +175,11 @@ type DatabaseSizes struct {
 	External float64 `json:"external"` // uncompressed database content size
 }
 
+// v3.x api
+type DatabaseProps struct {
+	Partitioned bool `json:"partitioned"`
+}
+
 type DatabaseStats struct {
 	DataSize           float64       `json:"data_size"`
 	DiskSize           float64       `json:"disk_size"`
@@ -187,6 +192,7 @@ type DatabaseStats struct {
 	DiskFormatVersion  float64     `json:"disk_format_version"`
 	UpdateSeq          json.Number `json:"update_seq"`
 	Views              ViewStatsByDesignDocName
+	Props              DatabaseProps `json:"props,omitempty"`
 }
 
 type DatabaseStatsByDbName map[string]DatabaseStats

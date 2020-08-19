@@ -260,7 +260,7 @@ func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfi
 				Name:      "info",
 				Help:      "General info about a database.",
 			},
-			[]string{"db_name", "disk_format_version"}),
+			[]string{"db_name", "disk_format_version", "partitioned"}),
 		diskSize: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,

@@ -46,6 +46,7 @@ func (e *Exporter) collectV1(stats Stats, exposedHttpStatusCodes []string, colle
 		e.dbInfo.WithLabelValues(
 			dbName,
 			strconv.FormatFloat(stats.DatabaseStatsByDbName[dbName].DiskFormatVersion, 'G', -1, 32),
+			strconv.FormatBool(stats.DatabaseStatsByDbName[dbName].Props.Partitioned),
 		).Set(1)
 		e.diskSize.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DiskSize)
 		e.dataSize.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DataSize)

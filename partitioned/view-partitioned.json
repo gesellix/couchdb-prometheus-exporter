@@ -1,0 +1,53 @@
+{
+  "_id": "_design/partitioned",
+  "language": "query",
+  "views": {
+    "index-account-type-name": {
+      "map": {
+        "fields": {
+          "doc_type": "asc",
+          "account_name": "asc"
+        },
+        "partial_filter_selector": {}
+      },
+      "reduce": "_count",
+      "options": {
+        "def": {
+          "fields": [
+            {
+              "doc_type": "asc"
+            },
+            {
+              "account_name": "asc"
+            }
+          ]
+        }
+      }
+    },
+    "index-account-type-email": {
+      "map": {
+        "fields": {
+          "doc_type": "asc",
+          "email": "asc"
+        },
+        "partial_filter_selector": {}
+      },
+      "reduce": "_count",
+      "options": {
+        "def": {
+          "fields": [
+            {
+              "doc_type": "asc"
+            },
+            {
+              "email": "asc"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "options": {
+    "partitioned": true
+  }
+}

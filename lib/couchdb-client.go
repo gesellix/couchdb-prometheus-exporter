@@ -381,6 +381,11 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 								v <- viewresult{err: fmt.Errorf("aborted view stats for /%s/%s/_view/%s", dbName, row.Doc.Id, viewName)}
 								return
 							}
+							if dbStats.Props.Partitioned {
+								v <- viewresult{err: fmt.Errorf("partitioned database /%s currently not supported for view stats", dbName)}
+								return
+							}
+
 							query := strings.Join([]string{
 								"stale=ok",
 								"update=false",

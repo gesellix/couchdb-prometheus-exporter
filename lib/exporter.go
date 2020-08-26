@@ -39,6 +39,7 @@ type Exporter struct {
 	bulkRequests             *prometheus.GaugeVec
 	viewReads                *prometheus.GaugeVec
 
+	dbInfo           *prometheus.GaugeVec
 	diskSize         *prometheus.GaugeVec
 	dataSize         *prometheus.GaugeVec
 	docCount         *prometheus.GaugeVec
@@ -252,6 +253,14 @@ func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfi
 			},
 			[]string{"node_name"}),
 
+		dbInfo: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "database",
+				Name:      "info",
+				Help:      "General info about a database.",
+			},
+			[]string{"db_name", "disk_format_version"}),
 		diskSize: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,

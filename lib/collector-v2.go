@@ -106,8 +106,20 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, colle
 	}
 
 	for _, dbName := range collectorConfig.ObservedDatabases {
-		e.diskSize.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DiskSize)
-		e.dataSize.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DataSize)
+		e.dbInfo.WithLabelValues(
+			dbName,
+			strconv.FormatFloat(stats.DatabaseStatsByDbName[dbName].DiskFormatVersion, 'G', -1, 32),
+		).Set(1)
+		if stats.DatabaseStatsByDbName[dbName].DiskSize == 0 && stats.DatabaseStatsByDbName[dbName].Sizes.File > 0 {
+			e.diskSize.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].Sizes.File)
+		} else {
+			e.diskSize.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DiskSize)
+		}
+		if stats.DatabaseStatsByDbName[dbName].DataSize == 0 && stats.DatabaseStatsByDbName[dbName].Sizes.Active > 0 {
+			e.dataSize.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].Sizes.Active)
+		} else {
+			e.dataSize.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DataSize)
+		}
 		e.docCount.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DocCount)
 		e.docDelCount.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].DocDelCount)
 		e.compactRunning.WithLabelValues(dbName).Set(stats.DatabaseStatsByDbName[dbName].CompactRunning)

@@ -3,6 +3,7 @@ package lib
 import (
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -27,6 +28,16 @@ type CouchdbClient struct {
 	client            *http.Client
 	ResetRequestCount func()
 	GetRequestCount   func() int
+}
+
+type HttpError struct {
+	Status     string
+	StatusCode int
+	RespBody   []byte
+}
+
+func (httpError *HttpError) Error() string {
+	return fmt.Errorf("status %s (%d): %s", httpError.Status, httpError.StatusCode, httpError.RespBody).Error()
 }
 
 type MembershipResponse struct {
@@ -289,7 +300,11 @@ func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string, concurrenc
 				r <- dbStatsResult{err: fmt.Errorf("error unmarshalling database '%s' stats: %v", dbName, err)}
 				return
 			}
-			dbStats.DiskSizeOverhead = dbStats.DiskSize - dbStats.DataSize
+			if dbStats.DiskSize == 0 && dbStats.Sizes.File > 0 {
+				dbStats.DiskSizeOverhead = dbStats.Sizes.File - dbStats.Sizes.Active
+			} else {
+				dbStats.DiskSizeOverhead = dbStats.DiskSize - dbStats.DataSize
+			}
 			if dbStats.CompactRunningBool {
 				dbStats.CompactRunning = 1
 			} else {
@@ -380,10 +395,30 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 							}, "&")
 							var viewDoc ViewResponse
 							viewDocData, err := c.Request("GET", fmt.Sprintf("%s/%s/%s/_view/%s?%s", c.BaseUri, escapedDbName, row.Doc.Id, viewName, query), nil)
+							if err != nil {
+								if httpError, ok := err.(*HttpError); ok == true {
+									semaphore.Release()
+									err = json.Unmarshal(httpError.RespBody, &viewDoc)
+									if err != nil {
+										v <- viewresult{err: fmt.Errorf("error unmarshalling http error response when requesting view '%s/%s/_view/%s': %v", dbName, row.Doc.Id, viewName, err)}
+										return
+									}
+									if viewDoc.Error != "" {
+										v <- viewresult{err: fmt.Errorf("error reading view '%s/%s/_view/%s': %v", dbName, row.Doc.Id, viewName, errors.New(fmt.Sprintf("%s, reason: %s", viewDoc.Error, viewDoc.Reason)))}
+										return
+									}
+								}
+								v <- viewresult{err: fmt.Errorf("error reading view '%s/%s/_view/%s': %v", dbName, row.Doc.Id, viewName, errors.New(fmt.Sprintf("%s, reason: %s", viewDoc.Error, viewDoc.Reason)))}
+								return
+							}
 							semaphore.Release()
 							err = json.Unmarshal(viewDocData, &viewDoc)
 							if err != nil {
 								v <- viewresult{err: fmt.Errorf("error unmarshalling view doc for view '%s/%s/_view/%s': %v", dbName, row.Doc.Id, viewName, err)}
+								return
+							}
+							if viewDoc.Error != "" {
+								v <- viewresult{err: fmt.Errorf("error reading view '%s/%s/_view/%s': %v", dbName, row.Doc.Id, viewName, errors.New(fmt.Sprintf("%s, reason: %s", viewDoc.Error, viewDoc.Reason)))}
 								return
 							}
 							v <- viewresult{viewName, viewDoc.UpdateSeq.String(), nil}
@@ -392,10 +427,13 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 					for range row.Doc.Views {
 						res := <-v
 						if res.err != nil {
-							r <- dbStatsResult{err: res.err}
-							return
+							// TODO consider adding a metric to make errors more visible
+							klog.Error(res.err)
+							//r <- dbStatsResult{err: res.err}
+							//return
+						} else {
+							updateSeqByView[res.viewName] = res.updateSeq
 						}
-						updateSeqByView[res.viewName] = res.updateSeq
 					}
 					viewmutex.Lock()
 					views[row.Doc.Id] = updateSeqByView
@@ -508,7 +546,7 @@ func (c *CouchdbClient) Request(method string, uri string, body io.Reader) (resp
 		if err != nil {
 			respData = []byte(err.Error())
 		}
-		return nil, fmt.Errorf("status %s (%d): %s", resp.Status, resp.StatusCode, respData)
+		return nil, &HttpError{resp.Status, resp.StatusCode, respData}
 	}
 	if err != nil {
 		return nil, err

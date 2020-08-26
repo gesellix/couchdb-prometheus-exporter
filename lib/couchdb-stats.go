@@ -160,20 +160,31 @@ type DocsResponse struct {
 
 type ViewResponse struct {
 	UpdateSeq json.Number `json:"update_seq"`
+	Error     string      `json:"error,omitempty"`
+	Reason    string      `json:"reason,omitempty"`
 }
 
 type ViewStats map[string]string
 
 type ViewStatsByDesignDocName map[string]ViewStats
 
+// v2.x api
+type DatabaseSizes struct {
+	Active   float64 `json:"active"`   // data_size
+	File     float64 `json:"file"`     // disk_size
+	External float64 `json:"external"` // uncompressed database content size
+}
+
 type DatabaseStats struct {
-	DiskSize           float64 `json:"disk_size"`
-	DataSize           float64 `json:"data_size"`
+	DataSize           float64       `json:"data_size"`
+	DiskSize           float64       `json:"disk_size"`
+	Sizes              DatabaseSizes `json:"sizes,omitempty"`
 	DiskSizeOverhead   float64
 	DocCount           float64 `json:"doc_count"`
 	DocDelCount        float64 `json:"doc_del_count"`
 	CompactRunningBool bool    `json:"compact_running"`
 	CompactRunning     float64
+	DiskFormatVersion  float64     `json:"disk_format_version"`
 	UpdateSeq          json.Number `json:"update_seq"`
 	Views              ViewStatsByDesignDocName
 }

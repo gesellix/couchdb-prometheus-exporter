@@ -126,6 +126,7 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	e.temporaryViewReads.Describe(ch)
 	e.viewReads.Describe(ch)
 
+	e.dbInfo.Describe(ch)
 	e.diskSize.Describe(ch)
 	e.dataSize.Describe(ch)
 	e.docCount.Describe(ch)
@@ -202,6 +203,7 @@ func (e *Exporter) resetAllMetrics() {
 		e.bulkRequests,
 		e.viewReads,
 
+		e.dbInfo,
 		e.diskSize,
 		e.dataSize,
 		e.docCount,
@@ -327,6 +329,7 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	e.temporaryViewReads.Collect(ch)
 	e.viewReads.Collect(ch)
 
+	e.dbInfo.Collect(ch)
 	e.diskSize.Collect(ch)
 	e.dataSize.Collect(ch)
 	e.docCount.Collect(ch)

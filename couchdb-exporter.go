@@ -93,7 +93,7 @@ func init() {
 		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:        "couchdb.username",
 			Usage:       "Basic auth username for the CouchDB instance",
-			EnvVars:     []string{"COUCHDB.USERNAME", "COUCHD_USERNAME"},
+			EnvVars:     []string{"COUCHDB.USERNAME", "COUCHDB_USERNAME"},
 			Hidden:      false,
 			Value:       "",
 			Destination: &exporterConfig.couchdbUsername,

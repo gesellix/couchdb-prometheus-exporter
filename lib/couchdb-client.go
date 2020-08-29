@@ -129,7 +129,7 @@ func (c *CouchdbClient) getStatsByNodeName(urisByNodeName map[string]string) (ma
 
 		err = json.Unmarshal(data, &stats)
 		if err != nil {
-			return nil, fmt.Errorf("error unmarshalling stats: %v", err)
+			return nil, fmt.Errorf("error unmarshalling stats for node %s: %v", name, err)
 		}
 
 		// TODO this one is expected to retrieve other nodes' info
@@ -165,7 +165,7 @@ func (c *CouchdbClient) getSystemByNodeName(urisByNodeName map[string]string) (m
 
 		err = json.Unmarshal(data, &stats)
 		if err != nil {
-			return nil, fmt.Errorf("error unmarshalling stats: %v", err)
+			return nil, fmt.Errorf("error unmarshalling system stats for node %s: %v", name, err)
 		}
 
 		systemByNodeName[name] = stats

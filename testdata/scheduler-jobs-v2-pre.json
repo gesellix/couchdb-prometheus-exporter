@@ -1,0 +1,92 @@
+{
+  "total_rows": 3,
+  "offset": 0,
+  "jobs": [
+    {
+      "database": "_replicator",
+      "id": "1ebc7c8a11b299a779ffb807e089c17e+create_target",
+      "pid": "<0.10858.6>",
+      "source": "http://source:5984/source-db/",
+      "target": "http://target:5984/target-db/",
+      "user": "admin",
+      "doc_id": "replicate-once",
+      "history": [
+        {
+          "timestamp": "2019-03-10T21:11:07Z",
+          "type": "started"
+        },
+        {
+          "timestamp": "2019-03-10T21:11:07Z",
+          "type": "added"
+        }
+      ],
+      "node": "couchdb@172.16.238.11",
+      "start_time": "2019-03-10T21:11:07Z"
+    },
+    {
+      "database": "_replicator",
+      "id": "2ae1733d6570280350d3e24c4929ebdf+continuous+create_target",
+      "pid": null,
+      "source": "http://source:5984/source-db/",
+      "target": "http://target:5984/target-db/",
+      "user": "admin",
+      "doc_id": "replicate-continuous-error",
+      "history": [
+        {
+          "timestamp": "2019-03-10T22:42:12Z",
+          "type": "crashed",
+          "reason": "{replication_auth_error,\n    {session_request_failed,\"http://localhost:15984/_session\",\"root\",\n        {conn_failed,{error,econnrefused}}}}"
+        },
+        {
+          "timestamp": "2019-03-10T22:42:07Z",
+          "type": "started"
+        },
+        {
+          "timestamp": "2019-03-10T22:40:10Z",
+          "type": "crashed",
+          "reason": "{replication_auth_error,\n    {session_request_failed,\"http://localhost:15984/_session\",\"root\",\n        {conn_failed,{error,econnrefused}}}}"
+        },
+        {
+          "timestamp": "2019-03-10T22:40:07Z",
+          "type": "started"
+        },
+        {
+          "timestamp": "2019-03-10T22:38:45Z",
+          "type": "crashed",
+          "reason": "{replication_auth_error,\n    {session_request_failed,\"http://localhost:15984/_session\",\"root\",\n        {conn_failed,{error,econnrefused}}}}"
+        },
+        {
+          "timestamp": "2019-03-10T22:38:40Z",
+          "type": "started"
+        },
+        {
+          "timestamp": "2019-03-10T22:38:40Z",
+          "type": "added"
+        }
+      ],
+      "node": "couchdb@172.16.238.12",
+      "start_time": "2019-03-10T22:38:40Z"
+    },
+    {
+      "database": "_replicator",
+      "id": "382782aeedd59468b52add2b0d7389a2+continuous+create_target",
+      "pid": "<0.25596.0>",
+      "source": "http://source:5984/source-db/",
+      "target": "http://target:5984/target-db/",
+      "user": "admin",
+      "doc_id": "replicate-continuous",
+      "history": [
+        {
+          "timestamp": "2019-03-10T21:07:40Z",
+          "type": "started"
+        },
+        {
+          "timestamp": "2019-03-10T21:07:40Z",
+          "type": "added"
+        }
+      ],
+      "node": "couchdb@172.16.238.13",
+      "start_time": "2019-03-10T21:07:40Z"
+    }
+  ]
+}

@@ -321,6 +321,48 @@ func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string, concurrenc
 	return dbStatsByDbName, nil
 }
 
+type viewStats struct {
+	viewName  string
+	updateSeq string
+	warn      string
+	err       error
+}
+
+func (c *CouchdbClient) viewStats(dbName string, designDocId string, viewName string) viewStats {
+	escapedDbName := url.PathEscape(dbName)
+
+	query := strings.Join([]string{
+		"stale=ok",
+		"update=false",
+		"stable=true",
+		"update_seq=true",
+		"include_docs=false",
+		"limit=0",
+	}, "&")
+	var viewDoc ViewResponse
+	viewDocData, err := c.Request("GET", fmt.Sprintf("%s/%s/%s/_view/%s?%s", c.BaseUri, escapedDbName, designDocId, viewName, query), nil)
+	if err != nil {
+		if httpError, ok := err.(*HttpError); ok == true {
+			err = json.Unmarshal(httpError.RespBody, &viewDoc)
+			if err != nil {
+				return viewStats{err: fmt.Errorf("error unmarshalling http error response when requesting view '%s/%s/_view/%s': %v", dbName, designDocId, viewName, err)}
+			}
+			if viewDoc.Error != "" {
+				return viewStats{err: fmt.Errorf("error reading view '%s/%s/_view/%s': %v", dbName, designDocId, viewName, errors.New(fmt.Sprintf("%s, reason: %s", viewDoc.Error, viewDoc.Reason)))}
+			}
+		}
+		return viewStats{err: fmt.Errorf("error reading view '%s/%s/_view/%s': %v", dbName, designDocId, viewName, errors.New(fmt.Sprintf("%s, reason: %s", viewDoc.Error, viewDoc.Reason)))}
+	}
+	err = json.Unmarshal(viewDocData, &viewDoc)
+	if err != nil {
+		return viewStats{err: fmt.Errorf("error unmarshalling view doc for view '%s/%s/_view/%s': %v", dbName, designDocId, viewName, err)}
+	}
+	if viewDoc.Error != "" {
+		return viewStats{err: fmt.Errorf("error reading view '%s/%s/_view/%s': %v", dbName, designDocId, viewName, errors.New(fmt.Sprintf("%s, reason: %s", viewDoc.Error, viewDoc.Reason)))}
+	}
+	return viewStats{viewName, viewDoc.UpdateSeq.String(), "", nil}
+}
+
 func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]DatabaseStats, concurrency uint) error {
 	// Setup for concurrent scatter/gather scrapes, with concurrency limit
 	r := make(chan dbStatsResult, len(dbStatsByDbName))
@@ -328,9 +370,9 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 
 	// scatter
 	for dbName, dbStats := range dbStatsByDbName {
-		dbName := dbName // rebind for closure to capture the value
+		dbName := dbName   // rebind for closure to capture the value
+		dbStats := dbStats // rebind for closure to capture the value
 		escapedDbName := url.PathEscape(dbName)
-		dbStats := dbStats
 		go func() {
 			err := semaphore.Acquire()
 			if err != nil {
@@ -365,74 +407,39 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 						done <- struct{}{}
 					}()
 					updateSeqByView := make(ViewStats)
-					type viewresult struct {
-						viewName  string
-						updateSeq string
-						err       error
-					}
-					v := make(chan viewresult, len(row.Doc.Views))
+					v := make(chan viewStats, len(row.Doc.Views))
 					for viewName := range row.Doc.Views {
 						viewName := viewName
+						if dbStats.Props.Partitioned {
+							v <- viewStats{warn: fmt.Sprintf("partitioned database /%s currently not supported for view stats", dbName)}
+							continue
+						}
 						go func() {
 							//klog.Infof("/%s/%s/_view/%s\n", dbName, row.Doc.Id, viewName)
 							err := semaphore.Acquire()
 							if err != nil {
 								// send something to parent coroutine so it doesn't block forever on receive
-								v <- viewresult{err: fmt.Errorf("aborted view stats for /%s/%s/_view/%s", dbName, row.Doc.Id, viewName)}
+								v <- viewStats{err: fmt.Errorf("aborted view stats for /%s/%s/_view/%s", dbName, row.Doc.Id, viewName)}
 								return
 							}
-							if dbStats.Props.Partitioned {
-								v <- viewresult{err: fmt.Errorf("partitioned database /%s currently not supported for view stats", dbName)}
-								return
-							}
-
-							query := strings.Join([]string{
-								"stale=ok",
-								"update=false",
-								"stable=true",
-								"update_seq=true",
-								"include_docs=false",
-								"limit=0",
-							}, "&")
-							var viewDoc ViewResponse
-							viewDocData, err := c.Request("GET", fmt.Sprintf("%s/%s/%s/_view/%s?%s", c.BaseUri, escapedDbName, row.Doc.Id, viewName, query), nil)
-							if err != nil {
-								if httpError, ok := err.(*HttpError); ok == true {
-									semaphore.Release()
-									err = json.Unmarshal(httpError.RespBody, &viewDoc)
-									if err != nil {
-										v <- viewresult{err: fmt.Errorf("error unmarshalling http error response when requesting view '%s/%s/_view/%s': %v", dbName, row.Doc.Id, viewName, err)}
-										return
-									}
-									if viewDoc.Error != "" {
-										v <- viewresult{err: fmt.Errorf("error reading view '%s/%s/_view/%s': %v", dbName, row.Doc.Id, viewName, errors.New(fmt.Sprintf("%s, reason: %s", viewDoc.Error, viewDoc.Reason)))}
-										return
-									}
-								}
-								v <- viewresult{err: fmt.Errorf("error reading view '%s/%s/_view/%s': %v", dbName, row.Doc.Id, viewName, errors.New(fmt.Sprintf("%s, reason: %s", viewDoc.Error, viewDoc.Reason)))}
-								return
-							}
-							semaphore.Release()
-							err = json.Unmarshal(viewDocData, &viewDoc)
-							if err != nil {
-								v <- viewresult{err: fmt.Errorf("error unmarshalling view doc for view '%s/%s/_view/%s': %v", dbName, row.Doc.Id, viewName, err)}
-								return
-							}
-							if viewDoc.Error != "" {
-								v <- viewresult{err: fmt.Errorf("error reading view '%s/%s/_view/%s': %v", dbName, row.Doc.Id, viewName, errors.New(fmt.Sprintf("%s, reason: %s", viewDoc.Error, viewDoc.Reason)))}
-								return
-							}
-							v <- viewresult{viewName, viewDoc.UpdateSeq.String(), nil}
+							defer semaphore.Release()
+							v <- c.viewStats(dbName, row.Doc.Id, viewName)
 						}()
 					}
 					for range row.Doc.Views {
 						res := <-v
+						if res.warn != "" {
+							// TODO consider adding a metric to make warnings more visible
+							klog.Warning(res.warn)
+						}
 						if res.err != nil {
 							// TODO consider adding a metric to make errors more visible
 							klog.Error(res.err)
+							continue
 							//r <- dbStatsResult{err: res.err}
 							//return
-						} else {
+						}
+						if res.updateSeq != "" {
 							updateSeqByView[res.viewName] = res.updateSeq
 						}
 					}
@@ -449,6 +456,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 			r <- dbStatsResult{dbName, dbStats, nil}
 		}()
 	}
+
 	// gather
 	for range dbStatsByDbName {
 		resp := <-r

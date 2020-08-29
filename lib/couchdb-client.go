@@ -9,11 +9,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
 
-	"github.com/hashicorp/go-version"
 	"k8s.io/klog"
 )
 
@@ -67,22 +67,18 @@ func (c *CouchdbClient) getServerVersion() (string, error) {
 }
 
 func (c *CouchdbClient) isCouchDbV2() (bool, error) {
-	clusteredCouch, err := version.NewConstraint(">= 2.0")
-	if err != nil {
-		return false, err
-	}
-
 	serverVersion, err := c.getServerVersion()
 	if err != nil {
 		return false, err
 	}
 
-	couchDbVersion, err := version.NewVersion(serverVersion)
+	versionParts := strings.Split(serverVersion, ".")
+	major, err := strconv.Atoi(versionParts[0])
 	if err != nil {
 		return false, err
 	}
 
-	return clusteredCouch.Check(couchDbVersion), nil
+	return major >= 2, nil
 }
 
 func (c *CouchdbClient) GetNodeNames() ([]string, error) {

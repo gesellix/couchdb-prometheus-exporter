@@ -1,0 +1,26 @@
+[
+  {
+    "node": "nonode@nohost",
+    "pid": "<0.16538.0>",
+    "changes_pending": 3421685,
+    "checkpoint_interval": 30000,
+    "checkpointed_source_seq": "147516-g1AAAAI7eJzLYWBg4MhgTmHgzcvPy09JdcjLz8gvLskBCjMlMiTJ____PyuDOYmBwbM_FyjGbppqkmxgZoquHocJSQpAMskebojXTbAhFgYWxsbmJsQa4gAyJB7hEkewIYnmhoapKcbEGpIAMqQebohLF9gQo7SkxJRkQyINyWMBkgwNQApoznyIQa5TIeFibpycbJBCkkELIAbthxjkJgM2KM3SwtDAMo0kgw5ADLoPDeQDEINSEw0tzC1JMugBxCBoGLnPgMSWkYVBSmoqurYsAMONrkE",
+    "continuous": false,
+    "database": null,
+    "doc_id": null,
+    "doc_write_failures": 0,
+    "docs_read": 5508,
+    "docs_written": 5508,
+    "missing_revisions_found": 5508,
+    "replication_id": "3ce5637fe908f83b981c1995ba6f6cfe+create_target",
+    "revisions_checked": 5508,
+    "source": "http://source.local/db/",
+    "source_seq": "158350-g1AAAAI7eJzLYWBg4MhgTmHgzcvPy09JdcjLz8gvLskBCjMlMiTJ____PyuDOYmBwX9VLlCM3TTVJNnAzBRdPQ4TkhSAZJI9wpAwsCEWBhbGxuYmxBriADIkHm6Iz1awIYnmhoapKcbEGpIAMqQebohbMdgQo7SkxJRkQyINyWMBkgwNQApoznyoa45DwsXcODnZIIUkgxZADNoPDZtUsEFplhaGBpZpJBl0AGLQfahBchCDUhMNLcwtSTLoAcQgaBj5ykBiy8jCICU1FV1bFgDjqq2-",
+    "started_on": 1500371814,
+    "target": "http://localhost:5984/db/",
+    "through_seq": "157848-g1AAAAI7eJzLYWBg4MhgTmHgzcvPy09JdcjLz8gvLskBCjMlMiTJ____PyuDOYmBwT83FyjGbppqkmxgZoquHocJSQpAMskeYYg42BALAwtjY3MTYg1xABkSDzfEpwxsSKK5oWFqijGxhiSADKmHG-KmCzbEKC0pMSXZkEhD8liAJEMDkAKaMx_qmlZIuJgbJycbpJBk0AKIQfuhYaMHNijN0sLQwDKNJIMOQAy6DzHI7z7EoNREQwtzS5IMegAxCBbQEIMsjCwMUlJT0bVlAQA6Da3G",
+    "type": "replication",
+    "updated_on": 1500371880,
+    "user": null
+  }
+]

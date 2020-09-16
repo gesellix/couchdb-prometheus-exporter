@@ -1,5 +1,5 @@
 ---
-# Make sure to check the documentation at http://goreleaser.com
+# Make sure to check the documentation at https://goreleaser.com/
 before:
   hooks:
     - go mod download

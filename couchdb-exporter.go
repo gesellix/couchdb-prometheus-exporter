@@ -215,7 +215,7 @@ func main() {
 			http.Error(w, fmt.Sprintf("Please GET %s", exporterConfig.metricsEndpoint), http.StatusNotFound)
 		})
 
-		klog.Infof("Starting exporter at '%s' to read from CouchDB at '%s'", exporterConfig.listenAddress, exporterConfig.couchdbURI)
+		klog.Infof("Starting exporter version %s at '%s' to read from CouchDB at '%s'", version, exporterConfig.listenAddress, exporterConfig.couchdbURI)
 		err := http.ListenAndServe(exporterConfig.listenAddress, nil)
 		if err != nil {
 			klog.Fatal(err)

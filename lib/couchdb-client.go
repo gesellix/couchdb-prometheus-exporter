@@ -430,7 +430,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 						res := <-v
 						if res.warn != "" {
 							// TODO consider adding a metric to make warnings more visible
-							klog.Warning(res.warn)
+							//klog.Warning(res.warn)
 						}
 						if res.err != nil {
 							// TODO consider adding a metric to make errors more visible

@@ -822,5 +822,91 @@
         "desc": "number of write quorum errors"
       }
     }
+  },
+  "mango": {
+    "unindexed_queries": {
+      "value": 0,
+      "type": "counter",
+      "desc": "number of mango queries that could not use an index"
+    },
+    "query_invalid_index": {
+      "value": 0,
+      "type": "counter",
+      "desc": "number of mango queries that generated an invalid index warning"
+    },
+    "too_many_docs_scanned": {
+      "value": 0,
+      "type": "counter",
+      "desc": "number of mango queries that generated an index scan warning"
+    },
+    "docs_examined": {
+      "value": 0,
+      "type": "counter",
+      "desc": "number of documents examined by mango queries coordinated by this node"
+    },
+    "quorum_docs_examined": {
+      "value": 0,
+      "type": "counter",
+      "desc": "number of documents examined by mango queries, using cluster quorum"
+    },
+    "results_returned": {
+      "value": 0,
+      "type": "counter",
+      "desc": "number of rows returned by mango queries"
+    },
+    "query_time": {
+      "value": {
+        "min": 0,
+        "max": 0,
+        "arithmetic_mean": 0,
+        "geometric_mean": 0,
+        "harmonic_mean": 0,
+        "median": 0,
+        "variance": 0,
+        "standard_deviation": 0,
+        "skewness": 0,
+        "kurtosis": 0,
+        "percentile": [
+          [
+            50,
+            0
+          ],
+          [
+            75,
+            0
+          ],
+          [
+            90,
+            0
+          ],
+          [
+            95,
+            0
+          ],
+          [
+            99,
+            0
+          ],
+          [
+            999,
+            0
+          ]
+        ],
+        "histogram": [
+          [
+            0,
+            0
+          ]
+        ],
+        "n": 0
+      },
+      "type": "histogram",
+      "desc": "length of time processing a mango query"
+    },
+    "evaluate_selector": {
+      "value": 10,
+      "type": "counter",
+      "desc": "number of mango selector evaluations"
+    }
   }
 }

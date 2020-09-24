@@ -87,6 +87,16 @@ type Exporter struct {
 	nodeMemoryCode          *prometheus.GaugeVec
 	nodeMemoryEts           *prometheus.GaugeVec
 
+
+	mangoUnindexedQueries	*prometheus.GaugeVec
+	mangoInvalidIndexes		*prometheus.GaugeVec
+	mangoTooManyDocs		*prometheus.GaugeVec
+	mangoDocsExamined		*prometheus.GaugeVec
+	mangoQuorumDocsExamined	*prometheus.GaugeVec
+	mangoResultsReturned	*prometheus.GaugeVec
+	mangoQueryTime			*prometheus.GaugeVec
+	mangoEvaluateSelectors	*prometheus.GaugeVec
+
 	viewStaleness *prometheus.GaugeVec
 
 	schedulerJobs *prometheus.GaugeVec
@@ -639,5 +649,78 @@ func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfi
 				Help:      "replicator connection metrics shown by type",
 			},
 			[]string{"metric", "node_name"}),
+
+		mangoUnindexedQueries: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "mango",
+				Name:      "unindexed_queries",
+				Help:      "number of mango queries that could not use an index",
+			},
+			[]string{"node_name"}),
+
+		mangoInvalidIndexes: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "mango",
+				Name:      "query_invalid_index",
+				Help:      "number of mango queries that generated an invalid index warning",
+			},
+			[]string{"node_name"}),
+
+		mangoTooManyDocs: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "mango",
+				Name:      "too_many_docs_scanned",
+				Help:      "number of mango queries that generated an index scan warning",
+			},
+			[]string{"node_name"}),
+
+		mangoDocsExamined: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "mango",
+				Name:      "docs_examined",
+				Help:      "number of documents examined by mango queries coordinated by this node",
+			},
+			[]string{"node_name"}),
+
+		mangoQuorumDocsExamined: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "mango",
+				Name:      "quorum_docs_examined",
+				Help:      "number of documents examined by mango queries, using cluster quorum",
+			},
+			[]string{"node_name"}),
+
+		mangoResultsReturned: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "mango",
+				Name:      "results_returned",
+				Help:      "number of rows returned by mango queries",
+			},
+			[]string{"node_name"}),
+
+		mangoQueryTime: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "mango",
+				Name:      "query_time",
+				Help:      "length of time processing a mango query",
+			},
+			[]string{"node_name", "metric"}),		
+
+		mangoEvaluateSelectors: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "mango",
+				Name:      "evaluate_selector",
+				Help:      "number of mango selector evaluations",
+			},
+			[]string{"node_name"}),		
+
 	}
 }

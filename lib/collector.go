@@ -179,6 +179,15 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	e.schedulerJobs.Describe(ch)
 
 	e.requestCount.Describe(ch)
+
+	e.mangoUnindexedQueries.Describe(ch)
+	e.mangoInvalidIndexes.Describe(ch)
+	e.mangoTooManyDocs.Describe(ch)
+	e.mangoDocsExamined.Describe(ch)
+	e.mangoQuorumDocsExamined.Describe(ch)
+	e.mangoResultsReturned.Describe(ch)
+	e.mangoQueryTime.Describe(ch)
+	e.mangoEvaluateSelectors.Describe(ch)	
 }
 
 func (e *Exporter) resetAllMetrics() {
@@ -382,6 +391,15 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	e.schedulerJobs.Collect(ch)
 
 	e.requestCount.Collect(ch)
+
+	e.mangoUnindexedQueries.Collect(ch)
+	e.mangoInvalidIndexes.Collect(ch)
+	e.mangoTooManyDocs.Collect(ch)
+	e.mangoDocsExamined.Collect(ch)
+	e.mangoQuorumDocsExamined.Collect(ch)
+	e.mangoResultsReturned.Collect(ch)
+	e.mangoQueryTime.Collect(ch)
+	e.mangoEvaluateSelectors.Collect(ch)
 
 	return nil
 }

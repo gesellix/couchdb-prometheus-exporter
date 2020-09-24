@@ -62,6 +62,18 @@ type CouchdbStats struct {
 	Httpd               Httpd               `json:"httpd"`
 	HttpdRequestMethods HttpdRequestMethods `json:"httpd_request_methods"`
 	HttpdStatusCodes    HttpdStatusCodes    `json:"httpd_status_codes"`
+
+}
+
+type MangoStats struct {
+	UnindexedQueries 	Counter   `json:"unindexed_queries"`
+	QueryInvalidIndex 	Counter   `json:"query_invalid_index"`
+	TooManyDocs 		Counter   `json:"too_many_docs_scanned"`
+	DocsExamined 		Counter   `json:"docs_examined"`
+	QuorumDocsExamined  Counter   `json:"quorum_docs_examined"`
+	ResultsReturned 	Counter   `json:"results_returned"`
+	QueryTime 			Histogram   `json:"query_time"`
+	EvaluateSelector	Counter   `json:"evaluate_selector"`
 }
 
 type HttpdRequestMethods struct {
@@ -128,6 +140,7 @@ type CouchReplicator struct {
 
 type StatsResponse struct {
 	Couchdb  CouchdbStats `json:"couchdb"`
+	Mango    MangoStats	  `json:"mango"`
 	Up       float64      `json:"-"`
 	NodeInfo NodeInfo     `json:"-"`
 	// v1.x api

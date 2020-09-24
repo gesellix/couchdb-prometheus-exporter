@@ -106,6 +106,31 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, colle
 		for _, metric := range exposedReplicatorConnection {
 			e.couchReplicatorConnection.WithLabelValues(metric, name).Set(nodeStats.CouchReplicator.Connection[metric].Value)
 		}
+
+		e.mangoUnindexedQueries.WithLabelValues(name).Set(nodeStats.Mango.UnindexedQueries.Value)
+		e.mangoInvalidIndexes.WithLabelValues(name).Set(nodeStats.Mango.QueryInvalidIndex.Value)
+		e.mangoTooManyDocs.WithLabelValues(name).Set(nodeStats.Mango.TooManyDocs.Value)
+		e.mangoDocsExamined.WithLabelValues(name).Set(nodeStats.Mango.DocsExamined.Value)
+		e.mangoQuorumDocsExamined.WithLabelValues(name).Set(nodeStats.Mango.QuorumDocsExamined.Value)
+		e.mangoResultsReturned.WithLabelValues(name).Set(nodeStats.Mango.ResultsReturned.Value)
+		e.mangoEvaluateSelectors.WithLabelValues(name).Set(nodeStats.Mango.EvaluateSelector.Value)
+
+		e.mangoQueryTime.WithLabelValues(name, "Min").Set(nodeStats.Mango.QueryTime.Value.Min)
+		e.mangoQueryTime.WithLabelValues(name, "Max").Set(nodeStats.Mango.QueryTime.Value.Max)
+
+		e.mangoQueryTime.WithLabelValues(name, "ArithmeticMean").Set(nodeStats.Mango.QueryTime.Value.ArithmeticMean)
+		e.mangoQueryTime.WithLabelValues(name, "GeometricMean").Set(nodeStats.Mango.QueryTime.Value.GeometricMean)
+		e.mangoQueryTime.WithLabelValues(name, "HarmonicMean").Set(nodeStats.Mango.QueryTime.Value.HarmonicMean)
+		e.mangoQueryTime.WithLabelValues(name, "Median").Set(nodeStats.Mango.QueryTime.Value.Median)
+		e.mangoQueryTime.WithLabelValues(name, "Variance").Set(nodeStats.Mango.QueryTime.Value.Variance)
+		e.mangoQueryTime.WithLabelValues(name, "StandardDeviation").Set(nodeStats.Mango.QueryTime.Value.StandardDeviation)
+		e.mangoQueryTime.WithLabelValues(name, "Skewness").Set(nodeStats.Mango.QueryTime.Value.Skewness)
+		e.mangoQueryTime.WithLabelValues(name, "Kurtosis").Set(nodeStats.Mango.QueryTime.Value.Kurtosis)
+
+		for _, percentile := range nodeStats.Mango.QueryTime.Value.Percentile {
+			e.mangoQueryTime.WithLabelValues(name, fmt.Sprintf("%v", percentile[0])).Set(percentile[1])
+		}
+
 	}
 
 	for _, dbName := range collectorConfig.ObservedDatabases {

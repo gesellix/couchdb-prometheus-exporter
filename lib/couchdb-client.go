@@ -66,7 +66,7 @@ func (c *CouchdbClient) getServerVersion() (string, error) {
 	return nodeInfo.Version, nil
 }
 
-func (c *CouchdbClient) isCouchDbV2() (bool, error) {
+func (c *CouchdbClient) isCouchDbV1() (bool, error) {
 	serverVersion, err := c.getServerVersion()
 	if err != nil {
 		return false, err
@@ -78,7 +78,7 @@ func (c *CouchdbClient) isCouchDbV2() (bool, error) {
 		return false, err
 	}
 
-	return major >= 2, nil
+	return major < 2, nil
 }
 
 func (c *CouchdbClient) GetNodeNames() ([]string, error) {
@@ -179,11 +179,11 @@ func (c *CouchdbClient) getSystemByNodeName(urisByNodeName map[string]string) (m
 }
 
 func (c *CouchdbClient) getStats(config CollectorConfig) (Stats, error) {
-	isCouchDbV2, err := c.isCouchDbV2()
+	isCouchDbV1, err := c.isCouchDbV1()
 	if err != nil {
 		return Stats{}, err
 	}
-	if isCouchDbV2 {
+	if !isCouchDbV1 {
 		urisByNode, err := c.getNodeBaseUrisByNodeName(c.BaseUri)
 		if err != nil {
 			return Stats{}, err
@@ -197,7 +197,7 @@ func (c *CouchdbClient) getStats(config CollectorConfig) (Stats, error) {
 			return Stats{}, err
 		}
 		if config.CollectViews {
-			err := c.enhanceWithViewUpdateSeq(databaseStats, config.ConcurrentRequests)
+			err := c.enhanceWithViewUpdateSeq(isCouchDbV1, databaseStats, config.ConcurrentRequests)
 			if err != nil {
 				return Stats{}, err
 			}
@@ -240,7 +240,7 @@ func (c *CouchdbClient) getStats(config CollectorConfig) (Stats, error) {
 			return Stats{}, err
 		}
 		if config.CollectViews {
-			err := c.enhanceWithViewUpdateSeq(databaseStats, config.ConcurrentRequests)
+			err := c.enhanceWithViewUpdateSeq(isCouchDbV1, databaseStats, config.ConcurrentRequests)
 			if err != nil {
 				return Stats{}, err
 			}
@@ -328,7 +328,7 @@ type viewStats struct {
 	err       error
 }
 
-func (c *CouchdbClient) viewStats(dbName string, designDocId string, viewName string) viewStats {
+func (c *CouchdbClient) viewStats(isCouchdbV1 bool, dbName string, designDocId string, viewName string) viewStats {
 	escapedDbName := url.PathEscape(dbName)
 
 	query := strings.Join([]string{
@@ -360,10 +360,35 @@ func (c *CouchdbClient) viewStats(dbName string, designDocId string, viewName st
 	if viewDoc.Error != "" {
 		return viewStats{err: fmt.Errorf("error reading view '%s/%s/_view/%s': %v", dbName, designDocId, viewName, errors.New(fmt.Sprintf("%s, reason: %s", viewDoc.Error, viewDoc.Reason)))}
 	}
-	return viewStats{viewName, viewDoc.UpdateSeq.String(), "", nil}
+
+	var updateSeq string
+	if isCouchdbV1 {
+		updateSeq = c.updateSeqFromInt(viewDoc.UpdateSeq)
+	} else {
+		updateSeq = c.updateSeqFromString(viewDoc.UpdateSeq)
+	}
+	return viewStats{viewName, updateSeq, "", nil}
 }
 
-func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]DatabaseStats, concurrency uint) error {
+func (c *CouchdbClient) updateSeqFromInt(message json.RawMessage) string {
+	var updateSeq int64
+	err := json.Unmarshal(message, &updateSeq)
+	if err != nil {
+		klog.Warningf("%v", err)
+	}
+	return strconv.FormatInt(updateSeq, 10)
+}
+
+func (c *CouchdbClient) updateSeqFromString(message json.RawMessage) string {
+	var updateSeq string
+	err := json.Unmarshal(message, &updateSeq)
+	if err != nil {
+		klog.Warningf("%v", err)
+	}
+	return updateSeq
+}
+
+func (c *CouchdbClient) enhanceWithViewUpdateSeq(isCouchdbV1 bool, dbStatsByDbName map[string]DatabaseStats, concurrency uint) error {
 	// Setup for concurrent scatter/gather scrapes, with concurrency limit
 	r := make(chan dbStatsResult, len(dbStatsByDbName))
 	semaphore := NewSemaphore(concurrency) // semaphore to limit concurrency
@@ -423,7 +448,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(dbStatsByDbName map[string]Data
 								return
 							}
 							defer semaphore.Release()
-							v <- c.viewStats(dbName, row.Doc.Id, viewName)
+							v <- c.viewStats(isCouchdbV1, dbName, row.Doc.Id, viewName)
 						}()
 					}
 					for range row.Doc.Views {

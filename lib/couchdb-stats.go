@@ -159,9 +159,9 @@ type DocsResponse struct {
 }
 
 type ViewResponse struct {
-	UpdateSeq json.Number `json:"update_seq"`
-	Error     string      `json:"error,omitempty"`
-	Reason    string      `json:"reason,omitempty"`
+	UpdateSeq json.RawMessage `json:"update_seq"`
+	Error     string          `json:"error,omitempty"`
+	Reason    string          `json:"reason,omitempty"`
 }
 
 type ViewStats map[string]string
@@ -189,8 +189,8 @@ type DatabaseStats struct {
 	DocDelCount        float64 `json:"doc_del_count"`
 	CompactRunningBool bool    `json:"compact_running"`
 	CompactRunning     float64
-	DiskFormatVersion  float64     `json:"disk_format_version"`
-	UpdateSeq          json.Number `json:"update_seq"`
+	DiskFormatVersion  float64         `json:"disk_format_version"`
+	UpdateSeq          json.RawMessage `json:"update_seq"`
 	Views              ViewStatsByDesignDocName
 	Props              DatabaseProps `json:"props,omitempty"`
 }

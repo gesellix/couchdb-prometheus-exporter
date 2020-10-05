@@ -1,4 +1,4 @@
-FROM alpine:3.11 AS builder
+FROM alpine:3.12 AS builder
 LABEL builder=true
 
 ENV CGO_ENABLED=0

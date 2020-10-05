@@ -5,6 +5,7 @@ package fileutil
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
@@ -223,22 +224,24 @@ func (fsm *MapInputSource) Generic(name string) (cli.Generic, error) {
 func (fsm *MapInputSource) Bool(name string) (bool, error) {
 	otherGenericValue, exists := fsm.valueMap[name]
 	if exists {
-		otherValue, isType := otherGenericValue.(bool)
-		if !isType {
-			return false, incorrectTypeForFlagError(name, "bool", otherGenericValue)
-		}
-		return otherValue, nil
+		return fsm.asBool(name, otherGenericValue)
 	}
 	nestedGenericValue, exists := nestedVal(name, fsm.valueMap)
 	if exists {
-		otherValue, isType := nestedGenericValue.(bool)
-		if !isType {
-			return false, incorrectTypeForFlagError(name, "bool", nestedGenericValue)
-		}
-		return otherValue, nil
+		return fsm.asBool(name, nestedGenericValue)
 	}
-
 	return false, nil
+}
+
+func (fsm *MapInputSource) asBool(name string, value interface{}) (bool, error) {
+	switch v := value.(type) {
+	case bool:
+		return v, nil
+	case string:
+		return strconv.ParseBool(v)
+	default:
+		return false, incorrectTypeForFlagError(name, "bool", value)
+	}
 }
 
 func incorrectTypeForFlagError(name, expectedTypeName string, value interface{}) error {

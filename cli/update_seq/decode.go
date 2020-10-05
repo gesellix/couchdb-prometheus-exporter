@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gesellix/couchdb-prometheus-exporter/v28/lib"
+	"github.com/gesellix/couchdb-prometheus-exporter/v29/lib"
 )
 
 func main() {

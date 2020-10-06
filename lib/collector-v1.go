@@ -1,8 +1,11 @@
 package lib
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
+
+	"k8s.io/klog"
 )
 
 func (e *Exporter) collectV1(stats Stats, exposedHttpStatusCodes []string, collectorConfig CollectorConfig) error {
@@ -57,7 +60,13 @@ func (e *Exporter) collectV1(stats Stats, exposedHttpStatusCodes []string, colle
 
 		for designDoc, view := range stats.DatabaseStatsByDbName[dbName].Views {
 			for viewName, updateSeq := range view {
-				dbUpdateSeq, _ := stats.DatabaseStatsByDbName[dbName].UpdateSeq.Int64()
+				var intSeq int64
+				err := json.Unmarshal(stats.DatabaseStatsByDbName[dbName].UpdateSeq, &intSeq)
+				if err != nil {
+					klog.Warningf("%v", err)
+					continue
+				}
+				dbUpdateSeq := intSeq
 				viewUpdateSeq, _ := strconv.ParseInt(updateSeq, 10, 64)
 				age := dbUpdateSeq - viewUpdateSeq
 				e.viewStaleness.WithLabelValues(dbName, designDoc, viewName, "0", "1").Set(float64(age))

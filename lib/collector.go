@@ -187,7 +187,7 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	e.mangoQuorumDocsExamined.Describe(ch)
 	e.mangoResultsReturned.Describe(ch)
 	e.mangoQueryTime.Describe(ch)
-	e.mangoEvaluateSelectors.Describe(ch)	
+	e.mangoEvaluateSelectors.Describe(ch)
 }
 
 func (e *Exporter) resetAllMetrics() {
@@ -272,7 +272,6 @@ func (e *Exporter) resetAllMetrics() {
 		e.mangoResultsReturned,
 		e.mangoQueryTime,
 		e.mangoEvaluateSelectors,
-
 	}
 	e.resetMetrics(metrics)
 }

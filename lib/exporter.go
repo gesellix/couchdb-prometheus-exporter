@@ -87,15 +87,14 @@ type Exporter struct {
 	nodeMemoryCode          *prometheus.GaugeVec
 	nodeMemoryEts           *prometheus.GaugeVec
 
-
-	mangoUnindexedQueries	*prometheus.GaugeVec
-	mangoInvalidIndexes		*prometheus.GaugeVec
-	mangoTooManyDocs		*prometheus.GaugeVec
-	mangoDocsExamined		*prometheus.GaugeVec
-	mangoQuorumDocsExamined	*prometheus.GaugeVec
-	mangoResultsReturned	*prometheus.GaugeVec
-	mangoQueryTime			*prometheus.GaugeVec
-	mangoEvaluateSelectors	*prometheus.GaugeVec
+	mangoUnindexedQueries   *prometheus.GaugeVec
+	mangoInvalidIndexes     *prometheus.GaugeVec
+	mangoTooManyDocs        *prometheus.GaugeVec
+	mangoDocsExamined       *prometheus.GaugeVec
+	mangoQuorumDocsExamined *prometheus.GaugeVec
+	mangoResultsReturned    *prometheus.GaugeVec
+	mangoQueryTime          *prometheus.GaugeVec
+	mangoEvaluateSelectors  *prometheus.GaugeVec
 
 	viewStaleness *prometheus.GaugeVec
 
@@ -711,7 +710,7 @@ func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfi
 				Name:      "query_time",
 				Help:      "length of time processing a mango query",
 			},
-			[]string{"node_name", "metric"}),		
+			[]string{"node_name", "metric"}),
 
 		mangoEvaluateSelectors: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
@@ -720,7 +719,6 @@ func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfi
 				Name:      "evaluate_selector",
 				Help:      "number of mango selector evaluations",
 			},
-			[]string{"node_name"}),		
-
+			[]string{"node_name"}),
 	}
 }

@@ -263,6 +263,16 @@ func (e *Exporter) resetAllMetrics() {
 		e.viewStaleness,
 
 		e.schedulerJobs,
+
+		e.mangoUnindexedQueries,
+		e.mangoInvalidIndexes,
+		e.mangoTooManyDocs,
+		e.mangoDocsExamined,
+		e.mangoQuorumDocsExamined,
+		e.mangoResultsReturned,
+		e.mangoQueryTime,
+		e.mangoEvaluateSelectors,
+
 	}
 	e.resetMetrics(metrics)
 }

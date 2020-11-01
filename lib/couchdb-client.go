@@ -277,7 +277,7 @@ func (c *CouchdbClient) getDatabasesStatsByDbName(databases []string, concurrenc
 	// scatter
 	for _, dbName := range databases {
 		dbName := dbName // rebind for closure to capture the value
-		escapedDbName := url.PathEscape(dbName)
+		escapedDbName := url.QueryEscape(dbName)
 		go func() {
 			err := semaphore.Acquire()
 			if err != nil {
@@ -329,7 +329,7 @@ type viewStats struct {
 }
 
 func (c *CouchdbClient) viewStats(isCouchdbV1 bool, dbName string, designDocId string, viewName string) viewStats {
-	escapedDbName := url.PathEscape(dbName)
+	escapedDbName := url.QueryEscape(dbName)
 
 	query := strings.Join([]string{
 		"stale=ok",
@@ -397,7 +397,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(isCouchdbV1 bool, dbStatsByDbNa
 	for dbName, dbStats := range dbStatsByDbName {
 		dbName := dbName   // rebind for closure to capture the value
 		dbStats := dbStats // rebind for closure to capture the value
-		escapedDbName := url.PathEscape(dbName)
+		escapedDbName := url.QueryEscape(dbName)
 		go func() {
 			err := semaphore.Acquire()
 			if err != nil {

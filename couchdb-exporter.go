@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/gesellix/couchdb-prometheus-exporter/v29/kitlog"
+	"github.com/gesellix/couchdb-prometheus-exporter/v30/kitlog"
 	"net/http"
 	"os"
 	"strconv"
@@ -17,8 +17,8 @@ import (
 	"github.com/urfave/cli/v2/altsrc"
 	"k8s.io/klog/v2"
 
-	"github.com/gesellix/couchdb-prometheus-exporter/v29/fileutil"
-	"github.com/gesellix/couchdb-prometheus-exporter/v29/lib"
+	"github.com/gesellix/couchdb-prometheus-exporter/v30/fileutil"
+	"github.com/gesellix/couchdb-prometheus-exporter/v30/lib"
 )
 
 var (

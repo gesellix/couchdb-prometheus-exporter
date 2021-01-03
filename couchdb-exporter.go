@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -21,12 +22,15 @@ import (
 var (
 	version = "dev"
 	commit  = "none"
-	date    = "unknown"
+	date    = time.Now().Format(time.RFC3339)
 )
 
+type webConfigType struct {
+	listenAddress   string
+	metricsEndpoint string
+}
+
 type exporterConfigType struct {
-	listenAddress              string
-	metricsEndpoint            string
 	couchdbURI                 string
 	couchdbUsername            string
 	couchdbPassword            string
@@ -46,6 +50,7 @@ type loggingConfigType struct {
 }
 
 var exporterConfig exporterConfigType
+var webConfig webConfigType
 
 var configFileFlagname = "config"
 
@@ -72,7 +77,7 @@ func init() {
 			EnvVars:     []string{"TELEMETRY.ADDRESS", "TELEMETRY_ADDRESS"},
 			Hidden:      false,
 			Value:       "localhost:9984",
-			Destination: &exporterConfig.listenAddress,
+			Destination: &webConfig.listenAddress,
 		}),
 		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:        "telemetry.endpoint",
@@ -80,7 +85,7 @@ func init() {
 			EnvVars:     []string{"TELEMETRY.ENDPOINT", "TELEMETRY_ENDPOINT"},
 			Hidden:      false,
 			Value:       "/metrics",
-			Destination: &exporterConfig.metricsEndpoint,
+			Destination: &webConfig.metricsEndpoint,
 		}),
 		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:        "couchdb.uri",
@@ -204,7 +209,7 @@ func main() {
 			exporterConfig.couchdbInsecure)
 		prometheus.MustRegister(exporter)
 
-		http.Handle(exporterConfig.metricsEndpoint, promhttp.Handler())
+		http.Handle(webConfig.metricsEndpoint, promhttp.Handler())
 		http.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
 			_, err := fmt.Fprint(w, "OK")
 			if err != nil {
@@ -212,11 +217,11 @@ func main() {
 			}
 		})
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			http.Error(w, fmt.Sprintf("Please GET %s", exporterConfig.metricsEndpoint), http.StatusNotFound)
+			http.Error(w, fmt.Sprintf("Please GET %s", webConfig.metricsEndpoint), http.StatusNotFound)
 		})
 
-		klog.Infof("Starting exporter version %s at '%s' to read from CouchDB at '%s'", version, exporterConfig.listenAddress, exporterConfig.couchdbURI)
-		err := http.ListenAndServe(exporterConfig.listenAddress, nil)
+		klog.Infof("Starting exporter version %s at '%s' to read from CouchDB at '%s'", version, webConfig.listenAddress, exporterConfig.couchdbURI)
+		err := http.ListenAndServe(webConfig.listenAddress, nil)
 		if err != nil {
 			klog.Fatal(err)
 		}

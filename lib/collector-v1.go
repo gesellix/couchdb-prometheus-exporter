@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 )
 
 func (e *Exporter) collectV1(stats Stats, exposedHttpStatusCodes []string, collectorConfig CollectorConfig) error {

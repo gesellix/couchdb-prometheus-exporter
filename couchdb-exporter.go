@@ -13,7 +13,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 
 	"github.com/gesellix/couchdb-prometheus-exporter/v29/fileutil"
 	"github.com/gesellix/couchdb-prometheus-exporter/v29/lib"

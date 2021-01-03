@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/gesellix/couchdb-prometheus-exporter/v29/kitlog"
 	"net/http"
 	"os"
 	"strconv"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/exporter-toolkit/https"
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"
 	"k8s.io/klog/v2"
@@ -53,6 +55,7 @@ var exporterConfig exporterConfigType
 var webConfig webConfigType
 
 var configFileFlagname = "config"
+var webConfigFile = ""
 
 // custom exposed (but hidden) logging config flags
 var loggingConfig loggingConfigType
@@ -67,9 +70,17 @@ func init() {
 	appFlags = []cli.Flag{
 		&cli.StringFlag{
 			Name:    configFileFlagname,
-			Usage:   "Path to config file",
+			Usage:   "Path to config ini file that configures the CouchDB connection",
 			EnvVars: []string{"CONFIG"},
 			Hidden:  false,
+		},
+		&cli.StringFlag{
+			Name:        "web.config",
+			Usage:       "Path to config yaml file that can enable TLS or authentication",
+			EnvVars:     []string{"WEB_CONFIG"},
+			Hidden:      false,
+			Value:       "",
+			Destination: &webConfigFile,
 		},
 		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:        "telemetry.address",
@@ -217,15 +228,27 @@ func main() {
 			}
 		})
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			http.Error(w, fmt.Sprintf("Please GET %s", webConfig.metricsEndpoint), http.StatusNotFound)
+			w.Header().Set("Location", webConfig.metricsEndpoint)
+			w.WriteHeader(http.StatusFound)
+			_, err := w.Write([]byte(`<html>
+			<head><title>CouchDB Prometheus Exporter</title></head>
+			<body>
+			<h1>CouchDB Prometheus Exporter</h1>
+			<p><a href="` + webConfig.metricsEndpoint + `">Metrics</a></p>
+			</body>
+			</html>`))
+			if err != nil {
+				klog.Error(err)
+			}
 		})
 
 		klog.Infof("Starting exporter version %s at '%s' to read from CouchDB at '%s'", version, webConfig.listenAddress, exporterConfig.couchdbURI)
-		err := http.ListenAndServe(webConfig.listenAddress, nil)
-		if err != nil {
-			klog.Fatal(err)
+		server := &http.Server{Addr: webConfig.listenAddress}
+		if err := https.Listen(server, webConfigFile, kitlog.NewKlogLogger()); err != nil {
+			klog.Error("msg", "Failed to start the server", "err", err)
+			os.Exit(1)
 		}
-		return err
+		return nil
 	}
 
 	app := cli.NewApp()
@@ -254,11 +277,11 @@ func beforeApp(appFlags []cli.Flag) cli.BeforeFunc {
 		if err := altsrc.InitInputSourceWithContext(appFlags, inputSource)(context); err != nil {
 			return err
 		}
-		return initKlogFlags(context)
+		return initKlogFlags(context, loggingConfig)
 	}
 }
 
-func initKlogFlags(_ *cli.Context) error {
+func initKlogFlags(_ *cli.Context, loggingConfig loggingConfigType) error {
 	klogFlags := flag.NewFlagSet("klog", flag.ContinueOnError)
 	klog.InitFlags(klogFlags)
 

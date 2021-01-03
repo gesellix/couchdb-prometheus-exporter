@@ -40,7 +40,7 @@ Configuration is possible via:
 
 - environment variables (e.g. `COUCHDB_USERNAME=admin`)
 - command line parameters (e.g. `--couchdb.username admin`)
-- configuration file
+- configuration file (e.g. `--config=config.ini`)
 
 The configuration file format is the "properties" file format, e.g. like this:
 
@@ -48,6 +48,31 @@ The configuration file format is the "properties" file format, e.g. like this:
 couchdb.username=admin
 couchdb.password=a-secret
 ````
+
+## Using TLS and/or Basic authentication
+
+TLS and/or Basic authentication is supported via `--web.config` parameter:
+
+    couchdb-prometheus-exporter --config=config.ini --web.config=web-config.yaml
+
+A complete `web-config.yml` might look like this:
+
+````yaml
+---
+tls_server_config :
+  cert_file : "path/to/https/server.crt"
+  key_file : "path/to/https/server.key"
+basic_auth_users:
+  alice: $2y$12$1DpfPeqF9HzHJt.EWswy1exHluGfbhnn3yXhR7Xes6m3WJqFg0Wby
+  bob: $2y$18$4VeFDzXIoPHKnKTU3O3GH.N.vZu06CVqczYZ8WvfzrddFU6tGqjR.
+  carol: $2y$10$qRTBuFoULoYNA7AQ/F3ck.trZBPyjV64.oA4ZsSBCIWvXuvQlQTuu
+  dave: $2y$10$2UXri9cIDdgeKjBo4Rlpx.U3ZLDV8X1IxKmsfOvhcM5oXQt/mLmXq
+...
+````
+
+For further information about TLS and/or Basic auth,
+please visit: [exporter-toolkit/https](https://pkg.go.dev/github.com/prometheus/exporter-toolkit@v0.4.0/https)
+or [github.com/prometheus/exporter-toolkit](https://github.com/prometheus/exporter-toolkit).
 
 ## Run it as container
 

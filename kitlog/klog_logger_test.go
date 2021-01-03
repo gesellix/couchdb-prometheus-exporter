@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gesellix/couchdb-prometheus-exporter/v29/kitlog"
+	"github.com/gesellix/couchdb-prometheus-exporter/v30/kitlog"
 	"k8s.io/klog/v2"
 )
 

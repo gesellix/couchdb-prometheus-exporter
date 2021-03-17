@@ -9,6 +9,11 @@ go:
   - 1.15.x
 #  - tip
 
-before_script: ./integrationtest-setup.sh
+integration-test:
+  before_script: ./integrationtest-setup.sh
+  after_script: ./integrationtest-teardown.sh
 
-after_script: ./integrationtest-teardown.sh
+mixin:
+  - cd mysqld-mixin; go install github.com/monitoring-mixins/mixtool/cmd/mixtool
+  - cd mysqld-mixin; go install github.com/google/go-jsonnet/cmd/jsonnetfmt
+  - cd mysqld-mixin; make lint build

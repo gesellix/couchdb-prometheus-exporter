@@ -10,5 +10,5 @@
   },
 
   prometheusAlerts+:
-    importRules(importstr 'alerts/general.yaml')
+    importRules(importstr 'alerts/general.yaml'),
 }

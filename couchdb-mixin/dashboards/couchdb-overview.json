@@ -1106,7 +1106,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (db_name) (couchdb_database_doc_count{db_name=~\"$database\"})",
+          "expr": "sum by (db_name) (couchdb_database_doc_count{node_name=~\"$node\",db_name=~\"$database\"})",
           "interval": "1m",
           "intervalFactor": 2,
           "legendFormat": "{{db_name}}",
@@ -1221,7 +1221,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (db_name) (couchdb_database_disk_size{db_name=~\"$database\"})",
+          "expr": "sum by (db_name) (couchdb_database_disk_size{node_name=~\"$node\",db_name=~\"$database\"})",
           "hide": false,
           "interval": "1m",
           "intervalFactor": 2,
@@ -1229,14 +1229,14 @@
           "refId": "A"
         },
         {
-          "expr": "sum by (db_name) (couchdb_database_data_size{db_name=~\"$database\"})",
+          "expr": "sum by (db_name) (couchdb_database_data_size{node_name=~\"$node\",db_name=~\"$database\"})",
           "interval": "1m",
           "intervalFactor": 2,
           "legendFormat": "Data size",
           "refId": "B"
         },
         {
-          "expr": "sum by (db_name) (couchdb_database_overhead{db_name=~\"$database\"})",
+          "expr": "sum by (db_name) (couchdb_database_overhead{node_name=~\"$node\",db_name=~\"$database\"})",
           "interval": "1m",
           "intervalFactor": 2,
           "legendFormat": "Overhead",

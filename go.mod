@@ -3,7 +3,7 @@ module github.com/gesellix/couchdb-prometheus-exporter/v30
 go 1.17
 
 require (
-	github.com/gesellix/couchdb-cluster-config/v17 v17.0.0
+	github.com/gesellix/couchdb-cluster-config/v17 v17.1.0
 	github.com/go-kit/kit v0.10.0
 	github.com/golang/protobuf v1.4.3
 	github.com/okeuday/erlang_go v2.0.1+incompatible

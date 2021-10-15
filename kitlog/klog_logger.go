@@ -15,7 +15,7 @@ func NewKlogLogger() kitlog.Logger {
 	return &klogLogger{}
 }
 
-// Logs the keyvals to the INFO log.
+// Log the keyvals to the INFO log.
 func (l klogLogger) Log(keyvals ...interface{}) error {
 	klog.InfoS("-", keyvals...)
 	return nil

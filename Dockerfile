@@ -1,4 +1,4 @@
-FROM golang:1.15-alpine AS builder
+FROM golang:1.17-alpine AS builder
 LABEL builder=true
 
 ENV CGO_ENABLED=0
@@ -14,7 +14,7 @@ RUN cd $APPPATH && go get -d \
     -ldflags '-s -w -extldflags "-static"' \
     -o /bin/main
 
-FROM alpine:3.12
+FROM alpine:3.14.2
 LABEL maintainer="Tobias Gesellchen <tobias@gesellix.de> (@gesellix)"
 
 ENV TELEMETRY_ADDRESS="0.0.0.0:9984"

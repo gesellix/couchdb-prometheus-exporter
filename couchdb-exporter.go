@@ -12,7 +12,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/prometheus/exporter-toolkit/https"
+	"github.com/prometheus/exporter-toolkit/web"
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"
 	"k8s.io/klog/v2"
@@ -244,7 +244,7 @@ func main() {
 
 		klog.Infof("Starting exporter version %s at '%s' to read from CouchDB at '%s'", version, webConfig.listenAddress, exporterConfig.couchdbURI)
 		server := &http.Server{Addr: webConfig.listenAddress}
-		if err := https.Listen(server, webConfigFile, kitlog.NewKlogLogger()); err != nil {
+		if err := web.ListenAndServe(server, webConfigFile, kitlog.NewKlogLogger()); err != nil {
 			klog.Error("msg", "Failed to start the server", "err", err)
 			os.Exit(1)
 		}

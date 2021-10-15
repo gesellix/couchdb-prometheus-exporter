@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/okeuday/erlang_go/src/erlang"
+	"github.com/okeuday/erlang_go/v2/erlang"
 )
 
 type UpdateSequence struct {

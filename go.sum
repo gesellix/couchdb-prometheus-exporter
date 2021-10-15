@@ -191,8 +191,8 @@ github.com/nats-io/nats.go v1.9.1/go.mod h1:ZjDU1L/7fJ09jvUSRVBR2e7+RnLiiIQyqyzE
 github.com/nats-io/nkeys v0.1.0/go.mod h1:xpnFELMwJABBLVhffcfd1MZx6VsNRFpEugbxziKVo7w=
 github.com/nats-io/nkeys v0.1.3/go.mod h1:xpnFELMwJABBLVhffcfd1MZx6VsNRFpEugbxziKVo7w=
 github.com/nats-io/nuid v1.0.1/go.mod h1:19wcPz3Ph3q0Jbyiqsd0kePYG7A95tJPxeL+1OSON2c=
-github.com/okeuday/erlang_go v2.0.1+incompatible h1:WhL4RWrpevyKnjuOGCEZ5+TrGBNAz8nmF22UOLrGKws=
-github.com/okeuday/erlang_go v2.0.1+incompatible/go.mod h1:BBz8nWELVZr7h7INZ5SVnswLIn13iDFZxHdT/wWcy7Q=
+github.com/okeuday/erlang_go/v2 v2.0.2 h1:FgdZ/xxEpYNMsoGwpYsy2AecKyMPadlfq0+epT9gpSk=
+github.com/okeuday/erlang_go/v2 v2.0.2/go.mod h1:bUnKKmkI110+DM1rV59zPPqbcXp4yv18Fp2ofRwBmk4=
 github.com/oklog/oklog v0.3.2/go.mod h1:FCV+B7mhrz4o+ueLpx+KqkyXRGMWOYEvfiXtdGtbWGs=
 github.com/oklog/run v1.0.0/go.mod h1:dlhp/R75TPv97u0XWUtDeV/lRKWPKSdTuV0TZvrmrQA=
 github.com/olekukonko/tablewriter v0.0.0-20170122224234-a0225b3f23b5/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=

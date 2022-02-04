@@ -48,7 +48,22 @@ func convertSeq(t interface{}) int {
 	case int32:
 		return int(rType)
 	case erlang.OtpErlangTuple:
-		return int(rType[0].(uint8))
+		// we should be able to use recursion,
+		// but we're not entirely sure why this is
+		// required in the first place.
+		// so let's try to have a plain stack trace
+		// in case the issue #106 isn't fixed, yet.
+		//return convertSeq(rType[0])
+		switch ttype := rType[0].(type) {
+		case uint8:
+			return int(ttype)
+		case int32:
+			return int(ttype)
+		default:
+			fmt.Printf("%v == %T\n", ttype, ttype)
+			// todo return err
+			return -1
+		}
 	default:
 		fmt.Printf("%v == %T\n", rType, rType)
 		// todo return err

@@ -25,9 +25,9 @@ func TestSemaphore(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		go worker(sem, results)
 	}
-	time.Sleep(20 * time.Millisecond) // plenty of time
+	time.Sleep(500 * time.Millisecond) // plenty of time
 	if len(results) != 100 {
-		t.Error("Workers did not complete in time")
+		t.Errorf("Workers did not complete in time (%d/100)", len(results))
 	}
 }
 
@@ -39,9 +39,9 @@ func TestUnlimitedSemaphore(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		go worker(sem, results)
 	}
-	time.Sleep(20 * time.Millisecond) // plenty of time
+	time.Sleep(500 * time.Millisecond) // plenty of time
 	if len(results) != 100 {
-		t.Error("Workers did not complete in time")
+		t.Errorf("Workers did not complete in time (%d/100)", len(results))
 	}
 }
 
@@ -57,9 +57,9 @@ func TestSerialSemaphore(t *testing.T) {
 		go worker(sem, results)
 	}
 	sem.Release()
-	time.Sleep(20 * time.Millisecond)
+	time.Sleep(50 * time.Millisecond)
 	if len(results) > 20 { // should never complete this many in the allotted time
-		t.Error("Workers completed job too fast", len(results))
+		t.Errorf("Workers completed job too fast: %d", len(results))
 	}
 }
 

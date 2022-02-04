@@ -12,7 +12,7 @@ require (
 	github.com/prometheus/exporter-toolkit v0.7.1
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
-	k8s.io/klog/v2 v2.20.0
+	k8s.io/klog/v2 v2.40.1
 )
 
 require (
@@ -22,7 +22,7 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
-	github.com/go-logr/logr v1.1.0 // indirect
+	github.com/go-logr/logr v1.2.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect

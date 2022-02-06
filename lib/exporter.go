@@ -47,12 +47,13 @@ type Exporter struct {
 	compactRunning   *prometheus.GaugeVec
 	diskSizeOverhead *prometheus.GaugeVec
 
-	activeTasks                      *prometheus.GaugeVec
-	activeTasksDatabaseCompaction    *prometheus.GaugeVec
-	activeTasksViewCompaction        *prometheus.GaugeVec
-	activeTasksIndexer               *prometheus.GaugeVec
-	activeTasksReplication           *prometheus.GaugeVec
-	activeTasksReplicationLastUpdate *prometheus.GaugeVec
+	activeTasks                          *prometheus.GaugeVec
+	activeTasksDatabaseCompaction        *prometheus.GaugeVec
+	activeTasksViewCompaction            *prometheus.GaugeVec
+	activeTasksIndexer                   *prometheus.GaugeVec
+	activeTasksReplication               *prometheus.GaugeVec
+	activeTasksReplicationLastUpdate     *prometheus.GaugeVec
+	activeTasksReplicationChangesPending *prometheus.GaugeVec
 
 	couchLog *prometheus.GaugeVec
 
@@ -333,7 +334,7 @@ func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfi
 				Namespace: namespace,
 				Subsystem: "server",
 				Name:      "active_tasks_database_compaction",
-				Help:      "active tasks",
+				Help:      "active tasks database compaction",
 			},
 			[]string{"node_name"}),
 		activeTasksViewCompaction: prometheus.NewGaugeVec(
@@ -341,7 +342,7 @@ func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfi
 				Namespace: namespace,
 				Subsystem: "server",
 				Name:      "active_tasks_view_compaction",
-				Help:      "active tasks",
+				Help:      "active tasks view compaction",
 			},
 			[]string{"node_name"}),
 		activeTasksIndexer: prometheus.NewGaugeVec(
@@ -349,7 +350,7 @@ func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfi
 				Namespace: namespace,
 				Subsystem: "server",
 				Name:      "active_tasks_indexer",
-				Help:      "active tasks",
+				Help:      "active tasks indexer",
 			},
 			[]string{"node_name"}),
 		activeTasksReplication: prometheus.NewGaugeVec(
@@ -357,7 +358,7 @@ func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfi
 				Namespace: namespace,
 				Subsystem: "server",
 				Name:      "active_tasks_replication",
-				Help:      "active tasks",
+				Help:      "active tasks replication",
 			},
 			[]string{"node_name"}),
 
@@ -366,7 +367,16 @@ func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfi
 				Namespace: namespace,
 				Subsystem: "server",
 				Name:      "active_tasks_replication_updated_on",
-				Help:      "active tasks",
+				Help:      "active tasks replication updated on",
+			},
+			[]string{"node_name", "doc_id", "continuous", "source", "target"}),
+
+		activeTasksReplicationChangesPending: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Subsystem: "server",
+				Name:      "active_tasks_replication_changes_pending",
+				Help:      "active tasks replication changes pending ",
 			},
 			[]string{"node_name", "doc_id", "continuous", "source", "target"}),
 

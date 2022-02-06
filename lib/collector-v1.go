@@ -83,6 +83,12 @@ func (e *Exporter) collectV1(stats Stats, exposedHttpStatusCodes []string, colle
 				strconv.FormatBool(task.Continuous),
 				task.Source,
 				task.Target).Set(task.UpdatedOn)
+			e.activeTasksReplicationChangesPending.WithLabelValues(
+				task.Node,
+				task.DocId,
+				strconv.FormatBool(task.Continuous),
+				task.Source,
+				task.Target).Set(float64(task.ChangesPending))
 		}
 
 		if _, ok := activeTasksByNode[task.Node]; !ok {

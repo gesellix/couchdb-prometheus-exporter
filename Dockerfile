@@ -14,7 +14,7 @@ RUN cd $APPPATH && go get -d \
     -ldflags '-s -w -extldflags "-static"' \
     -o /bin/main
 
-FROM alpine:3.14.2
+FROM alpine:3.15.0
 LABEL maintainer="Tobias Gesellchen <tobias@gesellix.de> (@gesellix)"
 
 ENV TELEMETRY_ADDRESS="0.0.0.0:9984"

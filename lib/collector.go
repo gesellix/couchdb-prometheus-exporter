@@ -140,6 +140,7 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	e.activeTasksIndexer.Describe(ch)
 	e.activeTasksReplication.Describe(ch)
 	e.activeTasksReplicationLastUpdate.Describe(ch)
+	e.activeTasksReplicationChangesPending.Describe(ch)
 
 	e.couchLog.Describe(ch)
 
@@ -226,6 +227,7 @@ func (e *Exporter) resetAllMetrics() {
 		e.activeTasksIndexer,
 		e.activeTasksReplication,
 		e.activeTasksReplicationLastUpdate,
+		e.activeTasksReplicationChangesPending,
 
 		e.couchLog,
 
@@ -361,6 +363,7 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	e.activeTasksIndexer.Collect(ch)
 	e.activeTasksReplication.Collect(ch)
 	e.activeTasksReplicationLastUpdate.Collect(ch)
+	e.activeTasksReplicationChangesPending.Collect(ch)
 
 	e.couchLog.Collect(ch)
 

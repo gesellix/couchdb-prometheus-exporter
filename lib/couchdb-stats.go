@@ -210,13 +210,14 @@ type DatabaseStats struct {
 type DatabaseStatsByDbName map[string]DatabaseStats
 
 type ActiveTask struct {
-	Type       string  `json:"type"`
-	Node       string  `json:"node,omitempty"`
-	Continuous bool    `json:"continuous,omitempty"`
-	UpdatedOn  float64 `json:"updated_on,omitempty"`
-	Source     string  `json:"source,omitempty"`
-	Target     string  `json:"target,omitempty"`
-	DocId      string  `json:"doc_id,omitempty"`
+	Type           string  `json:"type"`
+	Node           string  `json:"node,omitempty"`
+	ChangesPending int     `json:"changes_pending,omitempty"`
+	Continuous     bool    `json:"continuous,omitempty"`
+	UpdatedOn      float64 `json:"updated_on,omitempty"`
+	Source         string  `json:"source,omitempty"`
+	Target         string  `json:"target,omitempty"`
+	DocId          string  `json:"doc_id,omitempty"`
 }
 
 type ActiveTasksResponse []ActiveTask

@@ -6,6 +6,8 @@ ENV GO111MODULE=on
 ENV APPPATH /app
 
 #RUN apk add --update -t build-deps go git mercurial libc-dev gcc libgcc
+RUN apk add --update -t build-deps git
+
 COPY . $APPPATH
 RUN cd $APPPATH && go get -d \
  && go test -short ./... \

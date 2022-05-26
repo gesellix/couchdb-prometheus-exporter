@@ -14,7 +14,7 @@ func TestReadPropertiesFile(t *testing.T) {
 		t.FailNow()
 	}
 
-	if props["host"] != "localhost" || props["proxyHost"] != "test" || props["protocol"] != "https://" || props["chunk"] != "" || props["boolean"] != "true" {
+	if props["host"] != "localhost" || props["proxyHost"] != "test" || props["protocol"] != "https://" || props["chunk"] != "" || props["boolean"] != true {
 		fmt.Printf("props: %q", props)
 		t.Error("Error properties not loaded correctly")
 		t.Fail()

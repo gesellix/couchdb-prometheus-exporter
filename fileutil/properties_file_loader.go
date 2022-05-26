@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"github.com/urfave/cli/v2"
@@ -50,7 +51,25 @@ func readPropertiesFile(filename string) (map[interface{}]interface{}, error) {
 		return nil, err
 	}
 
+	// Other file formats would provide more type information, and unmarshalling would
+	// create correct types. Properties files aren't that useful, so we have to enforce
+	// some types by ourselves. We have to keep an eye on other types beside boolean,
+	// but this one seems good enough for now.
+	coerceBooleanValues(config)
+
 	return config, nil
+}
+
+func coerceBooleanValues(m map[interface{}]interface{}) {
+	for k, v := range m {
+		switch v := v.(type) {
+		case string:
+			parsed, err := strconv.ParseBool(v)
+			if err == nil {
+				m[k] = parsed
+			}
+		}
+	}
 }
 
 type propertiesSourceContext struct {
@@ -66,7 +85,7 @@ func NewPropertiesSourceFromFile(file string) (altsrc.InputSourceContext, error)
 		return nil, fmt.Errorf("Unable to load Properties file '%s': inner error: \n'%v'", ysc.FilePath, err.Error())
 	}
 
-	return &MapInputSource{valueMap: results}, nil
+	return altsrc.NewMapInputSource(file, results), nil
 }
 
 // NewPropertiesSourceFromFlagFunc creates a new Properties InputSourceContext from a provided flag name and source context.

@@ -1,9 +1,9 @@
 module github.com/gesellix/couchdb-prometheus-exporter/v30
 
-go 1.17
+go 1.18
 
 require (
-	github.com/gesellix/couchdb-cluster-config/v17 v17.1.0
+	github.com/gesellix/couchdb-cluster-config/v17 v17.2.0
 	github.com/go-kit/log v0.2.1
 	github.com/golang/protobuf v1.5.2
 	github.com/okeuday/erlang_go/v2 v2.0.4

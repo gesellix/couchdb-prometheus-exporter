@@ -19,14 +19,14 @@ builds:
       - arm
       - arm64
     goarm:
-      - 6
-      - 7
+      - "6"
+      - "7"
     ignore:
       - goos: darwin
-        goarch: 386
+        goarch: "386"
       - goos: linux
         goarch: arm
-        goarm: 7
+        goarm: "7"
 release:
   draft: true
 archives:

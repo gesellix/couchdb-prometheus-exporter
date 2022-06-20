@@ -11,7 +11,7 @@ require (
 	github.com/prometheus/client_model v0.2.0
 	github.com/prometheus/exporter-toolkit v0.7.1
 	github.com/stretchr/testify v1.7.3
-	github.com/urfave/cli/v2 v2.8.1
+	github.com/urfave/cli/v2 v2.10.2
 	k8s.io/klog/v2 v2.60.1
 )
 
@@ -19,7 +19,7 @@ require (
 	github.com/BurntSushi/toml v1.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-logr/logr v1.2.0 // indirect

@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -575,7 +574,7 @@ func (c *CouchdbClient) Request(method string, uri string, body io.Reader) (resp
 		}()
 	}
 
-	respData, err = ioutil.ReadAll(resp.Body)
+	respData, err = io.ReadAll(resp.Body)
 	if resp.StatusCode < 200 || resp.StatusCode >= 400 {
 		if err != nil {
 			respData = []byte(err.Error())

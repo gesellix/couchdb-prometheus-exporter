@@ -18,8 +18,7 @@ you'll have to get and install [a recent version of Golang](https://golang.org/d
 Then, you have to perform the following commands in the cloned repository:
 
 ````shell script
-export GO111MODULE=on  # in a Windows shell, please replace `export` with `set`
-go get github.com/gesellix/couchdb-prometheus-exporter
+go install github.com/gesellix/couchdb-prometheus-exporter/v30@v30.3.0
 ````
 
 Those commands will install the binary in your local `GOBIN` directory, usually something like

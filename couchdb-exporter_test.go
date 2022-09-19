@@ -3,12 +3,12 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -61,7 +61,7 @@ func BasicAuthHandler(basicAuth lib.BasicAuth, pass Handler) Handler {
 }
 
 func readFile(t *testing.T, filename string) []byte {
-	fileContent, err := ioutil.ReadFile(filename)
+	fileContent, err := os.ReadFile(filename)
 	if err != nil {
 		t.Errorf("Error reading file %s: %v\n", filename, err)
 	}

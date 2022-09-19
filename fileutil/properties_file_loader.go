@@ -6,7 +6,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -109,21 +109,21 @@ func loadDataFrom(filePath string) ([]byte, error) {
 			if err != nil {
 				return nil, err
 			}
-			return ioutil.ReadAll(res.Body)
+			return io.ReadAll(res.Body)
 		default:
 			return nil, fmt.Errorf("scheme of %s is unsupported", filePath)
 		}
-	} else if u.Path != "" { // i dont have a host, but I have a path. I am a local file.
+	} else if u.Path != "" { // I don't have a host, but I have a path. I am a local file.
 		if _, notFoundFileErr := os.Stat(filePath); notFoundFileErr != nil {
 			return nil, fmt.Errorf("cannot read from file: '%s' because it does not exist", filePath)
 		}
-		return ioutil.ReadFile(filePath)
+		return os.ReadFile(filePath)
 	} else if runtime.GOOS == "windows" && strings.Contains(u.String(), "\\") {
 		// on Windows systems u.Path is always empty, so we need to check the string directly.
 		if _, notFoundFileErr := os.Stat(filePath); notFoundFileErr != nil {
 			return nil, fmt.Errorf("cannot read from file: '%s' because it does not exist", filePath)
 		}
-		return ioutil.ReadFile(filePath)
+		return os.ReadFile(filePath)
 	} else {
 		return nil, fmt.Errorf("unable to determine how to load from path %s", filePath)
 	}

@@ -199,6 +199,13 @@ func init() {
 	}
 }
 
+func ofBool(i bool) *bool {
+	return &i
+}
+func ofString(i string) *string {
+	return &i
+}
+
 func main() {
 	var appAction = func(c *cli.Context) error {
 		var databases []string
@@ -244,7 +251,12 @@ func main() {
 
 		klog.Infof("Starting exporter version %s at '%s' to read from CouchDB at '%s'", version, webConfig.listenAddress, exporterConfig.couchdbURI)
 		server := &http.Server{Addr: webConfig.listenAddress}
-		if err := web.ListenAndServe(server, webConfigFile, kitlog.NewKlogLogger()); err != nil {
+		flags := web.FlagConfig{
+			WebListenAddresses: &([]string{webConfig.listenAddress}),
+			WebSystemdSocket:   ofBool(false),
+			WebConfigFile:      ofString(webConfigFile),
+		}
+		if err := web.ListenAndServe(server, &flags, kitlog.NewKlogLogger()); err != nil {
 			klog.Error("msg", "Failed to start the server", "err", err)
 			os.Exit(1)
 		}

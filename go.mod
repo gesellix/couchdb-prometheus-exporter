@@ -7,7 +7,7 @@ require (
 	github.com/go-kit/log v0.2.1
 	github.com/golang/protobuf v1.5.2
 	github.com/okeuday/erlang_go/v2 v2.0.5
-	github.com/prometheus/client_golang v1.13.0
+	github.com/prometheus/client_golang v1.13.1
 	github.com/prometheus/client_model v0.3.0
 	github.com/prometheus/exporter-toolkit v0.8.1
 	github.com/stretchr/testify v1.8.1

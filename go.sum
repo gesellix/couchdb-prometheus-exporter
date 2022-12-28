@@ -64,8 +64,8 @@ github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymF
 github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.4/go.mod h1:6rpuAdCZL397s3pYoYcLgu1mIlRU8Am5FuJP05cCM98=
 github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
-github.com/gesellix/couchdb-cluster-config/v17 v17.2.3 h1:1AV2yfwjBECqzw6vhcgTqZwsen+sNJ24iwx3tdNasYY=
-github.com/gesellix/couchdb-cluster-config/v17 v17.2.3/go.mod h1:4ne83mN7jZJHUMm0bciDjukk1xziLkQ02myGExFafCo=
+github.com/gesellix/couchdb-cluster-config/v17 v17.2.8 h1:S5xL/bmKOrMrY06RjtVuxTaQB4ACK3wvsZptdommCFs=
+github.com/gesellix/couchdb-cluster-config/v17 v17.2.8/go.mod h1:3LlOqvcVwKi4vTg7ca4flrK6fixspjhTVbtfvqd8nxs=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20191125211704-12ad95a8df72/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20200222043503-6f7a984d4dc4/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=

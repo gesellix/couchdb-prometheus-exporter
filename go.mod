@@ -12,7 +12,7 @@ require (
 	github.com/prometheus/exporter-toolkit v0.8.2
 	github.com/stretchr/testify v1.8.1
 	github.com/urfave/cli/v2 v2.24.2
-	k8s.io/klog/v2 v2.80.1
+	k8s.io/klog/v2 v2.90.0
 )
 
 require (

@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/gesellix/couchdb-cluster-config/v17 v17.2.8
 	github.com/go-kit/log v0.2.1
-	github.com/golang/protobuf v1.5.2
+	github.com/golang/protobuf v1.5.3
 	github.com/okeuday/erlang_go/v2 v2.0.5
 	github.com/prometheus/client_golang v1.14.0
 	github.com/prometheus/client_model v0.3.0

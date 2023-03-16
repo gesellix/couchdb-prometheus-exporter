@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gesellix/couchdb-prometheus-exporter/v30/kitlog"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -234,7 +235,7 @@ func main() {
 				klog.Error(err)
 			}
 		})
-		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		redirectToMetricsHandler := func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Location", webConfig.metricsEndpoint)
 			w.WriteHeader(http.StatusFound)
 			_, err := w.Write([]byte(`<html>
@@ -247,7 +248,40 @@ func main() {
 			if err != nil {
 				klog.Error(err)
 			}
+		}
+		landingPageHandler, err := web.NewLandingPage(web.LandingConfig{
+			Name:        "CouchDB Prometheus Exporter",
+			Description: "CouchDB metrics exporter for Prometheus",
+			Version:     fmt.Sprintf("%s (%s, %s)", version, commit, date),
+			Links: []web.LandingLinks{
+				{
+					Address:     "./metrics",
+					Text:        "Metrics",
+					Description: "Metrics, as scraped by Prometheus",
+				},
+				{
+					Address:     "https://github.com/gesellix/couchdb-prometheus-exporter",
+					Text:        "Project Homepage",
+					Description: "Source repository and primary project home page",
+				},
+				{
+					Address:     "https://couchdb.apache.org/",
+					Text:        "CouchDB Homepage",
+					Description: "CouchDB home page",
+				},
+				{
+					Address:     "https://prometheus.io/",
+					Text:        "Prometheus Homepage",
+					Description: "Prometheus home page",
+				},
+			},
 		})
+		if err != nil {
+			log.Printf("error creating landing page %v\n", err)
+			http.HandleFunc("/", redirectToMetricsHandler)
+		} else {
+			http.HandleFunc("/", landingPageHandler.ServeHTTP)
+		}
 
 		klog.Infof("Starting exporter version %s at '%s' to read from CouchDB at '%s'", version, webConfig.listenAddress, exporterConfig.couchdbURI)
 		server := &http.Server{Addr: webConfig.listenAddress}

@@ -6,7 +6,7 @@ require (
 	github.com/gesellix/couchdb-cluster-config/v17 v17.3.1
 	github.com/go-kit/log v0.2.1
 	github.com/golang/protobuf v1.5.3
-	github.com/okeuday/erlang_go/v2 v2.0.5
+	github.com/okeuday/erlang_go/v2 v2.0.6-develop.2
 	github.com/prometheus/client_golang v1.15.1
 	github.com/prometheus/client_model v0.4.0
 	github.com/prometheus/exporter-toolkit v0.10.0

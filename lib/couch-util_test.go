@@ -3,6 +3,9 @@ package lib
 import (
 	"encoding/json"
 	"log"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -31,6 +34,27 @@ func TestDecode2(t *testing.T) {
 	log.Printf("decoded:\n%v\n", decoded)
 
 	numberOfShards := 8
+	if len(decoded) != numberOfShards {
+		b, _ := json.Marshal(decoded)
+		t.Errorf("expected %s to contain %d tuples", b, numberOfShards)
+	}
+}
+
+func TestDecode3(t *testing.T) {
+	example := filepath.Clean("../testdata/large_update_seq.txt")
+	data, err := os.ReadFile(example)
+	if err != nil {
+		t.Error(err)
+	}
+	updateSeq := strings.Trim(string(data), "\n\r ")
+	decoded, err := DecodeUpdateSeq(updateSeq)
+	if err != nil {
+		t.Error(err)
+	}
+
+	log.Printf("decoded:\n%v\n", decoded)
+
+	numberOfShards := 256
 	if len(decoded) != numberOfShards {
 		b, _ := json.Marshal(decoded)
 		t.Errorf("expected %s to contain %d tuples", b, numberOfShards)

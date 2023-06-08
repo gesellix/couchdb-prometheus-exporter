@@ -11,7 +11,7 @@ require (
 	github.com/prometheus/client_model v0.4.0
 	github.com/prometheus/exporter-toolkit v0.10.0
 	github.com/stretchr/testify v1.8.4
-	github.com/urfave/cli/v2 v2.25.3
+	github.com/urfave/cli/v2 v2.25.5
 	k8s.io/klog/v2 v2.100.1
 )
 

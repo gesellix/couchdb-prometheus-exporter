@@ -5,9 +5,10 @@ import (
 	"log"
 	"regexp"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
 	dto "github.com/prometheus/client_model/go"
+	"google.golang.org/protobuf/encoding/prototext"
+	"google.golang.org/protobuf/proto"
 )
 
 func CollectMetrics(ch chan prometheus.Metric, debugMetrics bool) map[string]*dto.MetricFamily {
@@ -35,7 +36,7 @@ func CollectMetrics(ch chan prometheus.Metric, debugMetrics bool) map[string]*dt
 
 		if debugMetrics {
 			//log.Println(fmt.Sprintf("%s", name))
-			log.Println(fmt.Sprintf("%s\n%s\n*********", name, proto.MarshalTextString(dtoMetric)))
+			log.Println(fmt.Sprintf("%s\n%s\n*********", name, prototext.Format(dtoMetric)))
 		}
 	}
 	return metricFamiliesByName

@@ -72,8 +72,12 @@ services:
         condition: on-failure
 
   couchdb1:
-    image: couchdb:2.3.1
+    image: couchdb:3.3.2
     command: -name couchdb@couchdb1 -setcookie thecookie
+    environment:
+      - "COUCHDB_USER=${COUCHDB_USER:-root}"
+      - "COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
+      - "COUCHDB_SECRET=${COUCHDB_SECRET:-123456}"
     networks:
       couchdb-cluster:
       monitor-net:
@@ -88,8 +92,12 @@ services:
         condition: on-failure
 
   couchdb2:
-    image: couchdb:2.3.1
+    image: couchdb:3.3.2
     command: -name couchdb@couchdb2 -setcookie thecookie
+    environment:
+      - "COUCHDB_USER=${COUCHDB_USER:-root}"
+      - "COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
+      - "COUCHDB_SECRET=${COUCHDB_SECRET:-123456}"
     networks:
       couchdb-cluster:
       monitor-net:
@@ -104,8 +112,12 @@ services:
         condition: on-failure
 
   couchdb3:
-    image: couchdb:2.3.1
+    image: couchdb:3.3.2
     command: -name couchdb@couchdb3 -setcookie thecookie
+    environment:
+      - "COUCHDB_USER=${COUCHDB_USER:-root}"
+      - "COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
+      - "COUCHDB_SECRET=${COUCHDB_SECRET:-123456}"
     networks:
       couchdb-cluster:
       monitor-net:
@@ -158,7 +170,7 @@ services:
         condition: on-failure
 
   cluster-setup:
-    image: gesellix/couchdb-cluster-config:v17.0.0
+    image: gesellix/couchdb-cluster-config:v17.2.8
     command: setup --delay 10s --timeout 30s --username ${COUCHDB_USER:-root} --password ${COUCHDB_PASSWORD:-a-secret} -nodes couchdb1 -nodes couchdb2 -nodes couchdb3
     networks:
       couchdb-cluster:

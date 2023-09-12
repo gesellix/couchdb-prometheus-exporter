@@ -19,12 +19,12 @@ jobs:
       - name: Unshallow
         run: git fetch --prune --tags --unshallow -f
       - name: Check GoReleaser config
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
           args: check
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
           args: release --clean

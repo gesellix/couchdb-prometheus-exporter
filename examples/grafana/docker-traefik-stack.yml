@@ -170,7 +170,7 @@ services:
         condition: on-failure
 
   cluster-setup:
-    image: gesellix/couchdb-cluster-config:v17.2.8
+    image: gesellix/couchdb-cluster-config:v17.3.2
     command: setup --delay 10s --timeout 30s --username ${COUCHDB_USER:-root} --password ${COUCHDB_PASSWORD:-a-secret} -nodes couchdb1 -nodes couchdb2 -nodes couchdb3
     networks:
       couchdb-cluster:

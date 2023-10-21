@@ -2,6 +2,7 @@ package lib
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/klog/v2"
@@ -71,6 +72,7 @@ var (
 )
 
 type CollectorConfig struct {
+	ScrapeInterval       time.Duration
 	Databases            []string
 	ObservedDatabases    []string
 	CollectViews         bool
@@ -291,14 +293,17 @@ func (e *Exporter) getObservedDatabaseNames(candidates []string) ([]string, erro
 	return candidates, nil
 }
 
-func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
-	e.up.Set(0)
-	sendStatus := func() {
-		ch <- e.up
+func (e *Exporter) scrape() error {
+	if e.collectorConfig.ScrapeInterval != 0 {
+		// we have to protect collects during scrapes when scraping asynchronously
+		// otherwise the Collect() might get only partial stats
+		e.mutex.Lock()
+		defer e.mutex.Unlock()
 	}
-	defer sendStatus()
 
 	e.resetAllMetrics()
+
+	e.up.Set(0)
 
 	e.requestCount.Set(-1)
 	e.client.ResetRequestCount()
@@ -323,6 +328,22 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 		}
 	} else {
 		err = e.collectV1(stats, exposedHttpStatusCodes, e.collectorConfig)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
+	sendStatus := func() {
+		ch <- e.up
+	}
+	defer sendStatus()
+
+	if e.collectorConfig.ScrapeInterval == 0 {
+		// scrape now, before collecting stats into metrics
+		err := e.scrape()
 		if err != nil {
 			return err
 		}
@@ -419,8 +440,8 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 // Collect fetches the stats from configured couchdb location and delivers them
 // as Prometheus metrics. It implements prometheus.Collector.
 func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
-	e.mutex.Lock() // To protect metrics from concurrent collects.
-	defer e.mutex.Unlock()
+	e.mutex.RLock() // To protect metrics from concurrent collects.
+	defer e.mutex.RUnlock()
 	if err := e.collect(ch); err != nil {
 		klog.Error(fmt.Sprintf("Error collecting stats: %s", err))
 	}

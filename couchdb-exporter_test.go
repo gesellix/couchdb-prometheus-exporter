@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -124,8 +125,10 @@ func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetric
 	basicAuth := lib.BasicAuth{Username: "username", Password: "password"}
 	handler := http.HandlerFunc(BasicAuthHandler(basicAuth, couchdbResponse(t, couchdbVersion)))
 	server := httptest.NewServer(handler)
+	scrapeInterval, _ := time.ParseDuration("0s")
 
 	e := lib.NewExporter(server.URL, basicAuth, lib.CollectorConfig{
+		ScrapeInterval:       scrapeInterval,
 		Databases:            []string{"example", "another-example"},
 		CollectViews:         true,
 		CollectSchedulerJobs: true,
@@ -206,10 +209,12 @@ func TestCouchdbStatsV1Integration(t *testing.T) {
 		}
 	}
 
+	scrapeInterval, _ := time.ParseDuration("0s")
 	t.Run("node_up", func(t *testing.T) {
 		e := lib.NewExporter(dbUrl, basicAuth, lib.CollectorConfig{
-			Databases:    []string{},
-			CollectViews: true,
+			ScrapeInterval: scrapeInterval,
+			Databases:      []string{},
+			CollectViews:   true,
 		}, true)
 
 		ch := make(chan prometheus.Metric)
@@ -232,8 +237,9 @@ func TestCouchdbStatsV1Integration(t *testing.T) {
 
 	t.Run("_all_dbs", func(t *testing.T) {
 		e := lib.NewExporter(dbUrl, basicAuth, lib.CollectorConfig{
-			Databases:    []string{"_all_dbs"},
-			CollectViews: true,
+			ScrapeInterval: scrapeInterval,
+			Databases:      []string{"_all_dbs"},
+			CollectViews:   true,
 		}, true)
 
 		ch := make(chan prometheus.Metric)
@@ -272,7 +278,8 @@ func awaitMembership(t *testing.T, basicAuth lib.BasicAuth) func(address string)
 		c := lib.NewCouchdbClient(dbUrl, basicAuth, true)
 		nodeNames, err := c.GetNodeNames()
 		if err != nil {
-			if err, ok := err.(net.Error); ok && (err.Timeout() || err.Temporary()) {
+			var err net.Error
+			if errors.As(err, &err) && (err.Timeout() || err.Temporary()) {
 				return false, nil
 			}
 			return false, nil
@@ -316,10 +323,12 @@ func TestCouchdbStatsV2Integration(t *testing.T) {
 		}
 	}
 
+	scrapeInterval, _ := time.ParseDuration("0s")
 	t.Run("node_up", func(t *testing.T) {
 		e := lib.NewExporter(dbUrl, basicAuth, lib.CollectorConfig{
-			Databases:    []string{},
-			CollectViews: true,
+			ScrapeInterval: scrapeInterval,
+			Databases:      []string{},
+			CollectViews:   true,
 		}, true)
 
 		ch := make(chan prometheus.Metric)
@@ -342,8 +351,9 @@ func TestCouchdbStatsV2Integration(t *testing.T) {
 
 	t.Run("_all_dbs", func(t *testing.T) {
 		e := lib.NewExporter(dbUrl, basicAuth, lib.CollectorConfig{
-			Databases:    []string{"_all_dbs"},
-			CollectViews: true,
+			ScrapeInterval: scrapeInterval,
+			Databases:      []string{"_all_dbs"},
+			CollectViews:   true,
 		}, true)
 
 		ch := make(chan prometheus.Metric)

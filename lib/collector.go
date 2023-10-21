@@ -2,6 +2,7 @@ package lib
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/klog/v2"
@@ -71,6 +72,7 @@ var (
 )
 
 type CollectorConfig struct {
+	ScrapeInterval       time.Duration
 	Databases            []string
 	ObservedDatabases    []string
 	CollectViews         bool
@@ -291,14 +293,10 @@ func (e *Exporter) getObservedDatabaseNames(candidates []string) ([]string, erro
 	return candidates, nil
 }
 
-func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
-	e.up.Set(0)
-	sendStatus := func() {
-		ch <- e.up
-	}
-	defer sendStatus()
-
+func (e *Exporter) scrape() error {
 	e.resetAllMetrics()
+
+	e.up.Set(0)
 
 	e.requestCount.Set(-1)
 	e.client.ResetRequestCount()
@@ -326,6 +324,26 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 		if err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
+	sendStatus := func() {
+		ch <- e.up
+	}
+	defer sendStatus()
+
+	if e.collectorConfig.ScrapeInterval.Seconds() == 0 {
+		// sync
+		// old behaviour: scrape the CouchDB when the exporter is being scraped by Prometheus
+		err := e.scrape()
+		if err != nil {
+			return err
+		}
+	} else {
+		// async, continuously
+		// new behaviour: scrape the CouchDB at an interval, deliver most recent metrics when the exporter is being scraped by Prometheus
 	}
 
 	e.databasesTotal.Collect(ch)
@@ -421,6 +439,12 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	e.mutex.Lock() // To protect metrics from concurrent collects.
 	defer e.mutex.Unlock()
+	//registry := prometheus.NewRegistry()
+	//registry.Register(e)
+	//gather, err := registry.Gather()
+	//for _, m := range gather{
+	//	registry.
+	//}.
 	if err := e.collect(ch); err != nil {
 		klog.Error(fmt.Sprintf("Error collecting stats: %s", err))
 	}

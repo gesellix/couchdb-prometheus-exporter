@@ -214,12 +214,14 @@ func main() {
 			databases = strings.Split(exporterConfig.databases, ",")
 		}
 
+		scrapeInterval, _ := time.ParseDuration("0s")
 		exporter := lib.NewExporter(
 			exporterConfig.couchdbURI,
 			lib.BasicAuth{
 				Username: exporterConfig.couchdbUsername,
 				Password: exporterConfig.couchdbPassword},
 			lib.CollectorConfig{
+				ScrapeInterval:       scrapeInterval,
 				Databases:            databases,
 				CollectViews:         exporterConfig.databaseViews,
 				CollectSchedulerJobs: exporterConfig.schedulerJobs,

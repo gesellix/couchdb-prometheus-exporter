@@ -121,11 +121,10 @@ func couchdbResponse(t *testing.T, versionSuffix string) Handler {
 	}
 }
 
-func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetricsCount int, expectedGetRequestCount float64, expectedDiskSize float64, expectedRequestCount float64) {
+func performCouchdbStatsTest(t *testing.T, scrapeInterval time.Duration, couchdbVersion string, expectedMetricsCount int, expectedGetRequestCount float64, expectedDiskSize float64, expectedRequestCount float64) {
 	basicAuth := lib.BasicAuth{Username: "username", Password: "password"}
 	handler := http.HandlerFunc(BasicAuthHandler(basicAuth, couchdbResponse(t, couchdbVersion)))
 	server := httptest.NewServer(handler)
-	scrapeInterval, _ := time.ParseDuration("0s")
 
 	e := lib.NewExporter(server.URL, basicAuth, lib.CollectorConfig{
 		ScrapeInterval:       scrapeInterval,
@@ -133,6 +132,11 @@ func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetric
 		CollectViews:         true,
 		CollectSchedulerJobs: true,
 	}, true)
+
+	// scrapes might run asynchronously (scrapeInterval > 0), so let's wait at least one iteration
+	if scrapeInterval > 0 {
+		time.Sleep(scrapeInterval + time.Second*2)
+	}
 
 	ch := make(chan prometheus.Metric)
 	go func() {
@@ -176,15 +180,20 @@ func performCouchdbStatsTest(t *testing.T, couchdbVersion string, expectedMetric
 }
 
 func TestCouchdbStatsV1(t *testing.T) {
-	performCouchdbStatsTest(t, "v1", 59, 4711, 12396, 11)
+	performCouchdbStatsTest(t, 0, "v1", 59, 4711, 12396, 11)
 }
 
 func TestCouchdbStatsV2(t *testing.T) {
-	performCouchdbStatsTest(t, "v2", 307, 4712, 58570, 17)
+	performCouchdbStatsTest(t, 0, "v2", 307, 4712, 58570, 17)
+}
+
+func TestCouchdbStatsV2Async(t *testing.T) {
+	scrapeInterval, _ := time.ParseDuration("1s")
+	performCouchdbStatsTest(t, scrapeInterval, "v2", 307, 4712, 58570, 17)
 }
 
 func TestCouchdbStatsV2Prerelease(t *testing.T) {
-	performCouchdbStatsTest(t, "v2-pre", 295, 4712, 58570, 17)
+	performCouchdbStatsTest(t, 0, "v2-pre", 295, 4712, 58570, 17)
 }
 
 func TestCouchdbStatsV1Integration(t *testing.T) {

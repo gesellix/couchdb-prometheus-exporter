@@ -1,7 +1,9 @@
 package lib
 
 import (
+	"k8s.io/klog/v2"
 	"sync"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -102,9 +104,31 @@ type Exporter struct {
 	schedulerJobs *prometheus.GaugeVec
 }
 
+func (e *Exporter) maybeStartScraping() {
+	if e.collectorConfig.ScrapeInterval > 0 {
+		klog.Infof("Asynchronously scraping the CouchDB stats at an interval of %v", e.collectorConfig.ScrapeInterval)
+		ticker := time.NewTicker(e.collectorConfig.ScrapeInterval)
+		quit := make(chan struct{})
+		go func() {
+			for {
+				select {
+				case <-ticker.C:
+					err := e.scrape()
+					if err != nil {
+						klog.Error(err)
+					}
+				case <-quit:
+					ticker.Stop()
+					return
+				}
+			}
+		}()
+	}
+}
+
 func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfig, insecure bool) *Exporter {
 
-	return &Exporter{
+	e := &Exporter{
 		client:          NewCouchdbClient(uri, basicAuth, insecure),
 		collectorConfig: collectorConfig,
 
@@ -731,4 +755,6 @@ func NewExporter(uri string, basicAuth BasicAuth, collectorConfig CollectorConfi
 			},
 			[]string{"node_name"}),
 	}
+	e.maybeStartScraping()
+	return e
 }

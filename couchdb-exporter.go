@@ -38,6 +38,7 @@ type exporterConfigType struct {
 	couchdbUsername            string
 	couchdbPassword            string
 	couchdbInsecure            bool
+	scrapeInterval             time.Duration
 	databases                  string
 	databaseViews              bool
 	databaseConcurrentRequests uint
@@ -131,6 +132,14 @@ func init() {
 			Value:       true,
 			Destination: &exporterConfig.couchdbInsecure,
 		}),
+		altsrc.NewDurationFlag(&cli.DurationFlag{
+			Name:        "scrape.interval",
+			Usage:       fmt.Sprintf("Duration between metrics collection from the CouchDB cluster. '0s' collects only on Prometheus scrapes"),
+			EnvVars:     []string{"SCRAPE_INTERVAL"},
+			Hidden:      false,
+			Value:       0 * time.Second,
+			Destination: &exporterConfig.scrapeInterval,
+		}),
 		// TODO use cli.StringSliceFlag?
 		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:        "databases",
@@ -214,14 +223,13 @@ func main() {
 			databases = strings.Split(exporterConfig.databases, ",")
 		}
 
-		scrapeInterval, _ := time.ParseDuration("0s")
 		exporter := lib.NewExporter(
 			exporterConfig.couchdbURI,
 			lib.BasicAuth{
 				Username: exporterConfig.couchdbUsername,
 				Password: exporterConfig.couchdbPassword},
 			lib.CollectorConfig{
-				ScrapeInterval:       scrapeInterval,
+				ScrapeInterval:       exporterConfig.scrapeInterval,
 				Databases:            databases,
 				CollectViews:         exporterConfig.databaseViews,
 				CollectSchedulerJobs: exporterConfig.schedulerJobs,

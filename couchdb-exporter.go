@@ -220,6 +220,7 @@ func main() {
 				Username: exporterConfig.couchdbUsername,
 				Password: exporterConfig.couchdbPassword},
 			lib.CollectorConfig{
+				ScrapeOnCollect:      true,
 				Databases:            databases,
 				CollectViews:         exporterConfig.databaseViews,
 				CollectSchedulerJobs: exporterConfig.schedulerJobs,

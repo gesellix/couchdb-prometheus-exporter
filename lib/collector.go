@@ -71,7 +71,6 @@ var (
 )
 
 type CollectorConfig struct {
-	ScrapeOnCollect      bool
 	Databases            []string
 	ObservedDatabases    []string
 	CollectViews         bool
@@ -292,10 +291,14 @@ func (e *Exporter) getObservedDatabaseNames(candidates []string) ([]string, erro
 	return candidates, nil
 }
 
-func (e *Exporter) scrape() error {
-	e.resetAllMetrics()
-
+func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 	e.up.Set(0)
+	sendStatus := func() {
+		ch <- e.up
+	}
+	defer sendStatus()
+
+	e.resetAllMetrics()
 
 	e.requestCount.Set(-1)
 	e.client.ResetRequestCount()
@@ -323,26 +326,6 @@ func (e *Exporter) scrape() error {
 		if err != nil {
 			return err
 		}
-	}
-	return nil
-}
-
-func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
-	sendStatus := func() {
-		ch <- e.up
-	}
-	defer sendStatus()
-
-	if e.collectorConfig.ScrapeOnCollect {
-		// sync
-		// old behaviour: scrape the CouchDB when the exporter is being scraped by Prometheus
-		err := e.scrape()
-		if err != nil {
-			return err
-		}
-	} else {
-		// async
-		// new behaviour: scrape the CouchDB at an interval, deliver metrics when the exporter is being scraped by Prometheus
 	}
 
 	e.databasesTotal.Collect(ch)
@@ -438,12 +421,6 @@ func (e *Exporter) collect(ch chan<- prometheus.Metric) error {
 func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	e.mutex.Lock() // To protect metrics from concurrent collects.
 	defer e.mutex.Unlock()
-	//registry := prometheus.NewRegistry()
-	//registry.Register(e)
-	//gather, err := registry.Gather()
-	//for _, m := range gather{
-	//	registry.
-	//}.
 	if err := e.collect(ch); err != nil {
 		klog.Error(fmt.Sprintf("Error collecting stats: %s", err))
 	}

@@ -187,7 +187,7 @@ services:
         condition: on-failure
 
   prometheus:
-    image: prom/prometheus:v2.13.1
+    image: prom/prometheus:v2.48.0
     volumes:
       - ./prometheus/:/etc/prometheus/
       - prometheus_data:/prometheus
@@ -210,7 +210,7 @@ services:
         condition: on-failure
 
   node-exporter:
-    image: prom/node-exporter
+    image: prom/node-exporter:v1.7.0
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -218,10 +218,10 @@ services:
     command:
       - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
-      - --collector.filesystem.ignored-mount-points
+      - --collector.filesystem.mount-points-exclude
       - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
     ports:
-      - 9100:9100
+      - "9100:9100"
     networks:
       - monitor-net
     deploy:
@@ -230,9 +230,9 @@ services:
         condition: on-failure
 
   alertmanager:
-    image: prom/alertmanager
+    image: prom/alertmanager:v0.26.0
     ports:
-      - 9093:9093
+      - "9093:9093"
     volumes:
       - "./alertmanager/:/etc/alertmanager/"
     networks:
@@ -248,7 +248,7 @@ services:
         condition: on-failure
 
   cadvisor:
-    image: google/cadvisor
+    image: gcr.io/cadvisor/cadvisor
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw

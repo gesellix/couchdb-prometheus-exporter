@@ -73,7 +73,7 @@ services:
         condition: on-failure
 
   couchdb1:
-    image: couchdb:3.3.2
+    image: couchdb:3.3.3
     hostname: couchdb1.local
     command: -name couchdb@couchdb1.local -setcookie thecookie
     environment:
@@ -94,7 +94,7 @@ services:
         condition: on-failure
 
   couchdb2:
-    image: couchdb:3.3.2
+    image: couchdb:3.3.3
     hostname: couchdb2.local
     command: -name couchdb@couchdb2.local -setcookie thecookie
     environment:
@@ -115,7 +115,7 @@ services:
         condition: on-failure
 
   couchdb3:
-    image: couchdb:3.3.2
+    image: couchdb:3.3.3
     hostname: couchdb3.local
     command: -name couchdb@couchdb3.local -setcookie thecookie
     environment:

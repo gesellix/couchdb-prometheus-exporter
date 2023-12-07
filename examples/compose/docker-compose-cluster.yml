@@ -2,7 +2,7 @@ version: "2.3"
 
 services:
   couchdb1:
-    image: couchdb:3.3.2
+    image: couchdb:3.3.3
     command: -name couchdb@172.16.238.11 -setcookie thecookie
     env_file: .couchdb-env
     restart: always
@@ -13,7 +13,7 @@ services:
       - "15984:5984"
 
   couchdb2:
-    image: couchdb:3.3.2
+    image: couchdb:3.3.3
     command: -name couchdb@172.16.238.12 -setcookie thecookie
     env_file: .couchdb-env
     restart: always
@@ -24,7 +24,7 @@ services:
       - "25984:5984"
 
   couchdb3:
-    image: couchdb:3.3.2
+    image: couchdb:3.3.3
     command: -name couchdb@172.16.238.13 -setcookie thecookie
     env_file: .couchdb-env
     restart: always

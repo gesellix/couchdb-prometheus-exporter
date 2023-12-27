@@ -10,7 +10,7 @@ require (
 	github.com/prometheus/client_model v0.5.0
 	github.com/prometheus/exporter-toolkit v0.11.0
 	github.com/stretchr/testify v1.8.4
-	github.com/urfave/cli/v2 v2.26.0
+	github.com/urfave/cli/v2 v2.27.0
 	google.golang.org/protobuf v1.32.0
 	k8s.io/klog/v2 v2.110.1
 )

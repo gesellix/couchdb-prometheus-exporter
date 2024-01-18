@@ -12,7 +12,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/urfave/cli/v2 v2.27.1
 	google.golang.org/protobuf v1.32.0
-	k8s.io/klog/v2 v2.120.0
+	k8s.io/klog/v2 v2.120.1
 )
 
 require (

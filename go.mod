@@ -11,7 +11,7 @@ require (
 	github.com/prometheus/exporter-toolkit v0.11.0
 	github.com/stretchr/testify v1.9.0
 	github.com/urfave/cli/v2 v2.27.1
-	google.golang.org/protobuf v1.32.0
+	google.golang.org/protobuf v1.33.0
 	k8s.io/klog/v2 v2.120.1
 )
 

@@ -10,8 +10,8 @@ github.com/cpuguy83/go-md2man/v2 v2.0.4 h1:wfIWP927BUkWJb2NmU/kNDYIBTh/ziUX91+lV
 github.com/cpuguy83/go-md2man/v2 v2.0.4/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/gesellix/couchdb-cluster-config/v17 v17.3.4 h1:ZliWidX23s+DhwKKQVwTMrf7CMQYeqShaiMh0md6oAg=
-github.com/gesellix/couchdb-cluster-config/v17 v17.3.4/go.mod h1:VHUDk4yWMHHxFQVGFxpds+f4oh/nu28M2Z0PrpDLLTY=
+github.com/gesellix/couchdb-cluster-config/v17 v17.4.0 h1:RM5NqfIOjlUBy6nc4YrSv3fU3EbKfN4/eGJSzbjwFlo=
+github.com/gesellix/couchdb-cluster-config/v17 v17.4.0/go.mod h1:7bmn+B5+ZVVVD8pjD38mJO8BBzUIxlCkREbxq7Hy0EM=
 github.com/go-kit/log v0.2.1 h1:MRVx0/zhvdseW+Gza6N9rVzU/IVzaeE1SFI4raAhmBU=
 github.com/go-kit/log v0.2.1/go.mod h1:NwTd00d/i8cPZ3xOwwiv2PO5MOcx78fFErGNcVmBjv0=
 github.com/go-logfmt/logfmt v0.6.0 h1:wGYYu3uicYdqXVgoYbvnkrPVXkuLM1p1ifugDMEdRi4=

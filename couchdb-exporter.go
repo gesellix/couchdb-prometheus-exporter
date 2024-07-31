@@ -39,6 +39,7 @@ type exporterConfigType struct {
 	couchdbPassword            string
 	couchdbInsecure            bool
 	scrapeInterval             time.Duration
+	scrapeLocalNode            bool
 	databases                  string
 	databaseViews              bool
 	databaseConcurrentRequests uint
@@ -140,6 +141,14 @@ func init() {
 			Value:       0 * time.Second,
 			Destination: &exporterConfig.scrapeInterval,
 		}),
+		altsrc.NewBoolFlag(&cli.BoolFlag{
+			Name:        "scrape.localnode",
+			Usage:       fmt.Sprintf("Whether collect metrics from the whole cluster or local instance"),
+			EnvVars:     []string{"SCRAPE_MODE"},
+			Hidden:      false,
+			Value:       false,
+			Destination: &exporterConfig.scrapeLocalNode,
+		}),
 		// TODO use cli.StringSliceFlag?
 		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:        "databases",
@@ -225,6 +234,7 @@ func main() {
 
 		exporter := lib.NewExporter(
 			exporterConfig.couchdbURI,
+			exporterConfig.scrapeLocalNode,
 			lib.BasicAuth{
 				Username: exporterConfig.couchdbUsername,
 				Password: exporterConfig.couchdbPassword},

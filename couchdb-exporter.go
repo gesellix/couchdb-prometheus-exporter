@@ -1,13 +1,11 @@
 package main
 
 import (
-	"flag"
 	"fmt"
-	"github.com/gesellix/couchdb-prometheus-exporter/v30/kitlog"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -16,7 +14,6 @@ import (
 	"github.com/prometheus/exporter-toolkit/web"
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"
-	"k8s.io/klog/v2"
 
 	"github.com/gesellix/couchdb-prometheus-exporter/v30/fileutil"
 	"github.com/gesellix/couchdb-prometheus-exporter/v30/lib"
@@ -217,6 +214,9 @@ func ofString(i string) *string {
 }
 
 func main() {
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
+
 	var appAction = func(c *cli.Context) error {
 		var databases []string
 		if exporterConfig.databases != "" {
@@ -242,7 +242,7 @@ func main() {
 		http.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
 			_, err := fmt.Fprint(w, "OK")
 			if err != nil {
-				klog.Error(err)
+				slog.Error(fmt.Sprintf("%v", err))
 			}
 		})
 		redirectToMetricsHandler := func(w http.ResponseWriter, r *http.Request) {
@@ -256,7 +256,7 @@ func main() {
 			</body>
 			</html>`))
 			if err != nil {
-				klog.Error(err)
+				slog.Error(fmt.Sprintf("%v", err))
 			}
 		}
 		landingPageHandler, err := web.NewLandingPage(web.LandingConfig{
@@ -293,15 +293,15 @@ func main() {
 			http.HandleFunc("/", landingPageHandler.ServeHTTP)
 		}
 
-		klog.Infof("Starting exporter version %s at '%s' to read from CouchDB at '%s'", version, webConfig.listenAddress, exporterConfig.couchdbURI)
+		slog.Info(fmt.Sprintf("Starting exporter version %s at '%s' to read from CouchDB at '%s'", version, webConfig.listenAddress, exporterConfig.couchdbURI))
 		server := &http.Server{Addr: webConfig.listenAddress}
 		flags := web.FlagConfig{
 			WebListenAddresses: &([]string{webConfig.listenAddress}),
 			WebSystemdSocket:   ofBool(false),
 			WebConfigFile:      ofString(webConfigFile),
 		}
-		if err := web.ListenAndServe(server, &flags, kitlog.NewKlogLogger()); err != nil {
-			klog.Error("msg", "Failed to start the server", "err", err)
+		if err := web.ListenAndServe(server, &flags, logger); err != nil {
+			slog.Error("Failed to start the server", "err", err)
 			os.Exit(1)
 		}
 		return nil
@@ -316,11 +316,11 @@ func main() {
 	app.Before = beforeApp(appFlags)
 	app.Action = appAction
 
-	defer klog.Flush()
+	//defer klog.Flush()
 
 	err := app.Run(os.Args)
 	if err != nil {
-		klog.Fatal(err)
+		slog.Error(fmt.Sprintf("%v", err))
 	}
 }
 
@@ -333,27 +333,27 @@ func beforeApp(appFlags []cli.Flag) cli.BeforeFunc {
 		if err := altsrc.InitInputSourceWithContext(appFlags, inputSource)(context); err != nil {
 			return err
 		}
-		return initKlogFlags(context, loggingConfig)
+		return nil
 	}
 }
 
-func initKlogFlags(_ *cli.Context, loggingConfig loggingConfigType) error {
-	klogFlags := flag.NewFlagSet("klog", flag.ContinueOnError)
-	klog.InitFlags(klogFlags)
-
-	flags := map[string]string{
-		"logtostderr":     strconv.FormatBool(loggingConfig.toStderr),
-		"alsologtostderr": strconv.FormatBool(loggingConfig.alsoToStderr),
-		"stderrthreshold": strconv.Itoa(loggingConfig.stderrThreshold),
-		"v":               strconv.Itoa(loggingConfig.verbosity),
-		"log_dir":         loggingConfig.logDir,
-	}
-	for k, v := range flags {
-		if err := klogFlags.Set(k, v); err != nil {
-			return err
-		}
-	}
-
-	klog.Infof("adopted logging config: %+v\n", loggingConfig)
-	return nil
-}
+//func initKlogFlags(_ *cli.Context, loggingConfig loggingConfigType) error {
+//	klogFlags := flag.NewFlagSet("klog", flag.ContinueOnError)
+//	klog.InitFlags(klogFlags)
+//
+//	flags := map[string]string{
+//		"logtostderr":     strconv.FormatBool(loggingConfig.toStderr),
+//		"alsologtostderr": strconv.FormatBool(loggingConfig.alsoToStderr),
+//		"stderrthreshold": strconv.Itoa(loggingConfig.stderrThreshold),
+//		"v":               strconv.Itoa(loggingConfig.verbosity),
+//		"log_dir":         loggingConfig.logDir,
+//	}
+//	for k, v := range flags {
+//		if err := klogFlags.Set(k, v); err != nil {
+//			return err
+//		}
+//	}
+//
+//	klog.Infof("adopted logging config: %+v\n", loggingConfig)
+//	return nil
+//}

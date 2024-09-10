@@ -3,9 +3,8 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"strconv"
-
-	"k8s.io/klog/v2"
 )
 
 func (e *Exporter) collectV1(stats Stats, exposedHttpStatusCodes []string, collectorConfig CollectorConfig) error {
@@ -13,7 +12,7 @@ func (e *Exporter) collectV1(stats Stats, exposedHttpStatusCodes []string, colle
 
 	for name, nodeStats := range stats.StatsByNodeName {
 		//fmt.Printf("%s -> %v\n", name, stats)
-		//klog.Info(fmt.Sprintf("name: %s -> stats: %v\n", name, stats))
+		//slog.Info(fmt.Sprintf("name: %s -> stats: %v\n", name, stats))
 		e.nodeUp.WithLabelValues(name).Set(nodeStats.Up)
 		e.nodeInfo.WithLabelValues(name, nodeStats.NodeInfo.Version, nodeStats.NodeInfo.Vendor.Name).Set(1)
 
@@ -63,7 +62,7 @@ func (e *Exporter) collectV1(stats Stats, exposedHttpStatusCodes []string, colle
 				var intSeq int64
 				err := json.Unmarshal(stats.DatabaseStatsByDbName[dbName].UpdateSeq, &intSeq)
 				if err != nil {
-					klog.Warningf("%v", err)
+					slog.Warn(fmt.Sprintf("%v", err))
 					continue
 				}
 				dbUpdateSeq := intSeq

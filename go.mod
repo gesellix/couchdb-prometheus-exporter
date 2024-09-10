@@ -6,7 +6,6 @@ toolchain go1.22.3
 
 require (
 	github.com/gesellix/couchdb-cluster-config/v17 v17.5.0
-	github.com/go-kit/log v0.2.1
 	github.com/okeuday/erlang_go/v2 v2.0.7
 	github.com/prometheus/client_golang v1.20.5
 	github.com/prometheus/client_model v0.6.1
@@ -14,7 +13,6 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/urfave/cli/v2 v2.27.5
 	google.golang.org/protobuf v1.35.1
-	k8s.io/klog/v2 v2.130.1
 )
 
 require (
@@ -24,8 +22,6 @@ require (
 	github.com/coreos/go-systemd/v22 v22.5.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.5 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/go-logfmt/logfmt v0.6.0 // indirect
-	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/mdlayher/socket v0.4.1 // indirect

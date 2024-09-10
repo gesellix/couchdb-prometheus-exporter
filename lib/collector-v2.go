@@ -3,9 +3,8 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"strconv"
-
-	"k8s.io/klog/v2"
 )
 
 func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, collectorConfig CollectorConfig) error {
@@ -13,7 +12,7 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, colle
 
 	for name, nodeStats := range stats.StatsByNodeName {
 		// fmt.Printf("%s -> %v\n", name, stats)
-		// klog.Info(fmt.Sprintf("name: %s -> stats: %v\n", name, stats))
+		// slog.Info(fmt.Sprintf("name: %s -> stats: %v\n", name, stats))
 		e.nodeUp.WithLabelValues(name).Set(nodeStats.Up)
 		e.nodeInfo.WithLabelValues(name, nodeStats.NodeInfo.Version, nodeStats.NodeInfo.Vendor.Name).Set(1)
 
@@ -159,7 +158,7 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, colle
 				var stringSeq string
 				err := json.Unmarshal(stats.DatabaseStatsByDbName[dbName].UpdateSeq, &stringSeq)
 				if err != nil {
-					klog.Warningf("%v", err)
+					slog.Warn(fmt.Sprintf("%v", err))
 					continue
 				}
 				dbUpdateSeq, err := DecodeUpdateSeq(stringSeq)
@@ -176,7 +175,7 @@ func (e *Exporter) collectV2(stats Stats, exposedHttpStatusCodes []string, colle
 					for _, dbRangeSeq := range dbUpdateSeq {
 						if viewRangeSeq.Range[0].Cmp(dbRangeSeq.Range[0]) == 0 {
 							age := dbRangeSeq.Seq - viewRangeSeq.Seq
-							// klog.Infof("dbRangeSeq.Seq %d, viewRangeSeq.Seq %d, age %d", dbRangeSeq.Seq, viewRangeSeq.Seq, age)
+							// slog.Infof("dbRangeSeq.Seq %d, viewRangeSeq.Seq %d, age %d", dbRangeSeq.Seq, viewRangeSeq.Seq, age)
 							e.viewStaleness.WithLabelValues(
 								dbName,
 								designDoc,

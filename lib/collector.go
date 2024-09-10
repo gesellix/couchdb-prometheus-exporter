@@ -2,10 +2,10 @@ package lib
 
 import (
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"k8s.io/klog/v2"
 )
 
 const AllDbs = "_all_dbs"
@@ -443,7 +443,7 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	e.mutex.RLock() // To protect metrics from concurrent collects.
 	defer e.mutex.RUnlock()
 	if err := e.collect(ch); err != nil {
-		klog.Error(fmt.Sprintf("Error collecting stats: %s", err))
+		slog.Error(fmt.Sprintf("Error collecting stats: %s", err))
 	}
 	return
 }

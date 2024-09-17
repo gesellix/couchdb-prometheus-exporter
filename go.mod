@@ -8,7 +8,7 @@ require (
 	github.com/gesellix/couchdb-cluster-config/v17 v17.4.0
 	github.com/go-kit/log v0.2.1
 	github.com/okeuday/erlang_go/v2 v2.0.7
-	github.com/prometheus/client_golang v1.20.3
+	github.com/prometheus/client_golang v1.20.4
 	github.com/prometheus/client_model v0.6.1
 	github.com/prometheus/exporter-toolkit v0.11.0
 	github.com/stretchr/testify v1.9.0

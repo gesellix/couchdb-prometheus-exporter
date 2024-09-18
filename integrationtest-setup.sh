@@ -11,6 +11,6 @@ if [[ "$(docker info --format '{{ .Swarm.LocalNodeState }}')" == "inactive" ]];t
   echo "Initialize swarm manager."
   docker swarm init
 fi
-docker-compose -f examples/compose/docker-compose-integrationtest.yml -p db up -d
+docker compose -f examples/compose/docker-compose-integrationtest.yml -p db up -d
 
 curl -X GET "http://localhost:9984/metrics" -v

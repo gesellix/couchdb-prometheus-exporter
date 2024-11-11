@@ -73,7 +73,7 @@ services:
         condition: on-failure
 
   couchdb1:
-    image: couchdb:3.3.3
+    image: couchdb:3.4.2
     hostname: couchdb1.local
     command: -name couchdb@couchdb1.local -setcookie thecookie
     environment:
@@ -94,7 +94,7 @@ services:
         condition: on-failure
 
   couchdb2:
-    image: couchdb:3.3.3
+    image: couchdb:3.4.2
     hostname: couchdb2.local
     command: -name couchdb@couchdb2.local -setcookie thecookie
     environment:
@@ -115,7 +115,7 @@ services:
         condition: on-failure
 
   couchdb3:
-    image: couchdb:3.3.3
+    image: couchdb:3.4.2
     hostname: couchdb3.local
     command: -name couchdb@couchdb3.local -setcookie thecookie
     environment:
@@ -174,7 +174,7 @@ services:
         condition: on-failure
 
   cluster-setup:
-    image: gesellix/couchdb-cluster-config:v17.3.3
+    image: gesellix/couchdb-cluster-config:v17.5.1
     command: setup --delay 10s --timeout 30s --username ${COUCHDB_USER:-root} --password ${COUCHDB_PASSWORD:-a-secret} -nodes couchdb1.local -nodes couchdb2.local -nodes couchdb3.local
     networks:
       couchdb-cluster:

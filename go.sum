@@ -10,8 +10,8 @@ github.com/cpuguy83/go-md2man/v2 v2.0.5 h1:ZtcqGrnekaHpVLArFSe4HK5DoKx1T0rq2DwVB
 github.com/cpuguy83/go-md2man/v2 v2.0.5/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/gesellix/couchdb-cluster-config/v17 v17.5.0 h1:ukaf1x2dnOb9Io04y9m/jcZdRSMAUujzylHi9IhNWVs=
-github.com/gesellix/couchdb-cluster-config/v17 v17.5.0/go.mod h1:d7cV9fN1NZkZxLOdNA1dyrDviHJ4oWVQ/W8O8nA/EAQ=
+github.com/gesellix/couchdb-cluster-config/v17 v17.5.1 h1:7yRKgpsghwC+34aq5S0wDSipAnm3HtcMpU+H99eXehI=
+github.com/gesellix/couchdb-cluster-config/v17 v17.5.1/go.mod h1:RYB4BhdS+O2aezOeATQ71ObsSuuSXb2YKXElr/0iCpI=
 github.com/godbus/dbus/v5 v5.0.4/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=

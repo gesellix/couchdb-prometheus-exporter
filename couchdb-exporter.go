@@ -42,22 +42,11 @@ type exporterConfigType struct {
 	schedulerJobs              bool
 }
 
-type loggingConfigType struct {
-	toStderr        bool   // The -logtostderr flag.
-	alsoToStderr    bool   // The -alsologtostderr flag.
-	verbosity       int    // V logging level, the value of the -v flag/
-	stderrThreshold int    // The -stderrthreshold flag.
-	logDir          string // The -log_dir flag.
-}
-
 var exporterConfig exporterConfigType
 var webConfig webConfigType
 
 var configFileFlagname = "config"
 var webConfigFile = ""
-
-// custom exposed (but hidden) logging config flags
-var loggingConfig loggingConfigType
 
 var appFlags []cli.Flag
 
@@ -167,41 +156,6 @@ func init() {
 			EnvVars:     []string{"SCHEDULER.JOBS", "SCHEDULER_JOBS"},
 			Hidden:      false,
 			Destination: &exporterConfig.schedulerJobs,
-		}),
-
-		altsrc.NewBoolFlag(&cli.BoolFlag{
-			Name:        "logtostderr",
-			Usage:       "log to standard error instead of files",
-			Hidden:      true,
-			Value:       true,
-			Destination: &loggingConfig.toStderr,
-		}),
-		altsrc.NewBoolFlag(&cli.BoolFlag{
-			Name:        "alsologtostderr",
-			Usage:       "log to standard error as well as files",
-			Hidden:      true,
-			Destination: &loggingConfig.alsoToStderr,
-		}),
-		// TODO `v` clashed with urfave/cli's "version" shortcut `-v`.
-		altsrc.NewIntFlag(&cli.IntFlag{
-			Name:        "verbosity",
-			Usage:       "log level for V logs",
-			Value:       0,
-			Hidden:      true,
-			Destination: &loggingConfig.verbosity,
-		}),
-		altsrc.NewIntFlag(&cli.IntFlag{
-			Name:        "stderrthreshold",
-			Usage:       "logs at or above this threshold go to stderr",
-			Value:       2,
-			Hidden:      true,
-			Destination: &loggingConfig.stderrThreshold,
-		}),
-		altsrc.NewStringFlag(&cli.StringFlag{
-			Name:        "log_dir",
-			Usage:       "If non-empty, write log files in this directory",
-			Hidden:      true,
-			Destination: &loggingConfig.logDir,
 		}),
 	}
 }
@@ -336,24 +290,3 @@ func beforeApp(appFlags []cli.Flag) cli.BeforeFunc {
 		return nil
 	}
 }
-
-//func initKlogFlags(_ *cli.Context, loggingConfig loggingConfigType) error {
-//	klogFlags := flag.NewFlagSet("klog", flag.ContinueOnError)
-//	klog.InitFlags(klogFlags)
-//
-//	flags := map[string]string{
-//		"logtostderr":     strconv.FormatBool(loggingConfig.toStderr),
-//		"alsologtostderr": strconv.FormatBool(loggingConfig.alsoToStderr),
-//		"stderrthreshold": strconv.Itoa(loggingConfig.stderrThreshold),
-//		"v":               strconv.Itoa(loggingConfig.verbosity),
-//		"log_dir":         loggingConfig.logDir,
-//	}
-//	for k, v := range flags {
-//		if err := klogFlags.Set(k, v); err != nil {
-//			return err
-//		}
-//	}
-//
-//	klog.Infof("adopted logging config: %+v\n", loggingConfig)
-//	return nil
-//}

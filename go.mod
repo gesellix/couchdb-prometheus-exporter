@@ -5,7 +5,7 @@ go 1.22
 toolchain go1.22.3
 
 require (
-	github.com/gesellix/couchdb-cluster-config/v17 v17.5.0
+	github.com/gesellix/couchdb-cluster-config/v17 v17.5.1
 	github.com/okeuday/erlang_go/v2 v2.0.7
 	github.com/prometheus/client_golang v1.20.5
 	github.com/prometheus/client_model v0.6.1

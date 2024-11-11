@@ -18,7 +18,7 @@ docker run --rm -d \
   -v "$(pwd)"/data:/opt/couchdb/data \
   -e COUCHDB_USER=$COUCHDB_USER \
   -e COUCHDB_PASSWORD=$COUCHDB_PASSWORD \
-  couchdb:3.3.3
+  couchdb:3.4.2
 
 sleep 5
 

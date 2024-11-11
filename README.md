@@ -82,9 +82,7 @@ dns names or ip addresses when configuring the CouchDB URI.
 
 ## Logging
 
-The couchdb-exporter uses the [glog](https://godoc.org/github.com/golang/glog) library for logging.
-With the default parameters everything will be logged to `/tmp/`.
-Use `--logtostderr` to enable logging to stderr and `--help` to see all options.
+The couchdb-exporter uses the [slog](https://pkg.go.dev/golang.org/x/exp/slog) module for logging.
 
 ## CouchDB 2+ clusters
 

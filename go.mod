@@ -13,7 +13,7 @@ require (
 	github.com/prometheus/exporter-toolkit v0.11.0
 	github.com/stretchr/testify v1.9.0
 	github.com/urfave/cli/v2 v2.27.5
-	google.golang.org/protobuf v1.34.2
+	google.golang.org/protobuf v1.35.1
 	k8s.io/klog/v2 v2.130.1
 )
 

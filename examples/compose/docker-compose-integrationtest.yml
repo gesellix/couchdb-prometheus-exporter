@@ -57,7 +57,7 @@ services:
 
   couchdbstats1:
     image: "gesellix/couchdb-prometheus-exporter:${COUCHDB_EXPORTER_VERSION:-latest}"
-    command: --couchdb.uri=http://couchdb_node_1:5984 --logtostderr --databases=_all_dbs --databases.views=true
+    command: --couchdb.uri=http://couchdb_node_1:5984 --databases=_all_dbs --databases.views=true
     environment:
       - "COUCHDB_USERNAME=${COUCHDB_USER:-root}"
       - "COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
@@ -69,7 +69,7 @@ services:
 
   couchdbstats2:
     image: "gesellix/couchdb-prometheus-exporter:${COUCHDB_EXPORTER_VERSION:-latest}"
-    command: --couchdb.uri=http://couchdb_node_2:5984 --logtostderr --databases=_all_dbs --databases.views=true
+    command: --couchdb.uri=http://couchdb_node_2:5984 --databases=_all_dbs --databases.views=true
     environment:
       - "COUCHDB_USERNAME=${COUCHDB_USER:-root}"
       - "COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-a-secret}"

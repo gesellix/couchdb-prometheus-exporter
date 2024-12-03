@@ -75,16 +75,14 @@ or [github.com/prometheus/exporter-toolkit](https://github.com/prometheus/export
 
 ## Run it as container
 
-    docker run --rm -p 9984:9984 gesellix/couchdb-prometheus-exporter --couchdb.uri=http://couchdb:5984 --logtostderr
+    docker run --rm -p 9984:9984 gesellix/couchdb-prometheus-exporter --couchdb.uri=http://couchdb:5984
 
 Please note that host names like `localhost` won't leave the container, so you have to use non-loopback
 dns names or ip addresses when configuring the CouchDB URI.
 
 ## Logging
 
-The couchdb-exporter uses the [glog](https://godoc.org/github.com/golang/glog) library for logging.
-With the default parameters everything will be logged to `/tmp/`.
-Use `--logtostderr` to enable logging to stderr and `--help` to see all options.
+The couchdb-exporter uses the [slog](https://pkg.go.dev/golang.org/x/exp/slog) module for logging.
 
 ## CouchDB 2+ clusters
 

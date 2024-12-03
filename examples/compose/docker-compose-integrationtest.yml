@@ -11,7 +11,7 @@ services:
       - "4895:5984"
 
   couchdb_node_1:
-    image: couchdb:3.3.3
+    image: couchdb:3.4.2
     command: -setcookie thecookie
     environment:
       - "COUCHDB_USER=${COUCHDB_USER:-root}"
@@ -26,7 +26,7 @@ services:
       - "15984:5984"
 
   couchdb_node_2:
-    image: couchdb:3.3.3
+    image: couchdb:3.4.2
     command: -setcookie thecookie
     environment:
       - "COUCHDB_USER=${COUCHDB_USER:-root}"
@@ -41,7 +41,7 @@ services:
       - "25984:5984"
 
   couchdb_node_3:
-    image: couchdb:3.3.3
+    image: couchdb:3.4.2
     command: -setcookie thecookie
     environment:
       - "COUCHDB_USER=${COUCHDB_USER:-root}"
@@ -57,7 +57,7 @@ services:
 
   couchdbstats1:
     image: "gesellix/couchdb-prometheus-exporter:${COUCHDB_EXPORTER_VERSION:-latest}"
-    command: --couchdb.uri=http://couchdb_node_1:5984 --logtostderr --databases=_all_dbs --databases.views=true
+    command: --couchdb.uri=http://couchdb_node_1:5984 --databases=_all_dbs --databases.views=true
     environment:
       - "COUCHDB_USERNAME=${COUCHDB_USER:-root}"
       - "COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
@@ -69,7 +69,7 @@ services:
 
   couchdbstats2:
     image: "gesellix/couchdb-prometheus-exporter:${COUCHDB_EXPORTER_VERSION:-latest}"
-    command: --couchdb.uri=http://couchdb_node_2:5984 --logtostderr --databases=_all_dbs --databases.views=true
+    command: --couchdb.uri=http://couchdb_node_2:5984 --databases=_all_dbs --databases.views=true
     environment:
       - "COUCHDB_USERNAME=${COUCHDB_USER:-root}"
       - "COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-a-secret}"
@@ -80,7 +80,7 @@ services:
       - "9985:9984"
 
   cluster-setup:
-    image: gesellix/couchdb-cluster-config:v17.3.3
+    image: gesellix/couchdb-cluster-config:v17.5.1
     command: setup --delay 10s --timeout 30s --username ${COUCHDB_USER:-root} --password ${COUCHDB_PASSWORD:-a-secret} -nodes 172.16.238.11 -nodes 172.16.238.12 -nodes 172.16.238.13
     networks:
       couchdb-cluster:

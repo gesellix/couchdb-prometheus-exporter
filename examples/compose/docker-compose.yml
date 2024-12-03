@@ -2,7 +2,7 @@ version: "2"
 
 services:
   couchdb:
-    image: couchdb:3.3.3
+    image: couchdb:3.4.2
     env_file: .couchdb-env
     restart: always
     volumes:
@@ -14,7 +14,7 @@ services:
 
   couchdbstats:
     image: "gesellix/couchdb-prometheus-exporter:${COUCHDB_EXPORTER_VERSION:-latest}"
-    command: --couchdb.uri=http://couchdb:5984 --logtostderr
+    command: --couchdb.uri=http://couchdb:5984
     env_file: .couchdb-env
     networks:
       - couchdb-test

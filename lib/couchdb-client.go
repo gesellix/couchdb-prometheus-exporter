@@ -6,14 +6,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
-
-	"k8s.io/klog/v2"
 )
 
 type BasicAuth struct {
@@ -100,7 +99,7 @@ func (c *CouchdbClient) GetNodeNames(localMode bool) ([]string, error) {
 		membership.ClusterNodes=append(membership.ClusterNodes,membership.SingleNode)
 	}
 	// for i, name := range membership.ClusterNodes {
-	// 	klog.Infof("node[%d]: %s\n", i, name)
+	// 	slog.Infof("node[%d]: %s\n", i, name)
 	// }
 	return membership.ClusterNodes, nil
 }
@@ -129,7 +128,7 @@ func (c *CouchdbClient) getStatsByNodeName(urisByNodeName map[string]string) (ma
 			}
 
 			stats.Up = 0
-			klog.Error(fmt.Errorf("continuing despite error: %v", err))
+			slog.Error(fmt.Sprintf("continuing despite error: %v", err))
 			continue
 		}
 
@@ -167,7 +166,7 @@ func (c *CouchdbClient) getSystemByNodeName(urisByNodeName map[string]string) (m
 			if !strings.Contains(err.Error(), "\"error\":\"nodedown\"") {
 				return nil, err
 			}
-			klog.Error(fmt.Errorf("continuing despite error: %v", err))
+			slog.Error(fmt.Sprintf("continuing despite error: %v", err))
 			continue
 		}
 
@@ -382,7 +381,7 @@ func (c *CouchdbClient) updateSeqFromInt(message json.RawMessage) string {
 	var updateSeq int64
 	err := json.Unmarshal(message, &updateSeq)
 	if err != nil {
-		klog.Warningf("%v", err)
+		slog.Warn(fmt.Sprintf("%v", err))
 	}
 	return strconv.FormatInt(updateSeq, 10)
 }
@@ -391,7 +390,7 @@ func (c *CouchdbClient) updateSeqFromString(message json.RawMessage) string {
 	var updateSeq string
 	err := json.Unmarshal(message, &updateSeq)
 	if err != nil {
-		klog.Warningf("%v", err)
+		slog.Warn(fmt.Sprintf("%v", err))
 	}
 	return updateSeq
 }
@@ -448,7 +447,7 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(isCouchdbV1 bool, dbStatsByDbNa
 							continue
 						}
 						go func() {
-							//klog.Infof("/%s/%s/_view/%s\n", dbName, row.Doc.Id, viewName)
+							//slog.Infof("/%s/%s/_view/%s\n", dbName, row.Doc.Id, viewName)
 							err := semaphore.Acquire()
 							if err != nil {
 								// send something to parent coroutine so it doesn't block forever on receive
@@ -463,11 +462,11 @@ func (c *CouchdbClient) enhanceWithViewUpdateSeq(isCouchdbV1 bool, dbStatsByDbNa
 						res := <-v
 						if res.warn != "" {
 							// TODO consider adding a metric to make warnings more visible
-							//klog.Warning(res.warn)
+							//slog.Warning(res.warn)
 						}
 						if res.err != nil {
 							// TODO consider adding a metric to make errors more visible
-							klog.Error(res.err)
+							slog.Error(fmt.Sprintf("%v", res.err))
 							continue
 							//r <- dbStatsResult{err: res.err}
 							//return
@@ -611,7 +610,7 @@ type requestCountingRoundTripper struct {
 
 func (rt *requestCountingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	atomic.AddInt64(&rt.RequestCount, 1)
-	//klog.Infof("req[%d] %s", atomic.LoadInt64(&rt.RequestCount), req.URL.String())
+	//slog.Infof("req[%d] %s", atomic.LoadInt64(&rt.RequestCount), req.URL.String())
 	return rt.rt.RoundTrip(req)
 }
 

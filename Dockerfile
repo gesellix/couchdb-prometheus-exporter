@@ -1,4 +1,4 @@
-FROM golang:1.23.3-alpine AS builder
+FROM golang:1.23.4-alpine AS builder
 LABEL builder=true
 
 ENV CGO_ENABLED=0

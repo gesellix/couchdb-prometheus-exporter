@@ -127,10 +127,10 @@ func (e *Exporter) maybeStartScraping() {
 	}
 }
 
-func NewExporter(uri string, localMode bool, basicAuth BasicAuth, collectorConfig CollectorConfig, insecure bool) *Exporter {
+func NewExporter(uri string, localOnly bool, basicAuth BasicAuth, collectorConfig CollectorConfig, insecure bool) *Exporter {
 
 	e := &Exporter{
-		client:          NewCouchdbClient(uri, localMode, basicAuth, insecure),
+		client:          NewCouchdbClient(uri, localOnly, basicAuth, insecure),
 		collectorConfig: collectorConfig,
 
 		requestCount: prometheus.NewGauge(

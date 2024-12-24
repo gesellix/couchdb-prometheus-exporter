@@ -125,9 +125,9 @@ func performCouchdbStatsTest(t *testing.T, scrapeInterval time.Duration, couchdb
 	basicAuth := lib.BasicAuth{Username: "username", Password: "password"}
 	handler := http.HandlerFunc(BasicAuthHandler(basicAuth, couchdbResponse(t, couchdbVersion)))
 	server := httptest.NewServer(handler)
-	localMode:= false
+	localOnly := false
 
-	e := lib.NewExporter(server.URL, localMode, basicAuth, lib.CollectorConfig{
+	e := lib.NewExporter(server.URL, localOnly, basicAuth, lib.CollectorConfig{
 		ScrapeInterval:       scrapeInterval,
 		Databases:            []string{"example", "another-example"},
 		CollectViews:         true,
@@ -209,9 +209,9 @@ func TestCouchdbStatsV1Integration(t *testing.T) {
 	}
 	dbUrl := fmt.Sprintf("http://%s", dbAddress)
 	basicAuth := lib.BasicAuth{Username: "root", Password: "a-secret"}
-	localMode := false
+	localOnly := false
 
-	client := lib.NewCouchdbClient(dbUrl, localMode, basicAuth, true)
+	client := lib.NewCouchdbClient(dbUrl, localOnly, basicAuth, true)
 	databases := []string{"v1_testdb1", "v1_test/db2"}
 	for _, db := range databases {
 		_, err = client.Request("PUT", fmt.Sprintf("%s/%s", client.BaseUri, url.QueryEscape(db)), nil)
@@ -222,7 +222,7 @@ func TestCouchdbStatsV1Integration(t *testing.T) {
 
 	scrapeInterval, _ := time.ParseDuration("0s")
 	t.Run("node_up", func(t *testing.T) {
-		e := lib.NewExporter(dbUrl, localMode, basicAuth, lib.CollectorConfig{
+		e := lib.NewExporter(dbUrl, localOnly, basicAuth, lib.CollectorConfig{
 			ScrapeInterval: scrapeInterval,
 			Databases:      []string{},
 			CollectViews:   true,
@@ -247,7 +247,7 @@ func TestCouchdbStatsV1Integration(t *testing.T) {
 	})
 
 	t.Run("_all_dbs", func(t *testing.T) {
-		e := lib.NewExporter(dbUrl, localMode, basicAuth, lib.CollectorConfig{
+		e := lib.NewExporter(dbUrl, localOnly, basicAuth, lib.CollectorConfig{
 			ScrapeInterval: scrapeInterval,
 			Databases:      []string{"_all_dbs"},
 			CollectViews:   true,
@@ -281,13 +281,13 @@ func TestCouchdbStatsV1Integration(t *testing.T) {
 	}
 }
 
-func awaitMembership(t *testing.T,localMode bool, basicAuth lib.BasicAuth) func(address string) (bool, error) {
+func awaitMembership(t *testing.T,localOnly bool, basicAuth lib.BasicAuth) func(address string) (bool, error) {
 	time.Sleep(5 * time.Second)
 
 	return func(address string) (bool, error) {
 		dbUrl := fmt.Sprintf("http://%s", address)
-		c := lib.NewCouchdbClient(dbUrl, localMode, basicAuth, true)
-		nodeNames, err := c.GetNodeNames(localMode)
+		c := lib.NewCouchdbClient(dbUrl, localOnly, basicAuth, true)
+		nodeNames, err := c.GetNodeNames(localOnly)
 		if err != nil {
 			var err net.Error
 			if errors.As(err, &err) && (err.Timeout() || err.Temporary()) {
@@ -305,13 +305,13 @@ func awaitMembership(t *testing.T,localMode bool, basicAuth lib.BasicAuth) func(
 	}
 }
 
-func awaitLocalNode(t *testing.T, localMode bool, basicAuth lib.BasicAuth) func(address string) (bool, error) {
+func awaitLocalNode(t *testing.T, localOnly bool, basicAuth lib.BasicAuth) func(address string) (bool, error) {
 	time.Sleep(5 * time.Second)
 
 	return func(address string) (bool, error) {
 		dbUrl := fmt.Sprintf("http://%s", address)
-		c := lib.NewCouchdbClient(dbUrl, localMode, basicAuth, true)
-		nodeNames, err := c.GetNodeNames(localMode)
+		c := lib.NewCouchdbClient(dbUrl, localOnly, basicAuth, true)
+		nodeNames, err := c.GetNodeNames(localOnly)
 		if err != nil {
 			var err net.Error
 			if errors.As(err, &err) && (err.Timeout() || err.Temporary()) {
@@ -341,19 +341,19 @@ func TestCouchdbStatsV2Integration(t *testing.T) {
 
 	dbUrl := fmt.Sprintf("http://%s", dbAddress)
 	basicAuth := lib.BasicAuth{Username: "root", Password: "a-secret"}
-	localMode := false
+	localOnly := false
 
 	err = cluster_config.AwaitNodes([]string{dbAddress}, clusterSetupDelay, clusterSetupTimeout, awaitLocalNode(t, true, basicAuth))
 	if err != nil {
 		t.Error(err)
 	}
 
-	err = cluster_config.AwaitNodes([]string{dbAddress}, clusterSetupDelay, clusterSetupTimeout, awaitMembership(t, localMode, basicAuth))
+	err = cluster_config.AwaitNodes([]string{dbAddress}, clusterSetupDelay, clusterSetupTimeout, awaitMembership(t, localOnly, basicAuth))
 	if err != nil {
 		t.Error(err)
 	}
 
-	client := lib.NewCouchdbClient(dbUrl, localMode, basicAuth, true)
+	client := lib.NewCouchdbClient(dbUrl, localOnly, basicAuth, true)
 	databases := []string{"v2_testdb1", "v2_test/db2"}
 	for _, db := range databases {
 		_, err = client.Request("PUT", fmt.Sprintf("%s/%s", client.BaseUri, url.QueryEscape(db)), nil)
@@ -364,7 +364,7 @@ func TestCouchdbStatsV2Integration(t *testing.T) {
 
 	scrapeInterval, _ := time.ParseDuration("0s")
 	t.Run("node_up", func(t *testing.T) {
-		e := lib.NewExporter(dbUrl, localMode, basicAuth, lib.CollectorConfig{
+		e := lib.NewExporter(dbUrl, localOnly, basicAuth, lib.CollectorConfig{
 			ScrapeInterval: scrapeInterval,
 			Databases:      []string{},
 			CollectViews:   true,
@@ -389,7 +389,7 @@ func TestCouchdbStatsV2Integration(t *testing.T) {
 	})
 
 	t.Run("_all_dbs", func(t *testing.T) {
-		e := lib.NewExporter(dbUrl, localMode, basicAuth, lib.CollectorConfig{
+		e := lib.NewExporter(dbUrl, localOnly, basicAuth, lib.CollectorConfig{
 			ScrapeInterval: scrapeInterval,
 			Databases:      []string{"_all_dbs"},
 			CollectViews:   true,

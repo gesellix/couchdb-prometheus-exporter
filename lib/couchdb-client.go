@@ -21,7 +21,7 @@ type BasicAuth struct {
 }
 
 type CouchdbClient struct {
-	LocalMode         bool
+	LocalOnly         bool
 	BaseUri           string
 	basicAuth         BasicAuth
 	client            *http.Client
@@ -81,12 +81,12 @@ func (c *CouchdbClient) isCouchDbV1() (bool, error) {
 	return major < 2, nil
 }
 
-func (c *CouchdbClient) GetNodeNames(localMode bool) ([]string, error) {
+func (c *CouchdbClient) GetNodeNames(localOnly bool) ([]string, error) {
 	var nodeDiscovery string = "_membership"
-	if localMode{
+	if localOnly {
 		nodeDiscovery="_node/_local"
 	}
-	data, err := c.Request("GET", fmt.Sprintf("%s/%s", c.BaseUri,nodeDiscovery), nil)
+	data, err := c.Request("GET", fmt.Sprintf("%s/%s", c.BaseUri, nodeDiscovery), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (c *CouchdbClient) GetNodeNames(localMode bool) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	if localMode{
+	if localOnly {
 		membership.ClusterNodes=append(membership.ClusterNodes,membership.SingleNode)
 	}
 	// for i, name := range membership.ClusterNodes {
@@ -105,7 +105,7 @@ func (c *CouchdbClient) GetNodeNames(localMode bool) ([]string, error) {
 }
 
 func (c *CouchdbClient) getNodeBaseUrisByNodeName(baseUri string) (map[string]string, error) {
-	names, err := c.GetNodeNames(c.LocalMode)
+	names, err := c.GetNodeNames(c.LocalOnly)
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +213,7 @@ func (c *CouchdbClient) getStats(config CollectorConfig) (Stats, error) {
 		if config.CollectSchedulerJobs {
 			schedulerJobs, err = c.getSchedulerJobs()
 		}
-		activeTasks, err := c.getActiveTasks(c.LocalMode)
+		activeTasks, err := c.getActiveTasks(c.LocalOnly)
 		if err != nil {
 			return Stats{}, err
 		}
@@ -523,12 +523,12 @@ func (c *CouchdbClient) getSchedulerJobs() (SchedulerJobsResponse, error) {
 	return schedulerJobs, nil
 }
 
-func (c *CouchdbClient) getActiveTasks(localMode bool) (ActiveTasksResponse, error) {
+func (c *CouchdbClient) getActiveTasks(localOnly bool) (ActiveTasksResponse, error) {
 	var tasksDiscovery string = "_active_tasks"
-	if localMode {
+	if localOnly {
 		tasksDiscovery = "_node/_local/_active_tasks"
 	}
-	data, err := c.Request("GET", fmt.Sprintf("%s/%s", c.BaseUri,tasksDiscovery), nil)
+	data, err := c.Request("GET", fmt.Sprintf("%s/%s", c.BaseUri, tasksDiscovery), nil)
 	if err != nil {
 		return ActiveTasksResponse{}, fmt.Errorf("error reading active tasks: %v", err)
 	}
@@ -541,9 +541,9 @@ func (c *CouchdbClient) getActiveTasks(localMode bool) (ActiveTasksResponse, err
 	for _, activeTask := range activeTasks {
 		// CouchDB 1.x doesn't know anything about nodes.
 		if activeTask.Node == "" {
-			if localMode {
+			if localOnly {
 				activeTask.Node = "_local"
-			}else{
+			} else {
 				activeTask.Node = "master"
 			}
 		}
@@ -614,7 +614,7 @@ func (rt *requestCountingRoundTripper) RoundTrip(req *http.Request) (*http.Respo
 	return rt.rt.RoundTrip(req)
 }
 
-func NewCouchdbClient(uri string, localMode bool, basicAuth BasicAuth, insecure bool) *CouchdbClient {
+func NewCouchdbClient(uri string, localOnly bool, basicAuth BasicAuth, insecure bool) *CouchdbClient {
 	countingRoundTripper := &requestCountingRoundTripper{
 		0,
 		&http.Transport{
@@ -628,7 +628,7 @@ func NewCouchdbClient(uri string, localMode bool, basicAuth BasicAuth, insecure 
 
 	return &CouchdbClient{
 		BaseUri:   uri,
-		LocalMode: localMode,
+		LocalOnly: localOnly,
 		basicAuth: basicAuth,
 		client:    httpClient,
 		ResetRequestCount: func() {

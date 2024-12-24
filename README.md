@@ -92,9 +92,9 @@ credentials, e.g. like this:
 
     couchdb-prometheus-exporter --couchdb.uri=http://couchdb:5984 --couchdb.username=root --couchdb.password=a-secret
 
-It is also possible to fetch the stats from a single node, using the scrape.local option, e.g. Like this:
+It is also possible to fetch the stats from a single node, using the scrape.localonly option, e.g. Like this:
 
-    couchdb-prometheus-exporter --couchdb.uri=http://couchdb:5984 --couchdb.username=root --couchdb.password=a-secret --scrape.localnode=true
+    couchdb-prometheus-exporter --couchdb.uri=http://couchdb:5984 --couchdb.username=root --couchdb.password=a-secret --scrape.localonly=true
 
 ## Database disk usage stats
 

@@ -42,7 +42,7 @@ func (httpError *HttpError) Error() string {
 type MembershipResponse struct {
 	AllNodes     []string `json:"all_nodes"`
 	ClusterNodes []string `json:"cluster_nodes"`
-	SingleNode   string `json:"name"`
+	SingleNode   string   `json:"name"`
 }
 
 func (c *CouchdbClient) getNodeInfo(uri string) (NodeInfo, error) {
@@ -84,7 +84,7 @@ func (c *CouchdbClient) isCouchDbV1() (bool, error) {
 func (c *CouchdbClient) GetNodeNames(localOnly bool) ([]string, error) {
 	var nodeDiscovery string = "_membership"
 	if localOnly {
-		nodeDiscovery="_node/_local"
+		nodeDiscovery = "_node/_local"
 	}
 	data, err := c.Request("GET", fmt.Sprintf("%s/%s", c.BaseUri, nodeDiscovery), nil)
 	if err != nil {
@@ -96,7 +96,7 @@ func (c *CouchdbClient) GetNodeNames(localOnly bool) ([]string, error) {
 		return nil, err
 	}
 	if localOnly {
-		membership.ClusterNodes=append(membership.ClusterNodes,membership.SingleNode)
+		membership.ClusterNodes = append(membership.ClusterNodes, membership.SingleNode)
 	}
 	// for i, name := range membership.ClusterNodes {
 	// 	slog.Infof("node[%d]: %s\n", i, name)

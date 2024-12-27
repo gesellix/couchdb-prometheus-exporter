@@ -281,7 +281,7 @@ func TestCouchdbStatsV1Integration(t *testing.T) {
 	}
 }
 
-func awaitMembership(t *testing.T,localOnly bool, basicAuth lib.BasicAuth) func(address string) (bool, error) {
+func awaitMembership(t *testing.T, localOnly bool, basicAuth lib.BasicAuth) func(address string) (bool, error) {
 	time.Sleep(5 * time.Second)
 
 	return func(address string) (bool, error) {

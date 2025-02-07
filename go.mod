@@ -10,7 +10,7 @@ require (
 	github.com/prometheus/exporter-toolkit v0.13.2
 	github.com/stretchr/testify v1.10.0
 	github.com/urfave/cli/v2 v2.27.5
-	google.golang.org/protobuf v1.36.3
+	google.golang.org/protobuf v1.36.5
 )
 
 require (

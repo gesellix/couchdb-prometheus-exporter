@@ -3,6 +3,7 @@ version: "3.2"
 services:
   couchdb_1_7:
     image: couchdb:1.7.2
+    platform: linux/amd64
     environment:
       - "COUCHDB_USER=${COUCHDB_USER:-root}"
       - "COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-a-secret}"

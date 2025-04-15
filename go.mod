@@ -1,6 +1,6 @@
 module github.com/gesellix/couchdb-prometheus-exporter/v30
 
-go 1.23
+go 1.24.2
 
 require (
 	github.com/gesellix/couchdb-cluster-config/v17 v17.5.1

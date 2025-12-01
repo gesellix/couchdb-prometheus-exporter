@@ -48,6 +48,7 @@ var webConfig webConfigType
 
 var configFileFlagname = "config"
 var webConfigFile = ""
+var enableFilteredScraping = false
 
 var appFlags []cli.Flag
 
@@ -71,6 +72,14 @@ func init() {
 			Value:       "",
 			Destination: &webConfigFile,
 		},
+		altsrc.NewBoolFlag(&cli.BoolFlag{
+			Name:        "enable.filtered.scraping",
+			Usage:       "Enable filtered scraping with collect[] parameter support (node_exporter style)",
+			EnvVars:     []string{"ENABLE_FILTERED_SCRAPING"},
+			Hidden:      false,
+			Value:       false,
+			Destination: &enableFilteredScraping,
+		}),
 		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:        "telemetry.address",
 			Usage:       "Address on which to expose metrics",
@@ -186,23 +195,49 @@ func main() {
 			databases = strings.Split(exporterConfig.databases, ",")
 		}
 
-		exporter := lib.NewExporter(
-			exporterConfig.couchdbURI,
-			exporterConfig.scrapeLocalOnly,
-			lib.BasicAuth{
-				Username: exporterConfig.couchdbUsername,
-				Password: exporterConfig.couchdbPassword},
-			lib.CollectorConfig{
-				ScrapeInterval:       exporterConfig.scrapeInterval,
-				Databases:            databases,
-				CollectViews:         exporterConfig.databaseViews,
-				CollectSchedulerJobs: exporterConfig.schedulerJobs,
-				ConcurrentRequests:   exporterConfig.databaseConcurrentRequests,
-			},
-			exporterConfig.couchdbInsecure)
-		prometheus.MustRegister(exporter)
+		if enableFilteredScraping {
+			// Use the filtered scraping mode (node_exporter style)
+			slog.Info("Filtered scraping mode enabled - using collect[] parameter support")
+			
+			filteredExporter := lib.NewFilteredExporter(
+				exporterConfig.couchdbURI,
+				exporterConfig.scrapeLocalOnly,
+				lib.BasicAuth{
+					Username: exporterConfig.couchdbUsername,
+					Password: exporterConfig.couchdbPassword},
+				lib.CollectorConfig{
+					ScrapeInterval:       exporterConfig.scrapeInterval,
+					Databases:            databases,
+					CollectViews:         exporterConfig.databaseViews,
+					CollectSchedulerJobs: exporterConfig.schedulerJobs,
+					ConcurrentRequests:   exporterConfig.databaseConcurrentRequests,
+				},
+				exporterConfig.couchdbInsecure)
 
-		http.Handle(webConfig.metricsEndpoint, promhttp.Handler())
+			// Use the filtered handler that supports collect[] parameters
+			http.Handle(webConfig.metricsEndpoint, lib.CreateFilteredHandler(filteredExporter))
+		} else {
+			// Use the traditional global registry mode (backward compatible)
+			slog.Info("Traditional scraping mode - collecting all metrics on every scrape")
+			
+			exporter := lib.NewExporter(
+				exporterConfig.couchdbURI,
+				exporterConfig.scrapeLocalOnly,
+				lib.BasicAuth{
+					Username: exporterConfig.couchdbUsername,
+					Password: exporterConfig.couchdbPassword},
+				lib.CollectorConfig{
+					ScrapeInterval:       exporterConfig.scrapeInterval,
+					Databases:            databases,
+					CollectViews:         exporterConfig.databaseViews,
+					CollectSchedulerJobs: exporterConfig.schedulerJobs,
+					ConcurrentRequests:   exporterConfig.databaseConcurrentRequests,
+				},
+				exporterConfig.couchdbInsecure)
+			prometheus.MustRegister(exporter)
+
+			http.Handle(webConfig.metricsEndpoint, promhttp.Handler())
+		}
 		http.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
 			_, err := fmt.Fprint(w, "OK")
 			if err != nil {
@@ -252,7 +287,7 @@ func main() {
 		})
 		if err != nil {
 			log.Printf("error creating landing page %v\n", err)
-			http.HandleFunc("/", redirectToMetricsHandler)
+			http.HandleFunc("/", redirectToMetricsHandler) 
 		} else {
 			http.HandleFunc("/", landingPageHandler.ServeHTTP)
 		}

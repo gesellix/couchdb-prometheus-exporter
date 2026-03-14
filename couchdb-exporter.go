@@ -73,9 +73,9 @@ func init() {
 			Destination: &webConfigFile,
 		},
 		altsrc.NewBoolFlag(&cli.BoolFlag{
-			Name:        "enable.filtered.scraping",
+			Name:        "filtered.scraping.enabled",
 			Usage:       "Enable filtered scraping with collect[] parameter support (node_exporter style)",
-			EnvVars:     []string{"ENABLE_FILTERED_SCRAPING"},
+			EnvVars:     []string{"FILTERED_SCRAPING_ENABLED"},
 			Hidden:      false,
 			Value:       false,
 			Destination: &enableFilteredScraping,

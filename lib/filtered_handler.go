@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"fmt"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -243,7 +242,7 @@ func CreateFilteredHandler(exporter *FilteredExporter) http.HandlerFunc {
 		
 		// Log the requested collector groups
 		if len(groups) > 0 {
-			slog.Info(fmt.Sprintf("Scrape requested with filters: %v", groups))
+			slog.Info("Scrape requested with filters", "groups", groups)
 		} else {
 			slog.Debug("Scrape requested with default (standard) collectors")
 		}
@@ -264,7 +263,7 @@ func CreateFilteredHandler(exporter *FilteredExporter) http.HandlerFunc {
 				case CollectorGroupScheduler:
 					exporter.RegisterSchedulerMetrics(registry)
 				default:
-					slog.Warn(fmt.Sprintf("Unknown collector group: %s", group))
+					slog.Warn("Unknown collector group", "group", group)
 				}
 			}
 		}
@@ -308,7 +307,7 @@ func parseCollectorGroups(params []string) map[CollectorGroup]struct{} {
 		case "":
 			// Ignore empty parameters
 		default:
-			slog.Warn(fmt.Sprintf("Unknown collector parameter: %s", param))
+			slog.Warn("Unknown collector parameter", "param", param)
 		}
 	}
 	

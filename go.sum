@@ -11,8 +11,8 @@ github.com/cpuguy83/go-md2man/v2 v2.0.7/go.mod h1:oOW0eioCTA6cOiMLiUPZOpcVxMig6N
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/gesellix/couchdb-cluster-config/v17 v17.6.0 h1:WEiJcwTGd6M/nzWJTX9vvOzD0zd28SsUb1oHP2hiPJc=
-github.com/gesellix/couchdb-cluster-config/v17 v17.6.0/go.mod h1:u6IPR+TdOaPFnrAWfDsqbN/YxZvb73YYZ8NH2Uuxyis=
+github.com/gesellix/couchdb-cluster-config/v17 v17.7.0 h1:bbHNZFxErqdMjxIvVBoWyGx+ystkidjQwa7iofGwuEw=
+github.com/gesellix/couchdb-cluster-config/v17 v17.7.0/go.mod h1:RW8nPUKuH0CPqRG8ySqFDHyOXusdWN1ld3kROzl/kG4=
 github.com/golang-jwt/jwt/v5 v5.3.0 h1:pv4AsKCKKZuqlgs5sUmn4x8UlGa0kEVt/puTpKx9vvo=
 github.com/golang-jwt/jwt/v5 v5.3.0/go.mod h1:fxCRLWMO43lRc8nhHWY6LGqRcf+1gQWArsqaEUEa5bE=
 github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=

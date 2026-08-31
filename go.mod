@@ -7,7 +7,7 @@ require (
 	github.com/okeuday/erlang_go/v2 v2.0.7
 	github.com/prometheus/client_golang v1.24.1
 	github.com/prometheus/client_model v0.6.2
-	github.com/prometheus/exporter-toolkit v0.17.1
+	github.com/prometheus/exporter-toolkit v0.19.0
 	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v2 v2.27.7
 	google.golang.org/protobuf v1.36.11
